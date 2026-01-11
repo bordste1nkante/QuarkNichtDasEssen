@@ -2,9 +2,9 @@
 # hier könnten ihre Kommentare stehen
 
 
-Grundlegende Struktur (Mein Vorschlag):
+# Grundlegende Struktur (Mein Vorschlag):
 
-# This sketch is with metropolis algorithm in mind
+## This sketch is with metropolis algorithm in mind
 It is likely resourceful, if we do not generate an X for each update, but an array of matrices from which we uniformly pick on. After n sweeps we update parts or the whole list.
 
 void main()
