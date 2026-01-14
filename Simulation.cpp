@@ -276,8 +276,33 @@ void X_updateSU3(){
     }
 }
 
+//rounding errors causes matrices to potentially digress from det = 1, we correct that from time to time.
+void normalizeSU3(std::vector<Matrix<rSU,rSU>>& lattice){
+
+    Matrix<rSU,cSU> U;
+
+    for(int i = 0; i<tAxis; i++){
+        for(int j= 0; j<zAxis; j++){
+            for(int k=0; k<yAxis; k++){
+                for(int l=0; l<xAxis; l++){
+                    U = lattice[idx(l,k,j,i)];
+                    std::complex<double> detU = U(0,0)*(U(1,1)*U(2,2)-U(1,2)*U(2,1))-U(0,1)*(U(1,0)*U(2,2)-U(1,2)*U(2,0))+U(0,2)*(U(1,0)*U(2,1)-U(1,1)*U(2,0));
+                    for(int m = 0; m< rSU; m++){
+                        for(int n=0; n<cSU; n++){
+                            U(m,n)= U(m,n)/detU;
+                        }
+                    }
+                    lattice[idx(l,k,j,i)]= U;
+                }
 
 
+            }
+        }
+    }
+
+
+
+}
 
     
 
@@ -487,6 +512,7 @@ int main(){
     size_t numberOfThermalSweeps = 300;
     size_t NConfigs = 10000;
     size_t SweepFactor = 10;
+    size_t roundingFactor = 10;
 
     // our lattice as 1D array of matrices (3x3)
     std::vector<Matrix<rSU,rSU>> lattice(xAxis*yAxis*zAxis*tAxis);
@@ -551,9 +577,14 @@ int main(){
                         
                         }
                         // a function to check if U or U' is accepted and stored on the lattice
+                        
 
+                        // from time to time our matrices have to be projected to det=1, rounding errors cause trouble
+                        if (p% roundingFactor == 0 && p!=0){
+                            normalizeSU3(lattice);
+                        }
                         //save these configs, the rest is updates and after sufficient sweeps autocorrelation becomes negliable 
-                        if(p % SweepFactor){
+                        if(p % SweepFactor==0) {
 
                         }
 
