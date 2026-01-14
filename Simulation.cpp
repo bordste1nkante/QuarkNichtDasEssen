@@ -511,8 +511,8 @@ int main(){
 
     size_t numberOfThermalSweeps = 300;
     size_t NConfigs = 10000;
-    size_t SweepFactor = 10;
-    size_t roundingFactor = 10;
+    size_t SweepFactor = 10; //autocorrelation needs to be overcome, wait some iterations before collecting the next config.
+    size_t roundingFactor = 5; //rounding errors need to be corrected
 
     // our lattice as 1D array of matrices (3x3)
     std::vector<Matrix<rSU,rSU>> lattice(xAxis*yAxis*zAxis*tAxis);
@@ -579,7 +579,7 @@ int main(){
                         // a function to check if U or U' is accepted and stored on the lattice
                         
 
-                        // from time to time our matrices have to be projected to det=1, rounding errors cause trouble
+                        // from time to time our matrices have to be projected to det=1, rounding errors cause trouble and like X is also not neccesarily det 1, right?
                         if (p% roundingFactor == 0 && p!=0){
                             normalizeSU3(lattice);
                         }
