@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <yaml-cpp/yaml.h> //requires installation of this specific library on Linux: sudo apt install libyaml-cpp-dev
+#include <iostream>
 #include <cmath>
 #include <vector>
 #include <complex>
@@ -497,22 +499,28 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
 
 int main(){
 
+    //obtain .yaml name
+    std::string input;
+    std::cout << "Enter name of yaml file: ";
+    std::getline(std::cin, input);
+    input += ".yaml";
 
-
+    YAML::Node information = YAML::LoadFile(input);
 
     // assigned them the correct value by reading it from yaml file
-    xAxis = 5; 
-    yAxis = 5;
-    zAxis = 5;
-    tAxis = 5;
+    xAxis = information["lattice"]["x"].as<size_t>(); 
+    yAxis = information["lattice"]["y"].as<size_t>();
+    zAxis = information["lattice"]["z"].as<size_t>();
+    tAxis = information["lattice"]["t"].as<size_t>();
 
     // if true we have a cold start else a hot start, read from yaml
-    bool coldOrHot = true;
+    bool coldOrHot = information["startConfig"].as<bool>();
 
-    size_t numberOfThermalSweeps = 300;
-    size_t NConfigs = 10000;
-    size_t SweepFactor = 10; //autocorrelation needs to be overcome, wait some iterations before collecting the next config.
-    size_t roundingFactor = 5; //rounding errors need to be corrected
+    size_t numberOfThermalSweeps = information["updates"]["NSweepsThermal"].as<size_t>(); // number of complete lattice updates till you start the data run
+    size_t NConfigs = information["updates"]["NSweepsThermal"].as<size_t>(); //Number of configs for analysis
+    size_t SweepFactor = information["updates"]["Sweep"].as<size_t>();//autocorrelation needs to be overcome, wait some iterations before collecting the next config.
+    size_t roundingFactor = information["updates"]["Rounding"].as<size_t>(); //rounding errors need to be corrected
+    size_t XUpdate = information["updates"]["XUpdate"].as<size_t>(); //how often to generate new X
 
     // our lattice as 1D array of matrices (3x3)
     std::vector<Matrix<rSU,rSU>> lattice(xAxis*yAxis*zAxis*tAxis);
@@ -552,7 +560,14 @@ int main(){
                             }
                         
                         }
-
+                        //Update X matrices
+                        if(p%XUpdate ==0 && p!=0){
+                            X_updateSU3();
+                        }
+                        // from time to time our matrices have to be projected to det=1, rounding errors cause trouble and like X is also not neccesarily det 1, right?
+                        if (p% roundingFactor == 0 && p!=0){
+                            normalizeSU3(lattice);
+                        }
 
 
                 }}}}
@@ -579,6 +594,12 @@ int main(){
                         // a function to check if U or U' is accepted and stored on the lattice
                         
 
+
+
+                        //Update X matrices
+                        if(p%XUpdate ==0 && p!=0){
+                            X_updateSU3();
+                        }
                         // from time to time our matrices have to be projected to det=1, rounding errors cause trouble and like X is also not neccesarily det 1, right?
                         if (p% roundingFactor == 0 && p!=0){
                             normalizeSU3(lattice);

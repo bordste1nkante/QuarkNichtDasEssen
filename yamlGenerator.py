@@ -37,7 +37,7 @@ data= {
     "startConfig": start,
     "updates":{
         "NConfig": NumberOfConfigurations,
-        "NSweeps": NumberOfThermalSweeps,
+        "NSweepsThermal": NumberOfThermalSweeps,
         "Sweep": SweepFactor,
         "Rounding": roundingFactor,
         "XUpdate": XUpdate
