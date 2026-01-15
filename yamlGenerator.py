@@ -2,7 +2,7 @@ import yaml
 
 #to store the params of different projects and to make them easily readable by our simulation
 projectName= input("Enter yaml file name: ")
-h5Name= input("Enter .h5 file name: ")
+#h5Name= input("Enter .h5 file name: ")
 NumberOfConfigurations = int(input("Enter number of configurations: "))
 NumberOfThermalSweeps = int(input("How many calibration steps should be taken: "))
 SweepFactor = int(input("How many times should the lattice be updated, before a new configuration is saved: "))
@@ -12,6 +12,9 @@ xAxis = int(input("Dimension of X-axis: "))
 yAxis = int(input("Dimension of Y-axis: "))
 zAxis = int(input("Dimension of Z-axis: "))
 tAxis = int(input("Dimension of t-axis: "))
+beta = float(input("Coupling value: "))
+a = float(input("Lattice spacing: "))
+
 
 loop = True
 start = True
@@ -31,7 +34,9 @@ data= {
         "x": xAxis,
         "y": yAxis,
         "z":zAxis,
-        "t":tAxis
+        "t":tAxis,
+        "beta": beta,
+        "lattice spacing": a
     
     },
     "startConfig": start,
@@ -42,7 +47,7 @@ data= {
         "Rounding": roundingFactor,
         "XUpdate": XUpdate
     },
-    "h5Name":f"{h5Name}.h5"
+    "h5Name":f"{projectName}.h5"
 
 }
 
