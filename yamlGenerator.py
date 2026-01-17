@@ -6,6 +6,17 @@ from numpy import random
 #to store the params of different projects and to make them easily readable by our simulation
 projectName= input("Enter yaml file name: ")
 #h5Name= input("Enter .h5 file name: ")
+observable = int(input("Enter observable code: "))
+start = np.zeros(4, dtype=np.int64)
+end = np.zeros(4, dtype=np.int64)
+x= ["x", "y", "z", "t"]
+if(observable == 1 or observable == 2):
+    for i in range(0,4):
+        start[i]= int(input(f"Enter start position of {x[i]}-axis: "))
+        end[i] =  int(input(f"Enter end position of {x[i]}-axis: "))
+
+
+
 NumberOfConfigurations = int(input("Enter number of configurations: "))
 NumberOfThermalSweeps = int(input("How many calibration steps should be taken: "))
 SweepFactor = int(input("How many times should the lattice be updated, before a new configuration is saved: "))
@@ -46,6 +57,11 @@ while(loop):
 
 data= {
 
+    "observable": observable,
+    "positions":{
+        "startPoint": start,
+        "endPoint": end
+    },
     "lattice":{
         "x": xAxis,
         "y": yAxis,

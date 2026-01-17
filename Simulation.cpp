@@ -8,6 +8,7 @@
 #include "header/global.h"
 #include "header/latticeOP.h"
 #include "header/matrixOP.h"
+#include "header/observables.h"
 
 
 
@@ -49,6 +50,12 @@ int main(){
     acceptReject.seed(information["seeds"]["uniformAcceptReject"].as<double>());
 
 
+    std::vector<size_t> start = information["endPoint"].as<std::vector<size_t>>();
+    std::vector<size_t> end = information["endPoint"].as<std::vector<size_t>>();
+    size_t observable = information["observable"].as<size_t>();
+
+
+
     // our lattice as 1D array of matrices (3x3), factor 4 because every lattice site has 4 link variable (technically 8, but hermitean conjugate reduces it to 4 indepent ones)
     std::vector<Matrix<rSU,rSU>> lattice(4*xAxis*yAxis*zAxis*tAxis);
 
@@ -67,100 +74,6 @@ int main(){
     else{
         hot_start(lattice);
     }
+    latticeSimulationPureMetropolis(lattice,start, end, numberOfThermalSweeps,roundingFactor,XUpdate,NConfigs,SweepFactor,observable);
 
-//    //thermal sweeps, update the lattice a couple times so that equilibrium distribution can manifest
-//    for(int p=0; p<numberOfThermalSweeps; p++){
-//        for(int i = 0; i<tAxis; i++){
-//            for(int j= 0; j<zAxis; j++){
-//                for(int k=0; k<yAxis; k++){
-//                    for(int l=0; l<xAxis; l++){
-//                        for (int mu = 0; mu<linksPerSite; mu++){
-//                        size_t index = indexDist(indexing);
-//                        X=XSet[index];
-//
-//                        //matrix multiplication X*U = U'
-//                        for(int i=0; i<rSU; i++){
-//                            for(int j=0; j<cSU; j++){
-//                                std::complex<double> sum;
-//                                for(int k = 0; k<rSU; k++){
-//                                    sum += X(i,k)*lattice[idx(l,k,j,i, mu)](k,j);
-//                                
-//                                }
-//                                UPrime(i,j)= sum;
-//                            }
-//                        
-//                        }
-//                        // calculate lattice action change and change or not change the lattice
-//                        bool acceptance = latticeAction(lattice, lattice[idx(l,k,j,i, mu)], UPrime,l,k,j,i,mu );
-//                        if (acceptance == true)
-//                        {
-//                            lattice[idx(l,k,j,i, mu)] = UPrime;
-//                        }
-//                        
-//
-//                        //Update X matrices
-//                        if(p%XUpdate ==0 && p!=0){
-//                            X_updateSU3();
-//                        }
-//
-//                        // from time to time our matrices have to be projected to det=1, rounding errors cause trouble and like X is also not neccesarily det 1, right?
-//                        if (p% roundingFactor == 0 && p!=0){
-//                            normalizeSU3(lattice);
-//                        }
-//                        }
-//
-//                    }
-//                }
-//            }
-//        }
-//    }
-//   //actual data generation save a config after sufficient update to avoid autocorrelation 
-//    for(int p=0; p<NConfigs*SweepFactor; p++){
-//        for(int i = 0; i<tAxis; i++){
-//            for(int j= 0; j<zAxis; j++){
-//                for(int k=0; k<yAxis; k++){
-//                    for(int l=0; l<xAxis; l++){
-//                        for(int mu=0; mu<linksPerSite; mu++){
-//                        size_t index = indexDist(indexing);
-//                        X=XSet[index];
-//
-//                        //matrix multiplication X*U = U'
-//                        for(int i=0; i<rSU; i++){
-//                            for(int j=0; j<cSU; j++){
-//                                std::complex<double> sum;
-//                                for(int k = 0; k<rSU; k++){
-//                                    sum += X(i,k)*lattice[idx(l,k,j,i, mu)](k,j);
-//                                
-//                                }
-//                                UPrime(i,j)= sum;
-//                            }
-//                        
-//                        }
-//                        // calculate lattice action change and change or not change the lattice
-//                        bool acceptance = latticeAction(lattice, lattice[idx(l,k,j,i, mu)], UPrime,l,k,j,i,mu );
-//                        if (acceptance == true)
-//                        {
-//                            lattice[idx(l,k,j,i, mu)] = UPrime;
-//                        }
-//                        
-//
-//                        //Update X matrices
-//                        if(p%XUpdate ==0 && p!=0){
-//                            X_updateSU3();
-//                        }
-//                        // from time to time our matrices have to be projected to det=1, rounding errors cause trouble and like X is also not neccesarily det 1, right?
-//                        if (p% roundingFactor == 0 && p!=0){
-//                            normalizeSU3(lattice);
-//                        }
-//                        //save these configs, the rest is updates and after sufficient sweeps autocorrelation becomes negliable 
-//                        if(p % SweepFactor==0) {
-//
-//                        }
-//                    }
-//
-//                    }
-//            }
-//        }
-//    }
-//    }
 }
