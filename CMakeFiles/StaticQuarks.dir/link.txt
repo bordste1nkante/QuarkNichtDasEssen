@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/StaticQuarks.dir/Simulation.cpp.o CMakeFiles/StaticQuarks.dir/src/global.cpp.o CMakeFiles/StaticQuarks.dir/src/latticeOP.cpp.o CMakeFiles/StaticQuarks.dir/src/matrixOP.cpp.o CMakeFiles/StaticQuarks.dir/src/observables.cpp.o -o StaticQuarks 

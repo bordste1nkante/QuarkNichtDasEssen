@@ -50,8 +50,8 @@ int main(){
     acceptReject.seed(information["seeds"]["uniformAcceptReject"].as<double>());
 
 
-    std::vector<size_t> start = information["endPoint"].as<std::vector<size_t>>();
-    std::vector<size_t> end = information["endPoint"].as<std::vector<size_t>>();
+    std::vector<size_t> start = information["positions"]["startPoint"].as<std::vector<size_t>>();
+    std::vector<size_t> end = information["positions"]["endPoint"].as<std::vector<size_t>>();
     size_t observable = information["observable"].as<size_t>();
 
 

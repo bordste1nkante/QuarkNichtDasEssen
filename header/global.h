@@ -6,22 +6,21 @@
 #include <complex>
 #include <random>
 
-
-
-
 // storage for a SU(N) matrix
 template <size_t row, size_t column>
 struct Matrix{
-    std::complex<double> data;
+    std::complex<double> data[row][column];
 
 
-    constexpr std::complex<double>& operator()(size_t r, size_t c) noexcept;
+    constexpr std::complex<double>& operator()(size_t r, size_t c) noexcept{
+        return data[r][c];
+    }
 
 
-    const std::complex<double>& operator()(size_t r, size_t c) const;
-
+    const std::complex<double>& operator()(size_t r, size_t c) const{
+        return data[r][c];
+    }
 };
-
 
 //axes of lattice and number of independent link variable per site
 extern size_t xAxis; 
@@ -45,10 +44,10 @@ const size_t cSU=3;
 
 // list of N matrices and their inverse to generate new link variables
 const int NSetXMatrices = 50;
-std::vector<Matrix<rSU,rSU>> XSet;
+extern std::vector<Matrix<rSU,rSU>> XSet;
 
 //required for generation of X. Epsilon affects acceptance rate.
-const double epsilon = 0.4;
+extern double epsilon;
 
 extern std::mt19937_64 randNumb;
 extern std::uniform_real_distribution<double> distEpsilon;
@@ -58,7 +57,7 @@ extern std::uniform_real_distribution<double> dist;
 
 
 //required for hot start, to create a set of not identity matrices, like generating X, but with bigger spread 
-const double hotEpsilon = 0.7;
+extern double hotEpsilon;
 
 
 //uniform dist for generation of random variables in hot_start()
@@ -78,9 +77,9 @@ extern std::uniform_real_distribution<double> uniformAcceptReject;
 
 
 //Pauli matrices and 2x2 identity
-std::vector<Matrix<2,2>> pauliMatrices;
-Matrix<2,2> identity2, Pauli1,Pauli2, Pauli3;
+extern std::vector<Matrix<2,2>> pauliMatrices;
+extern Matrix<2,2> identity2, Pauli1,Pauli2, Pauli3;
 
 //rsU x cSU identity
-Matrix<rSU,cSU> identityMatrix;
+extern Matrix<rSU,cSU> identityMatrix;
 
