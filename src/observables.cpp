@@ -15,22 +15,6 @@ void latticeSimulationPureMetropolis(std::vector<Matrix<rSU,cSU>>& lattice, cons
     Matrix<rSU, cSU> X; 
 
 
-
-
-    //std::vector<int> diff;
-//
-    //for(int i= 0; i<4; i++){
-    //    diff.push_back(endPoint[i]-startingPoint[i]);
-    //}
-
-
-    
-    
-    //function to establish temporal gauge
-    //temporalGauge(lattice);
-
-    //run only over other variables
-
     //thermal sweeps, update the lattice a couple times so that equilibrium distribution can manifest
     for(int p=0; p<numberOfThermalSweeps; p++){
         for(int i = 0; i<tAxis; i++){

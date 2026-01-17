@@ -76,4 +76,6 @@ int main(){
     }
     latticeSimulationPureMetropolis(lattice,start, end, numberOfThermalSweeps,roundingFactor,XUpdate,NConfigs,SweepFactor,observable);
 
+
+    return 0;
 }
