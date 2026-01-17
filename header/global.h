@@ -80,3 +80,7 @@ extern std::uniform_real_distribution<double> uniformAcceptReject;
 //Pauli matrices and 2x2 identity
 std::vector<Matrix<2,2>> pauliMatrices;
 Matrix<2,2> identity2, Pauli1,Pauli2, Pauli3;
+
+//rsU x cSU identity
+Matrix<rSU,cSU> identityMatrix;
+

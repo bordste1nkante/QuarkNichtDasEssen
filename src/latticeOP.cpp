@@ -229,23 +229,6 @@ void normalizeSU3(std::vector<Matrix<rSU,rSU>>& lattice){
 //sets all matrices to identity, a potential starting config
 void cold_start(std::vector<Matrix<rSU,rSU>>& lattice){
 
-    Matrix<rSU,cSU> identityMatrix;
-
-    for(int i = 0; i<rSU; i++){
-        for(int j=0; j<cSU; j++){
-            if(i==j){
-                std::complex<double> z = {1.0, 0.0};
-                identityMatrix(i,j)= z;
-            }
-            else{
-
-                std::complex<double> z1 = {0.0, 0.0};
-                identityMatrix(i,j)=z1;
-            }
-        }
-    }
-
-
     for(int i = 0; i<tAxis; i++){
         for(int j= 0; j<zAxis; j++){
             for(int k=0; k<yAxis; k++){
@@ -412,6 +395,7 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
     return;
 
 }
+
 
 
 
@@ -670,12 +654,44 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
     }
 
 
-
-
-
-    
-
-
-
     return accept;
+}
+
+
+void temporalGauge(std::vector<Matrix<rSU,rSU>>& lattice){
+
+    // only time links are set to identity
+    size_t muT= 4; 
+
+    for(int i = 0; i<tAxis; i++){
+        for(int j= 0; j<zAxis; j++){
+            for(int k=0; k<yAxis; k++){
+                for(int l=0; l<xAxis; l++){
+                    
+                        lattice[idx(l,k,j,i,muT)]=identityMatrix;
+
+                }
+            }
+        }
+    }    
+
+}
+
+void spacialGauge(std::vector<Matrix<rSU,rSU>>& lattice){
+
+    //set all spacial links to identity
+    size_t spacialDimensions = 3;
+    for(int i = 0; i<tAxis; i++){
+        for(int j= 0; j<zAxis; j++){
+            for(int k=0; k<yAxis; k++){
+                for(int l=0; l<xAxis; l++){
+                    for(int mu= 0; 0<spacialDimensions; mu++)
+                    
+                        lattice[idx(l,k,j,i,mu)]=identityMatrix;
+
+                }
+            }
+        }
+    }    
+
 }

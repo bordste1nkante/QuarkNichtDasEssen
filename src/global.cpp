@@ -28,26 +28,26 @@ std::vector<Matrix<rSU,rSU>> XSet(2*NSetXMatrices);
 
 
 
-std::mt19937_64 randNumb(69);
+//std::mt19937_64 randNumb(69);
 std::uniform_real_distribution<double> distEpsilon(-epsilon,epsilon);
 
-std::mt19937_64 rng(42);
+//std::mt19937_64 rng(42);
 std::uniform_real_distribution<double> dist(-0.5,0.5);
 
 
 
 //uniform dist for generation of random variables in hot_start()
-std::mt19937_64 hotNumb(67);
+//std::mt19937_64 hotNumb(67);
 std::uniform_real_distribution<double> hotDist(-hotEpsilon, hotEpsilon);
 
 
 
 //uniform dist for selecting indece of XSet
-std::mt19937_64 indexing(666);
+//std::mt19937_64 indexing(666);
 std::uniform_int_distribution<int> indexDist (0, 2*NSetXMatrices);
 
 //uniform for accept/reject of new config
-std::mt19937_64 acceptReject(1949);
+//std::mt19937_64 acceptReject(1949);
 std::uniform_real_distribution<double> uniformAcceptReject(0, 1);
 
 

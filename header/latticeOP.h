@@ -30,3 +30,10 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice);
 
 //calculates the lattice action change and determines whether new configuration is accepted
 bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU,rSU>& U,  const Matrix<rSU,rSU>& UPrime ,size_t x, size_t y, size_t z, size_t t, size_t mu);
+
+
+//set all temporal link variables to identity 
+void temporalGauge(std::vector<Matrix<rSU,rSU>>& lattice);
+
+//set all spacial link variables to identity
+void spacialGauge(std::vector<Matrix<rSU,rSU>>& lattice);

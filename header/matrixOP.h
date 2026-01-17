@@ -26,3 +26,7 @@ Matrix<rSU,cSU> matrix_conjugate(const Matrix<rSU,rSU>& A);
 
 // returns the trace of the matrix
 std::complex<double> matrix_trace(const Matrix<rSU,rSU>& A);
+
+
+//generates a rSU x cSU identity matrix
+void generate_identity();

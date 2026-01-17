@@ -76,3 +76,22 @@ std::complex<double> matrix_trace(const Matrix<rSU,rSU>& A){
         }
     return trace;
 }
+
+
+
+//generates a rSU x cSU identity matrix
+void generate_identity(){
+    for(int i = 0; i<rSU; i++){
+        for(int j=0; j<cSU; j++){
+            if(i==j){
+                std::complex<double> z = {1.0, 0.0};
+                identityMatrix(i,j)= z;
+            }
+            else{
+
+                std::complex<double> z1 = {0.0, 0.0};
+                identityMatrix(i,j)=z1;
+            }
+        }
+    }
+}

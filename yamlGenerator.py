@@ -1,4 +1,7 @@
 import yaml
+import numpy as np
+from numpy import random
+
 
 #to store the params of different projects and to make them easily readable by our simulation
 projectName= input("Enter yaml file name: ")
@@ -14,7 +17,20 @@ zAxis = int(input("Dimension of Z-axis: "))
 tAxis = int(input("Dimension of t-axis: "))
 beta = float(input("Coupling value: "))
 a = float(input("Lattice spacing: "))
+testrun = bool(input("Is this a test or debugging run, 1 yes 0 no: "))
 
+seed1 = random.uniform(0,2)
+seed2 = random.uniform(0,3)
+seed3 = random.uniform(0,4)
+seed4 = random.uniform(0,5)
+seed5 = random.uniform(0,6)
+
+if (testrun==True):
+    seed1 = 69
+    seed2 = 42
+    seed3 = 67
+    seed4 = 666
+    seed5 = 1949
 
 loop = True
 start = True
@@ -46,6 +62,13 @@ data= {
         "Sweep": SweepFactor,
         "Rounding": roundingFactor,
         "XUpdate": XUpdate
+    },
+    "seeds":{
+        "distEpsilon": seed1,
+        "dist": seed2,
+        "hotDist": seed3,
+        "indexDist": seed4,
+        "uniformAcceptReject": seed5
     },
     "h5Name":f"{projectName}.h5"
 
