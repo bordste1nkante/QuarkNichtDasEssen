@@ -1,6 +1,6 @@
 #pragma once
 #include <stdlib.h>
-#include <iostream>
+#include <iostream> //std in/out etc.
 #include <cmath>
 #include <vector>
 #include <complex>
@@ -32,7 +32,7 @@ const size_t linksPerSite = 4;
 //coupling strength
 extern double beta;
 
-//lattice constant
+//lattice constant -> lattice spacing
 extern double a;
 
 
@@ -42,16 +42,18 @@ const size_t cSU=3;
 
 
 
-// list of N matrices and their inverse to generate new link variables
+// list of N matrices and their inverse to generate new link variables -> improves efficiency -> avoids regeneration for every update
 const int NSetXMatrices = 50;
 extern std::vector<Matrix<rSU,rSU>> XSet;
 
 //required for generation of X. Epsilon affects acceptance rate.
 extern double epsilon;
 
+//generate random values scaled with epsilon
 extern std::mt19937_64 randNumb;
 extern std::uniform_real_distribution<double> distEpsilon;
 
+//those are the random numbers for updates?
 extern std::mt19937_64 rng;
 extern std::uniform_real_distribution<double> dist;
 
@@ -78,7 +80,7 @@ extern std::uniform_real_distribution<double> uniformAcceptReject;
 
 //Pauli matrices and 2x2 identity
 extern std::vector<Matrix<2,2>> pauliMatrices;
-extern Matrix<2,2> identity2, Pauli1,Pauli2, Pauli3;
+extern Matrix<2,2> identity2, Pauli1, Pauli2, Pauli3;
 
 //rsU x cSU identity
 extern Matrix<rSU,cSU> identityMatrix;
