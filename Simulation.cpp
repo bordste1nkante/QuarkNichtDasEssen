@@ -57,7 +57,7 @@ int main(){
 
 
     // our lattice as 1D array of matrices (3x3), factor 4 because every lattice site has 4 link variable (technically 8, but hermitean conjugate reduces it to 4 indepent ones)
-    std::vector<Matrix<rSU,rSU>> lattice(4*xAxis*yAxis*zAxis*tAxis);
+    std::vector<Matrix<rSU,rSU>> lattice(4*xAxis*yAxis*zAxis*tAxis);//why 4* ?
 
    
 
@@ -75,6 +75,9 @@ int main(){
         hot_start(lattice);
     }
     latticeSimulationPureMetropolis(lattice,start, end, numberOfThermalSweeps,roundingFactor,XUpdate,NConfigs,SweepFactor,observable);
+
+    //add heatbath with and without overrelacation
+    //vielleicht als variable übergeben welcher Algorithmus gewählt werden soll?
 
 
     return 0;
