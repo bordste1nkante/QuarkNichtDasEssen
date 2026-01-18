@@ -12,7 +12,7 @@
 
 // this mimics the behaviour of a 4D lattice from our 1D array
 double idx(size_t x, size_t y, size_t z, size_t t, size_t mu);
-
+//why double and not size_t??
 
 //updates the whole set of X matrices
 void X_updateSU3();
@@ -28,12 +28,12 @@ void cold_start(std::vector<Matrix<rSU,rSU>>& lattice);
 //sets all matrices to random ones, a possible starting config
 void hot_start(std::vector<Matrix<rSU,rSU>>& lattice);
 
-//calculates the lattice action change and determines whether new configuration is accepted
+//calculates the lattice action change and determines whether new configuration is accepted, U -> U'
 bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU,rSU>& U,  const Matrix<rSU,rSU>& UPrime ,size_t x, size_t y, size_t z, size_t t, size_t mu);
 
 
 //set all temporal link variables to identity 
 void temporalGauge(std::vector<Matrix<rSU,rSU>>& lattice);
 
-//set all spacial link variables to identity
+//set all spatial link variables to identity
 void spacialGauge(std::vector<Matrix<rSU,rSU>>& lattice);

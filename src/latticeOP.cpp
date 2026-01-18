@@ -12,6 +12,7 @@
 double idx(size_t x, size_t y, size_t z, size_t t, size_t mu){
     return 4*(x+ xAxis*(y+ yAxis*(z+zAxis*t)))+mu;
 }
+//still don't get why this should be a double instead of a size_t :(
 
 
 //updates the whole set of X matrices
@@ -85,6 +86,7 @@ void X_updateSU3(){
                     }
                 } 
             }
+            //wird i=0 hier nicht trotzdem überschrieben??
             for(int j=0; j<2; j++){
                 for(int k=0; k<2; k++){
                     Ssmall(j,k)= pauliMatrices[i](j,k)*s[i-1];
@@ -164,6 +166,7 @@ void X_updateSU3(){
         }
         else{
             //normalizes det to 1
+            // not sure if this needs to be done by dividing over third root
             for(int i=0; i<rSU; i++){
                 for(int j=0; j<rSU; j++){
                     X(i,j)= X(i,j)/detX;
@@ -181,7 +184,7 @@ void X_updateSU3(){
             invX(2,1)=-(X(0,0)*X(2,1)-X(0,1)*X(2,0))/detX;
             invX(2,2)=(X(0,0)*X(1,1)-X(0,1)*X(1,0))/detX;
 
-
+            //aren't they already normalized?
             //save X and invX in our set of matrices
             XSet[2*p]= X;
             XSet[2*p+1]=invX;
@@ -208,6 +211,7 @@ void normalizeSU3(std::vector<Matrix<rSU,rSU>>& lattice){
                             for(int n=0; n<cSU; n++){
                                 U(m,n)= U(m,n)/detU;
                         }
+                        //same question for normalization using determinant
                     }
                         lattice[idx(l,k,j,i, mu)]= U;
                 }
@@ -260,11 +264,11 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
     Matrix<rSU,cSU> ST;
 
 
-
+    //fixed int c and d
     for(int a = 0; a<tAxis; a++){
         for(int b= 0; b<zAxis; b++){
-            for(int c=0; b<yAxis; c++){
-                for(int d=0; b<xAxis; d++){
+            for(int c=0; c<yAxis; c++){
+                for(int d=0; d<xAxis; d++){
                     for(int mu = 0; mu<linksPerSite; mu++){
                     //number required to generate 3 SU(2) matrices, from these we form a SU(3)
 
@@ -407,6 +411,7 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
     
     //double SActtionU;
     //double SActionUPrime;
+    //why not cSU?
     double SActionDif;
     Matrix<rSU,rSU> ATemp1;
     Matrix<rSU,rSU> ATemp2;
@@ -443,7 +448,7 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
         if(nu!=mu){
 
             if(nu==0){
-
+                //Ich glaube in dieser Schleife ist viel Index-Salat -> Nevermind??
                 if(mu==1){
 
                     xP= bCX(x+1);
@@ -456,7 +461,7 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
                     ATemp2 = matrix_multiplication(lattice[idx(x,yP,z,t,nu)],ATemp2);
                     ATemp3 = matrix_addition(ATemp1,ATemp2);
                     A = matrix_addition(A, ATemp3);
-
+                    
 
                 }
                 if(mu==2){
@@ -465,7 +470,8 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
                     zP= bCZ(z+1);
                     zM= bCZ(z-1);
                     ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(xM,y,z,t,mu)]), lattice[idx(xM,y,z,t,nu)]);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(xM,y,zP,t,nu)]),ATemp1);
+                    ATemp1 = matrix_multiplication
+                    (matrix_conjugate(lattice[idx(xM,y,zP,t,nu)]),ATemp1);
                     ATemp2 = matrix_multiplication(matrix_conjugate(lattice[idx(xP,y,z,t,mu)]),matrix_conjugate(lattice[idx(x,y,z,t,nu)]));
                     ATemp2 = matrix_multiplication(lattice[idx(x,y,zP,t,nu)],ATemp2);
                     ATemp3 = matrix_addition(ATemp1,ATemp2);
@@ -479,7 +485,8 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
                     xP= bCX(x+1);
                     xM= bCX(x-1);
                     ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(xM,y,z,t,mu)]), lattice[idx(xM,y,z,t,nu)]);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(xM,y,z,tP,nu)]),ATemp1);
+                    ATemp1 = matrix_multiplication
+                    (matrix_conjugate(lattice[idx(xM,y,z,tP,nu)]),ATemp1);
                     ATemp2 = matrix_multiplication(matrix_conjugate(lattice[idx(xP,y,z,t,mu)]),matrix_conjugate(lattice[idx(x,y,z,t,nu)]));
                     ATemp2 = matrix_multiplication(lattice[idx(x,y,z,tP,nu)],ATemp2);
                     ATemp3 = matrix_addition(ATemp1,ATemp2);
@@ -507,8 +514,8 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
 
                 }
                 if(mu==2){
-                    yP= bCX(y+1);
-                    yM= bCX(y-1);
+                    yP= bCY(y+1);
+                    yM= bCY(y-1);
                     zP= bCZ(z+1);
                     zM= bCZ(z-1);
                     ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,yM,z,t,mu)]), lattice[idx(x,yM,z,t,nu)]);
@@ -523,8 +530,8 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
                 if(mu==3){
                     tP= bCT(t+1);
                     tM= bCT(t-1);
-                    yP= bCX(y+1);
-                    yM= bCX(y-1);
+                    yP= bCY(y+1);
+                    yM= bCY(y-1);
                     ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,yM,z,t,mu)]), lattice[idx(x,yM,z,t,nu)]);
                     ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,yM,z,tP,nu)]),ATemp1);
                     ATemp2 = matrix_multiplication(matrix_conjugate(lattice[idx(x,yP,z,t,mu)]),matrix_conjugate(lattice[idx(x,y,z,t,nu)]));
@@ -592,7 +599,7 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
 
                     tP= bCT(t+1);
                     tM= bCT(t-1);
-                    y= bCY(y+1);
+                    yP= bCY(y+1);
                     yM= bCY(y-1);
                     ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,y,z,tM,mu)]), lattice[idx(x,y,z,tM,nu)]);
                     ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,yP,z,tM,nu)]),ATemp1);
@@ -639,12 +646,15 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
         }
     }
     SActionDif = -beta/(xAxis*yAxis*zAxis*tAxis)*(matrix_trace(matrix_multiplication(matrix_subtraction(UPrime, U),A))).real();
+    probability = min(1.0, exp(- SActionDif)); // according to my notes -> check in doubt
+    /*
     if(SActionDif > 1.0){
         probability=1;
     }
     else{
         probability=SActionDif;
     }
+    */
     r= uniformAcceptReject(acceptReject);
     if(r<=probability){
         accept = true;
@@ -661,7 +671,7 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
 void temporalGauge(std::vector<Matrix<rSU,rSU>>& lattice){
 
     // only time links are set to identity
-    size_t muT= 4; 
+    size_t muT= 3; //4; // spatial ones are in {0,1,2}, right? 
 
     for(int i = 0; i<tAxis; i++){
         for(int j= 0; j<zAxis; j++){
@@ -685,7 +695,9 @@ void spacialGauge(std::vector<Matrix<rSU,rSU>>& lattice){
         for(int j= 0; j<zAxis; j++){
             for(int k=0; k<yAxis; k++){
                 for(int l=0; l<xAxis; l++){
-                    for(int mu= 0; 0<spacialDimensions; mu++)
+                    //for(int mu= 0; 0<spacialDimensions; mu++)
+                    //a loop till the end of time :D
+                    for(int mu= 0; mu<spacialDimensions; mu++)
                     
                         lattice[idx(l,k,j,i,mu)]=identityMatrix;
 
