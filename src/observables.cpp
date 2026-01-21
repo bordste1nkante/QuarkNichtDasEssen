@@ -23,6 +23,8 @@ void latticeSimulationPureMetropolis(
     Matrix<rSU, cSU> UPrime;
     Matrix<rSU, cSU> X; 
 
+    size_t observableCollected= 0;
+
 
     //thermal sweeps, update the lattice a couple times so that equilibrium distribution can manifest
     for(int p=0; p<numberOfThermalSweeps; p++){
@@ -61,6 +63,7 @@ void latticeSimulationPureMetropolis(
         }
     }
 
+    std::cout << "Thermalization complete "<<std::endl;
 
 
 
@@ -145,8 +148,10 @@ void latticeSimulationPureMetropolis(
                                     zDistance+=1;
                                     r.push_back(std::sqrt(xDistance*xDistance+yDistance*yDistance+zDistance*zDistance));  
                                 }
-
+                                observableCollected += 1;
                                 //now save loops and r
+                                std::cout << "Extracted observable: " << observableCollected << "/" << NConfigs <<std::endl;
+
 
 
                             }
@@ -173,7 +178,9 @@ void latticeSimulationPureMetropolis(
 
                                 }
 
+                                observableCollected += 1;
                                 //now save loops and r
+                                std::cout << "Extracted observable: " << observableCollected << "/" << NConfigs <<std::endl;
 
                             }
 

@@ -25,10 +25,16 @@ void generate_Pauli(){
         }
     }
 
-            Pauli2(0,1)=std::complex<double> {0.0,-1.0};
-            Pauli2(1,0)=std::complex<double> {0.0,1.0};
-            Pauli3(0,0)=std::complex<double> {1.0,0.0};
-            Pauli3(1,1)=std::complex<double> {-1.0,0.0};
+    Pauli2(0,1)=std::complex<double> {0.0,-1.0};
+    Pauli2(1,0)=std::complex<double> {0.0,1.0};
+    Pauli3(0,0)=std::complex<double> {1.0,0.0};
+    Pauli3(1,1)=std::complex<double> {-1.0,0.0};
+
+    pauliMatrices.push_back(identity2);
+    pauliMatrices.push_back(Pauli1);
+    pauliMatrices.push_back(Pauli2);
+    pauliMatrices.push_back(Pauli3);
+    
 }
 
 Matrix<rSU,cSU> matrix_multiplication(const Matrix<rSU,rSU>& A, const Matrix<rSU,rSU>& B){

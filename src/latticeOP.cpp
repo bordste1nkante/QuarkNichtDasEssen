@@ -37,6 +37,8 @@ void X_updateSU3(){
 
         Matrix<rSU,cSU> ST;
 
+        //std::cout << "Matrix declared" << std::endl;
+
 
 
         //number required to generate 3 SU(2) matrices, from these we form a SU(3)
@@ -73,12 +75,14 @@ void X_updateSU3(){
             r[i]=er*r[i]/rLength;
 
         }
+        //std::cout << "vectors done" << std::endl;
 
         for(int i=0; i<4; i++){
 
             if(i==0){
                 for(int j=0; j<2; j++){
                     for(int k=0; k<2; k++){
+                        
 
                         Ssmall(j,k)= pauliMatrices[i](j,k)*s0;
                         Rsmall(j,k)= pauliMatrices[i](j,k)*r0;
@@ -97,6 +101,7 @@ void X_updateSU3(){
     }
 }       
 
+        //std::cout << "2D - matrix done" << std::endl;
         //fill R,S,T
         std::complex<double> uno= {1.0,0.0};
         std::complex<double> zero = {0.0,0.0};
@@ -161,9 +166,14 @@ void X_updateSU3(){
 
 
         // should insure that if det(X) \approx zero we just repeat the process and generate a new X
+
         double tol = 1e-9;
-        if(-tol <detX.real() <tol && -tol<detX.imag()<tol){
-            p=p-1;
+            
+        if (detX.real() > -tol && detX.real() < tol &&
+            detX.imag() > -tol && detX.imag() < tol)
+        {
+            std::cout << "Stuck in loop" << std::endl;
+            p = p - 1;
         }
         else{
             //normalizes det to 1
@@ -186,10 +196,12 @@ void X_updateSU3(){
             invX(2,1)=-(X(0,0)*X(2,1)-X(0,1)*X(2,0));
             invX(2,2)=(X(0,0)*X(1,1)-X(0,1)*X(1,0));
 
-   
+            //std::cout << "invertiert" << std::endl;
             //save X and invX in our set of matrices
             XSet[2*p]= X;
             XSet[2*p+1]=invX;
+
+            //std::cout << "X abgespeichert" << std::endl;
 
         }
 

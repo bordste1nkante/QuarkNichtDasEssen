@@ -1,3 +1,0 @@
-/home/mrv/QuarkNichtDasEssen/CMakeFiles/StaticQuarks.dir
-/home/mrv/QuarkNichtDasEssen/CMakeFiles/edit_cache.dir
-/home/mrv/QuarkNichtDasEssen/CMakeFiles/rebuild_cache.dir

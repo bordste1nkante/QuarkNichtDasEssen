@@ -20,6 +20,7 @@ int main(){
     std::cout << "Enter name of yaml file: ";
     std::getline(std::cin, input);
     input += ".yaml";
+    //std::cout << "input read" << std::endl;
 
     YAML::Node information = YAML::LoadFile(input);
 
@@ -54,19 +55,23 @@ int main(){
     std::vector<size_t> end = information["positions"]["endPoint"].as<std::vector<size_t>>();
     size_t observable = information["observable"].as<size_t>();
 
-
+    //std::cout << "yaml read" << std::endl;
 
     // our lattice as 1D array of matrices (3x3), factor 4 because every lattice site has 4 link variable (technically 8, but hermitean conjugate reduces it to 4 indepent ones)
     std::vector<Matrix<rSU,rSU>> lattice(4*xAxis*yAxis*zAxis*tAxis);//why 4* ?
 
-   
+    //std::cout << "lattice vector done" << std::endl;
 
     //generate the pauli matrices 0-3
     generate_Pauli();
+
+    //std::cout << "Pauli" << std::endl;
     //generate rSU x cSU identity
     generate_identity();
+    //std::cout << "identity" << std::endl;
     //create the first set of matrices X
     X_updateSU3();
+    //std::cout << "X" << std::endl;
 
     if(coldOrHot == true){
         cold_start(lattice);
@@ -74,8 +79,10 @@ int main(){
     else{
         hot_start(lattice);
     }
+    std::cout << "starting configuration created" << std::endl;
     latticeSimulationPureMetropolis(lattice,start, end, numberOfThermalSweeps,roundingFactor,XUpdate,NConfigs,SweepFactor,observable);
 
+    std::cout << "simulation done" << std::endl;
     //add heatbath with and without overrelacation
     //vielleicht als variable übergeben welcher Algorithmus gewählt werden soll?
 
