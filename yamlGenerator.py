@@ -7,13 +7,13 @@ from numpy import random
 projectName= input("Enter yaml file name: ")
 #h5Name= input("Enter .h5 file name: ")
 observable = int(input("Enter observable code: "))
-start = np.zeros(4, dtype=np.int64)
-end = np.zeros(4, dtype=np.int64)
+startPoint = np.zeros(4, dtype=np.int64)
+endPoint = np.zeros(4, dtype=np.int64)
 x= ["x", "y", "z", "t"]
 if(observable == 1 or observable == 2):
     for i in range(0,4):
-        start[i]= int(input(f"Enter start position of {x[i]}-axis: "))
-        end[i] =  int(input(f"Enter end position of {x[i]}-axis: "))
+        startPoint[i]= int(input(f"Enter start position of {x[i]}-axis: "))
+        endPoint[i] =  int(input(f"Enter end position of {x[i]}-axis: "))
 
 
 
@@ -59,8 +59,8 @@ data= {
 
     "observable": observable,
     "positions":{
-        "startPoint": start,
-        "endPoint": end
+        "startPoint": startPoint.tolist(),
+        "endPoint": endPoint.tolist()
     },
     "lattice":{
         "x": xAxis,
