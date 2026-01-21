@@ -10,7 +10,16 @@
 
 
 // run the simulation
-void latticeSimulationPureMetropolis(std::vector<Matrix<rSU,cSU>>& lattice, const std::vector<size_t>& startingPoint, const std::vector<size_t>& endPoint, const size_t numberOfThermalSweeps, const size_t roundingFactor, const size_t XUpdate, const size_t NConfigs, const size_t SweepFactor, const size_t observable ){
+void latticeSimulationPureMetropolis(
+    std::vector<Matrix<rSU,cSU>>& lattice, 
+    const std::vector<size_t>& startingPoint, 
+    const std::vector<size_t>& endPoint, 
+    const size_t numberOfThermalSweeps, 
+    const size_t roundingFactor, 
+    const size_t XUpdate, 
+    const size_t NConfigs, 
+    const size_t SweepFactor, 
+    const size_t observable ){
     Matrix<rSU, cSU> UPrime;
     Matrix<rSU, cSU> X; 
 
@@ -21,29 +30,29 @@ void latticeSimulationPureMetropolis(std::vector<Matrix<rSU,cSU>>& lattice, cons
             for(int j= 0; j<zAxis; j++){
                 for(int k=0; k<yAxis; k++){
                     for(int l=0; l<xAxis; l++){
-                        for (int mu = 0; mu<linksPerSite; mu++){
-                        size_t index = indexDist(indexing);
-                        X=XSet[index];
+                        for(int mu = 0; mu<linksPerSite; mu++){
+                            size_t index = indexDist(indexing);
+                            X=XSet[index];
 
-                        UPrime = matrix_multiplication(X,lattice[idx(l,k,j,i, mu)]);
+                            UPrime = matrix_multiplication(X,lattice[idx(l,k,j,i, mu)]);
 
-                        // calculate lattice action change and change or not change the lattice
-                        bool acceptance = latticeAction(lattice, lattice[idx(l,k,j,i, mu)], UPrime,l,k,j,i,mu );
-                        if (acceptance == true)
-                        {
-                            lattice[idx(l,k,j,i, mu)] = UPrime;
-                        }
-                        
+                            // calculate lattice action change and change or not change the lattice
+                            bool acceptance = latticeAction(lattice, lattice[idx(l,k,j,i, mu)], UPrime,l,k,j,i,mu );
+                            if (acceptance == true)
+                            {
+                                lattice[idx(l,k,j,i, mu)] = UPrime;
+                            }
+                            
 
-                        //Update X matrices
-                        if(p%XUpdate ==0 && p!=0){
-                            X_updateSU3();
-                        }
+                            //Update X matrices
+                            if(p%XUpdate ==0 && p!=0){
+                                X_updateSU3();
+                            }
 
-                        // from time to time our matrices have to be projected to det=1, rounding errors cause trouble and like X is also not neccesarily det 1, right?
-                        if(p% roundingFactor == 0 && p!=0){
-                            normalizeSU3(lattice);
-                        }
+                            // from time to time our matrices have to be projected to det=1, rounding errors cause trouble and like X is also not neccesarily det 1, right? -> Jup
+                            if(p% roundingFactor == 0 && p!=0){
+                                normalizeSU3(lattice);
+                            }
                         }
 
                     }
@@ -117,7 +126,7 @@ void latticeSimulationPureMetropolis(std::vector<Matrix<rSU,cSU>>& lattice, cons
                                     r.push_back(std::sqrt(xDistance*xDistance+yDistance*yDistance+zDistance*zDistance));
 
                                 }
-                                while (y!=endPoint[0])
+                                while (y!=endPoint[1])//should be 1 not 0?
                                 {
                                     Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,0,1)]);
                                     Path2=matrix_multiplication(Path2,lattice[idx(x,y,z,tAxis-1,1)]);
@@ -127,7 +136,7 @@ void latticeSimulationPureMetropolis(std::vector<Matrix<rSU,cSU>>& lattice, cons
                                     r.push_back(std::sqrt(xDistance*xDistance+yDistance*yDistance+zDistance*zDistance));                                
 
                                 }
-                                while (z!=endPoint[0])
+                                while (z!=endPoint[2])//should be 2 not 0?
                                 {
                                     Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,0,2)]);
                                     Path2=matrix_multiplication(Path2,lattice[idx(x,y,z,tAxis-1,2)]);
@@ -156,7 +165,7 @@ void latticeSimulationPureMetropolis(std::vector<Matrix<rSU,cSU>>& lattice, cons
                                     Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,t,3)]);
                                     Path2=matrix_multiplication(Path1, lattice[idx(x,y,z,endPoint[3],3)]);
                                     loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_conjugate(Path1))));
-                                    r.push_back(std::sqrt(tDistance*tDistance));
+                                    r.push_back(std::sqrt(tDistance*tDistance));// what is this line doing?
                                     tDistance +=1;
                                     t+=dt;
 
