@@ -4,15 +4,16 @@
 #include <vector>
 #include <complex>
 #include <random>
+#include <algorithm>
 #include "../header/global.h"
 #include "../header/latticeOP.h"
 #include "../header/matrixOP.h"
 
 // this mimics the behaviour of a 4D lattice from our 1D array
-double idx(size_t x, size_t y, size_t z, size_t t, size_t mu){
+size_t idx(size_t x, size_t y, size_t z, size_t t, size_t mu){
     return 4*(x+ xAxis*(y+ yAxis*(z+zAxis*t)))+mu;
 }
-//still don't get why this should be a double instead of a size_t :(
+
 
 
 //updates the whole set of X matrices
@@ -166,25 +167,26 @@ void X_updateSU3(){
         }
         else{
             //normalizes det to 1
-            // not sure if this needs to be done by dividing over third root
+            // not sure if this needs to be done by dividing over third root //Vincent: ?
             for(int i=0; i<rSU; i++){
                 for(int j=0; j<rSU; j++){
                     X(i,j)= X(i,j)/detX;
                 }
             }
-            invX(0,0)= (X(1,1)*X(2,2)-X(1,2)*X(2,1))/detX;
-            invX(0,1)=-(X(0,1)*X(2,2)-X(0,2)*X(2,1))/detX;
-            invX(0,2)= (X(0,1)*X(1,2)-X(0,2)*X(1,1))/detX;
+            //the X are already normalized to be detX=1, therefore it becomes redundant to divide by detX
+            invX(0,0)= (X(1,1)*X(2,2)-X(1,2)*X(2,1));
+            invX(0,1)=-(X(0,1)*X(2,2)-X(0,2)*X(2,1));
+            invX(0,2)= (X(0,1)*X(1,2)-X(0,2)*X(1,1));
 
-            invX(1,0)=-(X(1,0)*X(2,2)-X(1,2)*X(2,0))/detX;
-            invX(1,1)=(X(0,0)*X(2,2)-X(0,2)*X(2,0))/detX;
-            invX(1,2)=-(X(0,0)*X(1,2)-X(0,2)*X(1,0))/detX;
+            invX(1,0)=-(X(1,0)*X(2,2)-X(1,2)*X(2,0));
+            invX(1,1)=(X(0,0)*X(2,2)-X(0,2)*X(2,0));
+            invX(1,2)=-(X(0,0)*X(1,2)-X(0,2)*X(1,0));
 
-            invX(2,0)=(X(1,0)*X(2,1)-X(1,1)*X(2,0))/detX;
-            invX(2,1)=-(X(0,0)*X(2,1)-X(0,1)*X(2,0))/detX;
-            invX(2,2)=(X(0,0)*X(1,1)-X(0,1)*X(1,0))/detX;
+            invX(2,0)=(X(1,0)*X(2,1)-X(1,1)*X(2,0));
+            invX(2,1)=-(X(0,0)*X(2,1)-X(0,1)*X(2,0));
+            invX(2,2)=(X(0,0)*X(1,1)-X(0,1)*X(1,0));
 
-            //aren't they already normalized?
+   
             //save X and invX in our set of matrices
             XSet[2*p]= X;
             XSet[2*p+1]=invX;
@@ -409,14 +411,11 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
     double r;
     double probability;
     
-    //double SActtionU;
-    //double SActionUPrime;
-    //why not cSU?
     double SActionDif;
-    Matrix<rSU,rSU> ATemp1;
-    Matrix<rSU,rSU> ATemp2;
-    Matrix<rSU,rSU> ATemp3;
-    Matrix<rSU,rSU> A;
+    Matrix<rSU,cSU> ATemp1;
+    Matrix<rSU,cSU> ATemp2;
+    Matrix<rSU,cSU> ATemp3;
+    Matrix<rSU,cSU> A;
 
     double Sum;
     //enforce periodic boundary condition
@@ -455,9 +454,9 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
                     xM= bCX(x-1);
                     yP= bCY(y+1);
                     yM= bCY(y-1);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(xM,y,z,t,mu)]), lattice[idx(xM,y,z,t,nu)]);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(xM,yP,z,t,nu)]),ATemp1);
-                    ATemp2 = matrix_multiplication(matrix_conjugate(lattice[idx(xP,y,z,t,mu)]),matrix_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xM,y,z,t,mu)]), lattice[idx(xM,y,z,t,nu)]);
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xM,yP,z,t,nu)]),ATemp1);
+                    ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xP,y,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
                     ATemp2 = matrix_multiplication(lattice[idx(x,yP,z,t,nu)],ATemp2);
                     ATemp3 = matrix_addition(ATemp1,ATemp2);
                     A = matrix_addition(A, ATemp3);
@@ -469,10 +468,10 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
                     xM= bCX(x-1);
                     zP= bCZ(z+1);
                     zM= bCZ(z-1);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(xM,y,z,t,mu)]), lattice[idx(xM,y,z,t,nu)]);
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xM,y,z,t,mu)]), lattice[idx(xM,y,z,t,nu)]);
                     ATemp1 = matrix_multiplication
-                    (matrix_conjugate(lattice[idx(xM,y,zP,t,nu)]),ATemp1);
-                    ATemp2 = matrix_multiplication(matrix_conjugate(lattice[idx(xP,y,z,t,mu)]),matrix_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    (matrix_hermitean_conjugate(lattice[idx(xM,y,zP,t,nu)]),ATemp1);
+                    ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xP,y,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
                     ATemp2 = matrix_multiplication(lattice[idx(x,y,zP,t,nu)],ATemp2);
                     ATemp3 = matrix_addition(ATemp1,ATemp2);
                     A = matrix_addition(A, ATemp3);
@@ -484,10 +483,10 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
                     tM= bCT(t-1);
                     xP= bCX(x+1);
                     xM= bCX(x-1);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(xM,y,z,t,mu)]), lattice[idx(xM,y,z,t,nu)]);
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xM,y,z,t,mu)]), lattice[idx(xM,y,z,t,nu)]);
                     ATemp1 = matrix_multiplication
-                    (matrix_conjugate(lattice[idx(xM,y,z,tP,nu)]),ATemp1);
-                    ATemp2 = matrix_multiplication(matrix_conjugate(lattice[idx(xP,y,z,t,mu)]),matrix_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    (matrix_hermitean_conjugate(lattice[idx(xM,y,z,tP,nu)]),ATemp1);
+                    ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xP,y,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
                     ATemp2 = matrix_multiplication(lattice[idx(x,y,z,tP,nu)],ATemp2);
                     ATemp3 = matrix_addition(ATemp1,ATemp2);
                     A = matrix_addition(A, ATemp3);
@@ -504,9 +503,9 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
                     xM= bCX(x-1);
                     yP= bCY(y+1);
                     yM= bCY(y-1);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,yM,z,t,mu)]), lattice[idx(x,yM,z,t,nu)]);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(xP,yM,z,t,nu)]),ATemp1);
-                    ATemp2 = matrix_multiplication(matrix_conjugate(lattice[idx(x,yP,z,t,mu)]),matrix_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yM,z,t,mu)]), lattice[idx(x,yM,z,t,nu)]);
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xP,yM,z,t,nu)]),ATemp1);
+                    ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yP,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
                     ATemp2 = matrix_multiplication(lattice[idx(xP,y,z,t,nu)],ATemp2);
                     ATemp3 = matrix_addition(ATemp1,ATemp2);
                     A = matrix_addition(A, ATemp3);
@@ -518,9 +517,9 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
                     yM= bCY(y-1);
                     zP= bCZ(z+1);
                     zM= bCZ(z-1);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,yM,z,t,mu)]), lattice[idx(x,yM,z,t,nu)]);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,yM,zP,t,nu)]),ATemp1);
-                    ATemp2 = matrix_multiplication(matrix_conjugate(lattice[idx(x,yP,z,t,mu)]),matrix_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yM,z,t,mu)]), lattice[idx(x,yM,z,t,nu)]);
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yM,zP,t,nu)]),ATemp1);
+                    ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yP,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
                     ATemp2 = matrix_multiplication(lattice[idx(x,y,zP,t,nu)],ATemp2);
                     ATemp3 = matrix_addition(ATemp1,ATemp2);
                     A = matrix_addition(A, ATemp3);
@@ -532,9 +531,9 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
                     tM= bCT(t-1);
                     yP= bCY(y+1);
                     yM= bCY(y-1);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,yM,z,t,mu)]), lattice[idx(x,yM,z,t,nu)]);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,yM,z,tP,nu)]),ATemp1);
-                    ATemp2 = matrix_multiplication(matrix_conjugate(lattice[idx(x,yP,z,t,mu)]),matrix_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yM,z,t,mu)]), lattice[idx(x,yM,z,t,nu)]);
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yM,z,tP,nu)]),ATemp1);
+                    ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yP,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
                     ATemp2 = matrix_multiplication(lattice[idx(x,y,z,tP,nu)],ATemp2);
                     ATemp3 = matrix_addition(ATemp1,ATemp2);
                     A = matrix_addition(A, ATemp3);
@@ -552,9 +551,9 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
                     zM= bCZ(z-1);
                     yP= bCY(y+1);
                     yM= bCY(y-1);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,y,zM,t,mu)]), lattice[idx(x,y,zM,t,nu)]);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,yP,zM,t,nu)]),ATemp1);
-                    ATemp2 = matrix_multiplication(matrix_conjugate(lattice[idx(x,y,zP,t,mu)]),matrix_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zM,t,mu)]), lattice[idx(x,y,zM,t,nu)]);
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yP,zM,t,nu)]),ATemp1);
+                    ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zP,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
                     ATemp2 = matrix_multiplication(lattice[idx(x,yP,z,t,nu)],ATemp2);
                     ATemp3 = matrix_addition(ATemp1,ATemp2);
                     A = matrix_addition(A, ATemp3);
@@ -566,9 +565,9 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
                     xM= bCX(x-1);
                     zP= bCZ(z+1);
                     zM= bCZ(z-1);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,y,zM,t,mu)]), lattice[idx(x,y,zM,t,nu)]);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(xP,y,zM,t,nu)]),ATemp1);
-                    ATemp2 = matrix_multiplication(matrix_conjugate(lattice[idx(x,y,zP,t,mu)]),matrix_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zM,t,mu)]), lattice[idx(x,y,zM,t,nu)]);
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xP,y,zM,t,nu)]),ATemp1);
+                    ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zP,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
                     ATemp2 = matrix_multiplication(lattice[idx(xP,y,z,t,nu)],ATemp2);
                     ATemp3 = matrix_addition(ATemp1,ATemp2);
                     A = matrix_addition(A, ATemp3);
@@ -580,9 +579,9 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
                     tM= bCT(t-1);
                     zP= bCZ(x+1);
                     zM= bCZ(x-1);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,y,zM,t,mu)]), lattice[idx(x,y,zM,t,nu)]);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,y,zM,tP,nu)]),ATemp1);
-                    ATemp2 = matrix_multiplication(matrix_conjugate(lattice[idx(x,y,zP,t,mu)]),matrix_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zM,t,mu)]), lattice[idx(x,y,zM,t,nu)]);
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zM,tP,nu)]),ATemp1);
+                    ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zP,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
                     ATemp2 = matrix_multiplication(lattice[idx(x,y,z,tP,nu)],ATemp2);
                     ATemp3 = matrix_addition(ATemp1,ATemp2);
                     A = matrix_addition(A, ATemp3);
@@ -601,9 +600,9 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
                     tM= bCT(t-1);
                     yP= bCY(y+1);
                     yM= bCY(y-1);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,y,z,tM,mu)]), lattice[idx(x,y,z,tM,nu)]);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,yP,z,tM,nu)]),ATemp1);
-                    ATemp2 = matrix_multiplication(matrix_conjugate(lattice[idx(x,y,z,tP,mu)]),matrix_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,z,tM,mu)]), lattice[idx(x,y,z,tM,nu)]);
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yP,z,tM,nu)]),ATemp1);
+                    ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,z,tP,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
                     ATemp2 = matrix_multiplication(lattice[idx(x,yP,z,t,nu)],ATemp2);
                     ATemp3 = matrix_addition(ATemp1,ATemp2);
                     A = matrix_addition(A, ATemp3);
@@ -615,9 +614,9 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
                     tM= bCT(t-1);
                     zP= bCZ(z+1);
                     zM= bCZ(z-1);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,y,z,tM,mu)]), lattice[idx(x,y,z,tM,nu)]);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,y,zP,tM,nu)]),ATemp1);
-                    ATemp2 = matrix_multiplication(matrix_conjugate(lattice[idx(x,y,z,tP,mu)]),matrix_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,z,tM,mu)]), lattice[idx(x,y,z,tM,nu)]);
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zP,tM,nu)]),ATemp1);
+                    ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,z,tP,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
                     ATemp2 = matrix_multiplication(lattice[idx(x,y,zP,t,nu)],ATemp2);
                     ATemp3 = matrix_addition(ATemp1,ATemp2);
                     A = matrix_addition(A, ATemp3);
@@ -629,9 +628,9 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
                     tM= bCT(t-1);
                     xP= bCX(x+1);
                     xM= bCX(x-1);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(x,y,z,tM,mu)]), lattice[idx(x,y,z,tM,nu)]);
-                    ATemp1 = matrix_multiplication(matrix_conjugate(lattice[idx(xP,y,z,tM,nu)]),ATemp1);
-                    ATemp2 = matrix_multiplication(matrix_conjugate(lattice[idx(x,y,z,tP,mu)]),matrix_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,z,tM,mu)]), lattice[idx(x,y,z,tM,nu)]);
+                    ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xP,y,z,tM,nu)]),ATemp1);
+                    ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,z,tP,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
                     ATemp2 = matrix_multiplication(lattice[idx(xP,y,z,t,nu)],ATemp2);
                     ATemp3 = matrix_addition(ATemp1,ATemp2);
                     A = matrix_addition(A, ATemp3);
@@ -646,15 +645,8 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
         }
     }
     SActionDif = -beta/(xAxis*yAxis*zAxis*tAxis)*(matrix_trace(matrix_multiplication(matrix_subtraction(UPrime, U),A))).real();
-    probability = min(1.0, exp(- SActionDif)); // according to my notes -> check in doubt
-    /*
-    if(SActionDif > 1.0){
-        probability=1;
-    }
-    else{
-        probability=SActionDif;
-    }
-    */
+    probability = std::min(1.0, exp(- SActionDif)); // according to my notes -> check in doubt
+
     r= uniformAcceptReject(acceptReject);
     if(r<=probability){
         accept = true;

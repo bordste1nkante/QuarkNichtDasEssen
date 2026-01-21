@@ -55,8 +55,3 @@ std::vector<Matrix<2,2>> pauliMatrices;
 Matrix<rSU,cSU> identityMatrix;
 
 
-//shouldn't indices are {0,1} here?
-//identity2(1,1)=std::complex<double> {1.0,0.0};
-//identity2(1,2)=std::complex<double> {0.0,0.0};
-//identity2(2,1)=std::complex<double> {0.0,0.0};
-//identity2(2,2)=std::complex<double> {1.0,0.0};

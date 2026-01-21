@@ -120,27 +120,27 @@ void latticeSimulationPureMetropolis(
 
                                     Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,0,0)]);
                                     Path2=matrix_multiplication(Path2,lattice[idx(x,y,z,tAxis-1,0)]);
-                                    loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_conjugate(Path1))));
+                                    loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_hermitean_conjugate(Path1))));
                                     x+=dx;
                                     xDistance+=1;
                                     r.push_back(std::sqrt(xDistance*xDistance+yDistance*yDistance+zDistance*zDistance));
 
                                 }
-                                while (y!=endPoint[1])//should be 1 not 0?
+                                while (y!=endPoint[1])
                                 {
                                     Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,0,1)]);
                                     Path2=matrix_multiplication(Path2,lattice[idx(x,y,z,tAxis-1,1)]);
-                                    loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_conjugate(Path1))));
+                                    loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_hermitean_conjugate(Path1))));
                                     y+=dy;
                                     yDistance+=1;
                                     r.push_back(std::sqrt(xDistance*xDistance+yDistance*yDistance+zDistance*zDistance));                                
 
                                 }
-                                while (z!=endPoint[2])//should be 2 not 0?
+                                while (z!=endPoint[2])
                                 {
                                     Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,0,2)]);
                                     Path2=matrix_multiplication(Path2,lattice[idx(x,y,z,tAxis-1,2)]);
-                                    loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_conjugate(Path1))));
+                                    loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_hermitean_conjugate(Path1))));
                                     z+=dz;
                                     zDistance+=1;
                                     r.push_back(std::sqrt(xDistance*xDistance+yDistance*yDistance+zDistance*zDistance));  
@@ -164,8 +164,10 @@ void latticeSimulationPureMetropolis(
                                 while(t!=endPoint[3]){
                                     Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,t,3)]);
                                     Path2=matrix_multiplication(Path1, lattice[idx(x,y,z,endPoint[3],3)]);
-                                    loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_conjugate(Path1))));
-                                    r.push_back(std::sqrt(tDistance*tDistance));// what is this line doing?
+                                    loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_hermitean_conjugate(Path1))));
+
+                                    //save t-distance in r array (for simplicity)
+                                    r.push_back(std::sqrt(tDistance*tDistance));
                                     tDistance +=1;
                                     t+=dt;
 

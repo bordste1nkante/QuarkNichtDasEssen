@@ -11,8 +11,8 @@
 
 
 // this mimics the behaviour of a 4D lattice from our 1D array
-double idx(size_t x, size_t y, size_t z, size_t t, size_t mu);
-//why double and not size_t??
+size_t idx(size_t x, size_t y, size_t z, size_t t, size_t mu);
+
 
 //updates the whole set of X matrices
 void X_updateSU3();

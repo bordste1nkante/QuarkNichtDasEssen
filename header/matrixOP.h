@@ -20,8 +20,8 @@ Matrix<rSU,cSU> matrix_addition(const Matrix<rSU,rSU>& A, const Matrix<rSU,rSU>&
 Matrix<rSU,cSU> matrix_subtraction(const Matrix<rSU,rSU>& A, const Matrix<rSU,rSU>& B);
 
 
-// returns the complex conjugate of the matrix -> but not the hermitian conjugate, i.e. conjugate & transpose
-Matrix<rSU,cSU> matrix_conjugate(const Matrix<rSU,rSU>& A);
+// returns the hermitean conjugate
+Matrix<rSU,cSU> matrix_hermitean_conjugate(const Matrix<rSU,rSU>& A);
 
 
 // returns the trace of the matrix
