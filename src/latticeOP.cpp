@@ -161,9 +161,9 @@ void X_updateSU3(){
 
         }
 
-        //inverting X
-        std::complex<double> detX = X(0,0)*(X(1,1)*X(2,2)-X(1,2)*X(2,1))-X(0,1)*(X(1,0)*X(2,2)-X(1,2)*X(2,0))+X(0,2)*(X(1,0)*X(2,1)-X(1,1)*X(2,0));
-
+        ////inverting X
+        //std::complex<double> detX = X(0,0)*(X(1,1)*X(2,2)-X(1,2)*X(2,1))-X(0,1)*(X(1,0)*X(2,2)-X(1,2)*X(2,0))+X(0,2)*(X(1,0)*X(2,1)-X(1,1)*X(2,0));
+        std::complex<double> detX = det_A(X);
 
         // should insure that if det(X) \approx zero we just repeat the process and generate a new X
 
@@ -183,19 +183,21 @@ void X_updateSU3(){
                     X(i,j)= X(i,j)/detX;
                 }
             }
-            //the X are already normalized to be detX=1, therefore it becomes redundant to divide by detX
-            invX(0,0)= (X(1,1)*X(2,2)-X(1,2)*X(2,1));
-            invX(0,1)=-(X(0,1)*X(2,2)-X(0,2)*X(2,1));
-            invX(0,2)= (X(0,1)*X(1,2)-X(0,2)*X(1,1));
+//            //the X are already normalized to be detX=1, therefore it becomes redundant to divide by detX
+//            invX(0,0)= (X(1,1)*X(2,2)-X(1,2)*X(2,1));
+//            invX(0,1)=-(X(0,1)*X(2,2)-X(0,2)*X(2,1));
+//            invX(0,2)= (X(0,1)*X(1,2)-X(0,2)*X(1,1));
+//
+//            invX(1,0)=-(X(1,0)*X(2,2)-X(1,2)*X(2,0));
+//            invX(1,1)=(X(0,0)*X(2,2)-X(0,2)*X(2,0));
+//            invX(1,2)=-(X(0,0)*X(1,2)-X(0,2)*X(1,0));
+//
+//            invX(2,0)=(X(1,0)*X(2,1)-X(1,1)*X(2,0));
+//            invX(2,1)=-(X(0,0)*X(2,1)-X(0,1)*X(2,0));
+//            invX(2,2)=(X(0,0)*X(1,1)-X(0,1)*X(1,0));
+//
 
-            invX(1,0)=-(X(1,0)*X(2,2)-X(1,2)*X(2,0));
-            invX(1,1)=(X(0,0)*X(2,2)-X(0,2)*X(2,0));
-            invX(1,2)=-(X(0,0)*X(1,2)-X(0,2)*X(1,0));
-
-            invX(2,0)=(X(1,0)*X(2,1)-X(1,1)*X(2,0));
-            invX(2,1)=-(X(0,0)*X(2,1)-X(0,1)*X(2,0));
-            invX(2,2)=(X(0,0)*X(1,1)-X(0,1)*X(1,0));
-
+            invX = inverse_A(X);
             //std::cout << "invertiert" << std::endl;
             //save X and invX in our set of matrices
             XSet[2*p]= X;
@@ -398,6 +400,14 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
                                 U(i,j)= sum;
                             }
                         
+                        }
+                        //normalize to det(U)=1
+                        std::complex<double> detU = det_A(U);
+                        
+                        for(int i = 0; i<rSU; i++){
+                            for(int j = 0; j<cSU; j++){
+                                U(i,j)=U(i,j)/detU;
+                            }
                         }
                     
                         lattice[idx(a,b,c,d, mu)]=U;

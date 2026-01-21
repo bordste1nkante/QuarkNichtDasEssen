@@ -84,9 +84,13 @@ void latticeSimulationPureMetropolis(
                         if (acceptance == true)
                         {
                             lattice[idx(l,k,j,i, mu)] = UPrime;
-                        }
-                        
+                            }
 
+                        }
+                    }
+                }
+            }
+        }
                         //Update X matrices
                         if(p%XUpdate ==0 && p!=0){
                             X_updateSU3();
@@ -188,10 +192,3 @@ void latticeSimulationPureMetropolis(
                     }
 
                     }
-            }
-        }
-    }
-    }
-
-
-}

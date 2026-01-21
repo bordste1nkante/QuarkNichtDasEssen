@@ -38,7 +38,7 @@ int main(){
     bool coldOrHot = information["startConfig"].as<bool>();
 
     size_t numberOfThermalSweeps = information["updates"]["NSweepsThermal"].as<size_t>(); // number of complete lattice updates till you start the data run
-    size_t NConfigs = information["updates"]["NSweepsThermal"].as<size_t>(); //Number of configs for analysis
+    size_t NConfigs = information["updates"]["NConfig"].as<size_t>(); //Number of configs for analysis
     size_t SweepFactor = information["updates"]["Sweep"].as<size_t>();//autocorrelation needs to be overcome, wait some iterations before collecting the next config.
     size_t roundingFactor = information["updates"]["Rounding"].as<size_t>(); //rounding errors need to be corrected
     size_t XUpdate = information["updates"]["XUpdate"].as<size_t>(); //how often to generate new X

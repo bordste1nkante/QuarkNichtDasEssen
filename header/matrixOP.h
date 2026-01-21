@@ -30,3 +30,10 @@ std::complex<double> matrix_trace(const Matrix<rSU,rSU>& A);
 
 //generates a rSU x cSU identity matrix
 void generate_identity();
+
+
+//calculate and return det(A)
+std::complex<double> det_A(const Matrix<rSU,cSU>& A);
+
+//calculate and return inverse of A
+Matrix<rSU,cSU> inverse_A(const Matrix<rSU,cSU>& A);
