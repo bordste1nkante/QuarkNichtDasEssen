@@ -1,0 +1,3 @@
+/home/mrv/QuarkNichtDasEssen/TestVincent/buildTestV/CMakeFiles/staticquarks.dir
+/home/mrv/QuarkNichtDasEssen/TestVincent/buildTestV/CMakeFiles/edit_cache.dir
+/home/mrv/QuarkNichtDasEssen/TestVincent/buildTestV/CMakeFiles/rebuild_cache.dir
