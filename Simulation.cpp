@@ -45,8 +45,8 @@ int main(){
 
     //place seeds
     randNumb.seed(information["seeds"]["distEpsilon"].as<double>());
-    rng.seed(information["seeds"]["dist"].as<double>());
-    hotNumb.seed(information["seeds"]["hotDist"].as<double>());
+    rng1.seed(information["seeds"]["dist"].as<double>());
+    hotNumb1.seed(information["seeds"]["hotDist"].as<double>());
     indexing.seed(information["seeds"]["indexDist"].as<double>());
     acceptReject.seed(information["seeds"]["uniformAcceptReject"].as<double>());
 

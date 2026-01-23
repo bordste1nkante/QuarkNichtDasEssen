@@ -18,8 +18,10 @@ size_t idx(size_t x, size_t y, size_t z, size_t t, size_t mu);
 void X_updateSU3();
 
 
-//rounding errors causes matrices to potentially digress from det = 1, we correct that from time to time.
+//rounding errors causes matrices to potentially digress from det = 1, we correct that from time to time, also we project to unitarity.
 void normalizeSU3(std::vector<Matrix<rSU,rSU>>& lattice);
+
+void normalizeSU3Matrix(Matrix<rSU,rSU>& U);
 
 
 //sets all matrices to identity, a potential starting config

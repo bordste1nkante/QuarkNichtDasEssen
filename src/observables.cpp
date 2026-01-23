@@ -37,6 +37,7 @@ void latticeSimulationPureMetropolis(
                             X=XSet[index];
 
                             UPrime = matrix_multiplication(X,lattice[idx(l,k,j,i, mu)]);
+                            normalizeSU3Matrix(UPrime);
 
                             // calculate lattice action change and change or not change the lattice
                             bool acceptance = latticeAction(lattice, lattice[idx(l,k,j,i, mu)], UPrime,l,k,j,i,mu );
@@ -51,10 +52,6 @@ void latticeSimulationPureMetropolis(
                                 X_updateSU3();
                             }
 
-                            // from time to time our matrices have to be projected to det=1, rounding errors cause trouble and like X is also not neccesarily det 1, right? -> Jup
-                            if(p% roundingFactor == 0 && p!=0){
-                                normalizeSU3(lattice);
-                            }
                         }
 
                     }
@@ -78,6 +75,7 @@ void latticeSimulationPureMetropolis(
                         X=XSet[index];
 
                         UPrime = matrix_multiplication(X,lattice[idx(l,k,j,i, mu)]);
+                        normalizeSU3Matrix(UPrime);
 
                         // calculate lattice action change and change or not change the lattice
                         bool acceptance = latticeAction(lattice, lattice[idx(l,k,j,i, mu)], UPrime,l,k,j,i,mu );
@@ -94,10 +92,6 @@ void latticeSimulationPureMetropolis(
                         //Update X matrices
                         if(p%XUpdate ==0 && p!=0){
                             X_updateSU3();
-                        }
-                        // from time to time our matrices have to be projected to det=1, rounding errors cause trouble and like X is also not neccesarily det 1, right?
-                        if (p% roundingFactor == 0 && p!=0){
-                            normalizeSU3(lattice);
                         }
                         //save these configs, the rest is updates and after sufficient sweeps autocorrelation becomes negliable 
                         if(p % SweepFactor==0) {

@@ -54,7 +54,9 @@ extern std::mt19937_64 randNumb;
 extern std::uniform_real_distribution<double> distEpsilon;
 
 //those are the random numbers for updates?
-extern std::mt19937_64 rng;
+extern std::mt19937_64 rng1;
+extern std::mt19937_64 rng2;
+extern std::mt19937_64 rng3;
 extern std::uniform_real_distribution<double> dist;
 
 
@@ -63,7 +65,29 @@ extern double hotEpsilon;
 
 
 //uniform dist for generation of random variables in hot_start()
-extern std::mt19937_64 hotNumb;
+extern std::mt19937_64 hotNumb1;
+extern std::mt19937_64 hotNumb2;
+extern std::mt19937_64 hotNumb3;
+
+extern std::mt19937_64 hotNumb1Extra;
+extern std::mt19937_64 hotNumb2Extra;
+extern std::mt19937_64 hotNumb3Extra;
+
+
+extern std::mt19937_64 hotNumbT1;
+extern std::mt19937_64 hotNumbT2;
+extern std::mt19937_64 hotNumbT3;
+
+
+extern std::mt19937_64 hotNumbS1;
+extern std::mt19937_64 hotNumbS2;
+extern std::mt19937_64 hotNumbS3;
+
+
+extern std::mt19937_64 hotNumbR1;
+extern std::mt19937_64 hotNumbR2;
+extern std::mt19937_64 hotNumbR3;
+
 extern std::uniform_real_distribution<double> hotDist;
 
 
@@ -84,4 +108,7 @@ extern Matrix<2,2> identity2, Pauli1, Pauli2, Pauli3;
 
 //rsU x cSU identity
 extern Matrix<rSU,cSU> identityMatrix;
+
+
+
 

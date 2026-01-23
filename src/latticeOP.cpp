@@ -44,28 +44,38 @@ void X_updateSU3(){
         //number required to generate 3 SU(2) matrices, from these we form a SU(3)
 
         double r[3];
-        double r0 = dist(rng); 
+        double r0 = dist(rng1); 
+        double s[3];
+        double s0 = dist(rng2); 
+        double t[3];
+        double t0 = dist(rng3);
 
+        r[0]= dist(hotNumbR1);
+        r[1]= dist(hotNumbR2);
+        r[2]= dist(hotNumbR3);  
 
-        double er = distEpsilon(randNumb);
+        double er = dist(hotNumb1Extra);
 
         double rLength = std::sqrt(r[0]*r[0]+r[1]*r[1]+r[2]*r[2]);
         r0=r0/std::sqrt(r0*r0)*std::sqrt(1-er*er);
 
-        double s[3];
-        double s0 = dist(rng); 
 
-        double es = distEpsilon(randNumb);     
-        
+        s[0]= dist(hotNumbS1);
+        s[1]= dist(hotNumbS2);
+        s[2]= dist(hotNumbS3);                     
+
+        double es = dist(hotNumb2Extra);    
+
         double sLength = std::sqrt(s[0]*s[0]+s[1]*s[1]+s[2]*s[2]);
         s0=s0/std::sqrt(s0*s0)*std::sqrt(1-es*es);
 
 
-        double t[3];
-        double t0 = dist(rng);
 
-        double et = distEpsilon(randNumb);
+        t[0]= dist(hotNumbT1);
+        t[1]= dist(hotNumbT2);
+        t[2]= dist(hotNumbT3);                    
 
+        double et = dist(hotNumb3Extra);
         double tLength = std::sqrt(t[0]*t[0]+t[1]*t[1]+t[2]*t[2]);
         t0=t0/std::sqrt(t0*t0)*std::sqrt(1-et*et);
   
@@ -91,15 +101,16 @@ void X_updateSU3(){
                     }
                 } 
             }
-            //wird i=0 hier nicht trotzdem überschrieben??
+            else{
             for(int j=0; j<2; j++){
                 for(int k=0; k<2; k++){
-                    Ssmall(j,k)= pauliMatrices[i](j,k)*s[i-1];
-                    Rsmall(j,k)= pauliMatrices[i](j,k)*r[i-1];
-                    Tsmall(j,k)= pauliMatrices[i](j,k)*t[i-1];
-        }
-    }
-}       
+                    Ssmall(j,k)+= pauliMatrices[i](j,k)*s[i-1];
+                    Rsmall(j,k)+= pauliMatrices[i](j,k)*r[i-1];
+                    Tsmall(j,k)+= pauliMatrices[i](j,k)*t[i-1];
+                    }
+                }
+            }
+        }       
 
         //std::cout << "2D - matrix done" << std::endl;
         //fill R,S,T
@@ -165,9 +176,11 @@ void X_updateSU3(){
         //std::complex<double> detX = X(0,0)*(X(1,1)*X(2,2)-X(1,2)*X(2,1))-X(0,1)*(X(1,0)*X(2,2)-X(1,2)*X(2,0))+X(0,2)*(X(1,0)*X(2,1)-X(1,1)*X(2,0));
         std::complex<double> detX = det_A(X);
 
+        //std::cout << detX << std::endl;
+
         // should insure that if det(X) \approx zero we just repeat the process and generate a new X
 
-        double tol = 1e-9;
+        double tol = 1e-11;
             
         if (detX.real() > -tol && detX.real() < tol &&
             detX.imag() > -tol && detX.imag() < tol)
@@ -180,9 +193,13 @@ void X_updateSU3(){
             // not sure if this needs to be done by dividing over third root //Vincent: ?
             for(int i=0; i<rSU; i++){
                 for(int j=0; j<rSU; j++){
-                    X(i,j)= X(i,j)/detX;
+                    X(i,j)= X(i,j)/pow(detX, 1.0/double(rSU));
                 }
             }
+            //detX = det_A(X);
+            //std::cout << detX << std::endl;
+
+
 //            //the X are already normalized to be detX=1, therefore it becomes redundant to divide by detX
 //            invX(0,0)= (X(1,1)*X(2,2)-X(1,2)*X(2,1));
 //            invX(0,1)=-(X(0,1)*X(2,2)-X(0,2)*X(2,1));
@@ -200,8 +217,11 @@ void X_updateSU3(){
             invX = inverse_A(X);
             //std::cout << "invertiert" << std::endl;
             //save X and invX in our set of matrices
+            //std::cout << X(0,0) << std::endl;
             XSet[2*p]= X;
             XSet[2*p+1]=invX;
+
+            //std::cout << "X generated" << std::endl;
 
             //std::cout << "X abgespeichert" << std::endl;
 
@@ -222,13 +242,7 @@ void normalizeSU3(std::vector<Matrix<rSU,rSU>>& lattice){
                 for(int l=0; l<xAxis; l++){
                     for(int mu = 0; mu<linksPerSite; mu++){
                         U = lattice[idx(l,k,j,i, mu)];
-                        std::complex<double> detU = U(0,0)*(U(1,1)*U(2,2)-U(1,2)*U(2,1))-U(0,1)*(U(1,0)*U(2,2)-U(1,2)*U(2,0))+U(0,2)*(U(1,0)*U(2,1)-U(1,1)*U(2,0));
-                        for(int m = 0; m< rSU; m++){
-                            for(int n=0; n<cSU; n++){
-                                U(m,n)= U(m,n)/detU;
-                        }
-                        //same question for normalization using determinant
-                    }
+                        normalizeSU3Matrix(U);
                         lattice[idx(l,k,j,i, mu)]= U;
                 }
                 }
@@ -241,6 +255,49 @@ void normalizeSU3(std::vector<Matrix<rSU,rSU>>& lattice){
 
 
 }
+
+
+void normalizeSU3Matrix(Matrix<rSU,rSU>& U){
+
+
+    std::complex<double> sum, vuProduct, vsum;
+
+    std::vector<std::complex<double>> vPrime;
+    for(int i = 0; i<rSU; i++){
+        sum += std::norm(U(0,i));
+}
+    sum= std::sqrt(sum);
+    for(int i = 0; i<rSU; i++){
+    U(0,i)= U(0,i)/sum;
+}
+    for(int i = 0; i<rSU; i++){
+    vuProduct += U(1,i)*std::conj(U(0,i));
+}
+    for(int i = 0; i<rSU; i++){
+    vPrime.push_back(U(1,i)-U(0,i)*(vuProduct));
+}
+    for(int i = 0; i<rSU; i++){
+        vsum += std::norm(vPrime[i]);
+}
+    vsum= std::sqrt(vsum);
+
+    for(int i = 0; i<rSU; i++){
+    U(1,i)= vPrime[i]/vsum;
+}
+    
+
+    U(2,0)= std::conj(U(0,1))*std::conj(U(1,2))-std::conj(U(0,2))*std::conj(U(1,1));
+    U(2,1)= std::conj(U(0,2))*std::conj(U(1,0))-std::conj(U(0,0))*std::conj(U(1,2));
+    U(2,2)= std::conj(U(0,0))*std::conj(U(1,1))-std::conj(U(0,1))*std::conj(U(1,0));
+
+
+    std::complex<double> detU = det_A(U);
+    for(int m = 0; m< rSU; m++){
+        for(int n=0; n<cSU; n++){
+            U(m,n)= U(m,n)/pow(detU, 1.0/double(rSU));
+                        }
+                    }
+                }
 
     
 
@@ -289,27 +346,37 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
                     //number required to generate 3 SU(2) matrices, from these we form a SU(3)
 
                     double r[3];
-                    double r0 = dist(hotNumb); 
+                    r[0]= dist(hotNumbR1);
+                    r[1]= dist(hotNumbR2);
+                    r[2]= dist(hotNumbR3); 
+                    double r0 = dist(hotNumb1); 
 
 
-                    double er = hotDist(hotNumb);
+                    double er = hotDist(hotNumb1Extra);
 
                     double rLength = std::sqrt(r[0]*r[0]+r[1]*r[1]+r[2]*r[2]);
                     r0=r0/std::sqrt(r0*r0)*std::sqrt(1-er*er);
 
                     double s[3];
-                    double s0 = dist(hotNumb); 
+                    s[0]= dist(hotNumbS1);
+                    s[1]= dist(hotNumbS2);
+                    s[2]= dist(hotNumbS3);                     
+                    double s0 = dist(hotNumb2); 
 
-                    double es = hotDist(hotNumb);     
+                    double es = hotDist(hotNumb2Extra);     
 
                     double sLength = std::sqrt(s[0]*s[0]+s[1]*s[1]+s[2]*s[2]);
                     s0=s0/std::sqrt(s0*s0)*std::sqrt(1-es*es);
 
 
                     double t[3];
-                    double t0 = dist(hotNumb);
+                    t[0]= dist(hotNumbT1);
+                    t[1]= dist(hotNumbT2);
+                    t[2]= dist(hotNumbT3);                    
 
-                    double et = hotDist(hotNumb);
+                    double t0 = dist(hotNumb3);
+
+                    double et = hotDist(hotNumb3Extra);
 
                     double tLength = std::sqrt(t[0]*t[0]+t[1]*t[1]+t[2]*t[2]);
                     t0=t0/std::sqrt(t0*t0)*std::sqrt(1-et*et);
@@ -334,13 +401,15 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
                                 }
                             } 
                         }
+                        else{
                         for(int j=0; j<2; j++){
                             for(int k=0; k<2; k++){
-                                Ssmall(j,k)= pauliMatrices[i](j,k)*s[i-1];
-                                Rsmall(j,k)= pauliMatrices[i](j,k)*r[i-1];
-                                Tsmall(j,k)= pauliMatrices[i](j,k)*t[i-1];
+                                Ssmall(j,k)+= pauliMatrices[i](j,k)*s[i-1];
+                                Rsmall(j,k)+= pauliMatrices[i](j,k)*r[i-1];
+                                Tsmall(j,k)+= pauliMatrices[i](j,k)*t[i-1];
                         }
-                        }       
+                        }  
+                    }     
                     }               
 
                         //fill R,S,T
@@ -406,7 +475,7 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
                         
                         for(int i = 0; i<rSU; i++){
                             for(int j = 0; j<cSU; j++){
-                                U(i,j)=U(i,j)/detU;
+                                U(i,j)=U(i,j)/pow(detU, 1.0/double(rSU));
                             }
                         }
                     
