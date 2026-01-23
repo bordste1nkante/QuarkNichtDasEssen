@@ -45,8 +45,24 @@ int main(){
 
     //place seeds
     randNumb.seed(information["seeds"]["distEpsilon"].as<double>());
-    rng1.seed(information["seeds"]["dist"].as<double>());
-    hotNumb1.seed(information["seeds"]["hotDist"].as<double>());
+    rng1.seed(information["seeds"]["dist"]["rng1"].as<double>());
+    rng2.seed(information["seeds"]["dist"]["rng2"].as<double>());
+    rng3.seed(information["seeds"]["dist"]["rng3"].as<double>());
+    hotNumb1.seed(information["seeds"]["dist"]["hotNumb1"].as<double>());
+    hotNumb2.seed(information["seeds"]["dist"]["hotNumb2"].as<double>());
+    hotNumb3.seed(information["seeds"]["dist"]["hotNumb3"].as<double>());
+    hotNumb1Extra.seed(information["seeds"]["dist"]["hotNumb1Extra"].as<double>());
+    hotNumb2Extra.seed(information["seeds"]["dist"]["hotNumb2Extra"].as<double>());
+    hotNumb3Extra.seed(information["seeds"]["dist"]["hotNumb3Extra"].as<double>());
+    hotNumbS1.seed(information["seeds"]["dist"]["hotNumbS1"].as<double>());
+    hotNumbS2.seed(information["seeds"]["dist"]["hotNumbS2"].as<double>());
+    hotNumbS3.seed(information["seeds"]["dist"]["hotNumbS3"].as<double>());
+    hotNumbT1.seed(information["seeds"]["dist"]["hotNumbT1"].as<double>());
+    hotNumbT2.seed(information["seeds"]["dist"]["hotNumbT2"].as<double>());
+    hotNumbT3.seed(information["seeds"]["dist"]["hotNumbT3"].as<double>());
+    hotNumbR1.seed(information["seeds"]["dist"]["hotNumbR1"].as<double>());
+    hotNumbR2.seed(information["seeds"]["dist"]["hotNumbR2"].as<double>());
+    hotNumbR3.seed(information["seeds"]["dist"]["hotNumbR3"].as<double>());
     indexing.seed(information["seeds"]["indexDist"].as<double>());
     acceptReject.seed(information["seeds"]["uniformAcceptReject"].as<double>());
 
