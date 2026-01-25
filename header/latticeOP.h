@@ -31,7 +31,14 @@ void cold_start(std::vector<Matrix<rSU,rSU>>& lattice);
 void hot_start(std::vector<Matrix<rSU,rSU>>& lattice);
 
 //calculates the lattice action change and determines whether new configuration is accepted, U -> U'
-bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU,rSU>& U,  const Matrix<rSU,rSU>& UPrime ,size_t x, size_t y, size_t z, size_t t, size_t mu);
+bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU,rSU>& U,  const Matrix<rSU,rSU>& UPrime ,size_t x, size_t y, size_t z, size_t t, size_t mu, const Matrix<rSU,cSU>& A);
+
+//calculates the Plaquette values to determine lattice change
+Matrix<rSU,cSU> determineA(const std::vector<Matrix<rSU,rSU>>& lattice ,size_t x, size_t y, size_t z, size_t t, size_t mu);
+
+//determine U' by overrelaxation
+Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& U);
+
 
 
 //set all temporal link variables to identity 

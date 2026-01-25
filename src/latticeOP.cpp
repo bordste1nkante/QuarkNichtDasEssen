@@ -496,13 +496,29 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
 
 
 
-bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU,rSU>& U,  const Matrix<rSU,rSU>& UPrime ,size_t x, size_t y, size_t z, size_t t, size_t mu){
+bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU,rSU>& U,  const Matrix<rSU,rSU>& UPrime ,size_t x, size_t y, size_t z, size_t t, size_t mu, const Matrix<rSU,cSU>& A){
     
     bool accept;
     double r;
     double probability;
     
     double SActionDif;
+    SActionDif = -beta/(xAxis*yAxis*zAxis*tAxis)*(matrix_trace(matrix_multiplication(matrix_subtraction(UPrime, U),A))).real();
+    probability = std::min(1.0, exp(- SActionDif)); // according to my notes -> check in doubt
+
+    r= uniformAcceptReject(acceptReject);
+    if(r<=probability){
+        accept = true;
+    }
+    else{
+        accept = false;
+    }
+
+
+    return accept;
+}
+
+Matrix<rSU,cSU> determineA(const std::vector<Matrix<rSU,rSU>>& lattice ,size_t x, size_t y, size_t z, size_t t, size_t mu){
     Matrix<rSU,cSU> ATemp1;
     Matrix<rSU,cSU> ATemp2;
     Matrix<rSU,cSU> ATemp3;
@@ -735,21 +751,17 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
 
         }
     }
-    SActionDif = -beta/(xAxis*yAxis*zAxis*tAxis)*(matrix_trace(matrix_multiplication(matrix_subtraction(UPrime, U),A))).real();
-    probability = std::min(1.0, exp(- SActionDif)); // according to my notes -> check in doubt
-
-    r= uniformAcceptReject(acceptReject);
-    if(r<=probability){
-        accept = true;
-    }
-    else{
-        accept = false;
-    }
 
 
-    return accept;
+
+
+
+    return A;
 }
 
+Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& U){
+
+}
 
 void temporalGauge(std::vector<Matrix<rSU,rSU>>& lattice){
 

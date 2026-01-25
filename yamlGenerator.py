@@ -138,7 +138,6 @@ data= {
                  "hotNumbR2": seed3_13,
                  "hotNumbR3": seed3_14
                  },
-        "hotDist": seed3,
         "indexDist": seed4,
         "uniformAcceptReject": seed5
     },

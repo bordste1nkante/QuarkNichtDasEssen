@@ -109,6 +109,10 @@ extern Matrix<2,2> identity2, Pauli1, Pauli2, Pauli3;
 //rsU x cSU identity
 extern Matrix<rSU,cSU> identityMatrix;
 
+//not yet defined
+extern size_t numberOfMultiHit;
+extern size_t overrelaxationStep;
+
 
 
 
