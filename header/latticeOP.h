@@ -43,9 +43,22 @@ Matrix<rSU,cSU> determineA(const std::vector<Matrix<rSU,rSU>>& lattice ,size_t x
 Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& U);
 
 
+void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<double>>& loops,
+                            std::vector<double>& r,   const std::vector<size_t>& startingPoint, 
+    const std::vector<size_t>& endPoint );
+
+
+void polyakovLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<double>>& loops,
+                            std::vector<double>& r,   const std::vector<size_t>& startingPoint, 
+    const std::vector<size_t>& endPoint );
+
+
 
 //set all temporal link variables to identity 
 void temporalGauge(std::vector<Matrix<rSU,rSU>>& lattice);
 
 //set all spatial link variables to identity
 void spacialGauge(std::vector<Matrix<rSU,rSU>>& lattice);
+
+
+

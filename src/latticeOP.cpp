@@ -833,6 +833,97 @@ Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& 
 
 }
 
+
+void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<double>>& loops,
+                            std::vector<double>& r,   const std::vector<size_t>& startingPoint, 
+    const std::vector<size_t>& endPoint ){
+    Matrix<rSU, cSU> Path1;
+    Matrix<rSU, cSU> Path2;
+
+    int dx=(endPoint[0]>startingPoint[0]) ? +1:-1;
+    int dy=(endPoint[1]>startingPoint[1]) ? +1:-1;                              
+    int dz=(endPoint[2]>startingPoint[2]) ? +1:-1;
+
+    int x= startingPoint[0];
+    int y= startingPoint[1];
+    int z= startingPoint[2];
+
+    int xDistance=0;
+    int yDistance=0;
+    int zDistance=0;
+
+
+
+    while (x!=endPoint[0])
+    {
+
+        Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,0,0)]);
+        Path2=matrix_multiplication(Path2,lattice[idx(x,y,z,tAxis-1,0)]);
+        loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_hermitean_conjugate(Path1))));
+        x+=dx;
+        xDistance+=1;
+        r.push_back(std::sqrt(xDistance*xDistance+yDistance*yDistance+zDistance*zDistance));
+
+    }
+    while (y!=endPoint[1])
+    {
+        Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,0,1)]);
+        Path2=matrix_multiplication(Path2,lattice[idx(x,y,z,tAxis-1,1)]);
+        loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_hermitean_conjugate(Path1))));
+        y+=dy;
+        yDistance+=1;
+        r.push_back(std::sqrt(xDistance*xDistance+yDistance*yDistance+zDistance*zDistance));                                
+
+    }
+    while (z!=endPoint[2])
+    {
+        Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,0,2)]);
+        Path2=matrix_multiplication(Path2,lattice[idx(x,y,z,tAxis-1,2)]);
+        loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_hermitean_conjugate(Path1))));
+        z+=dz;
+        zDistance+=1;
+        r.push_back(std::sqrt(xDistance*xDistance+yDistance*yDistance+zDistance*zDistance));  
+    }
+                            
+
+
+
+    }
+
+
+void polyakovLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<double>>& loops,
+                            std::vector<double>& r,   const std::vector<size_t>& startingPoint, 
+    const std::vector<size_t>& endPoint ){
+
+    Matrix<rSU, cSU> Path1;
+    Matrix<rSU, cSU> Path2;
+
+
+    int dt=(endPoint[3]>startingPoint[3]) ? +1:-1;
+    int x= startingPoint[0];
+    int y= startingPoint[1];
+    int z= startingPoint[2];
+    int t= startingPoint[3];
+
+    int tDistance= 0;
+
+    while(t!=endPoint[3]){
+        Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,t,3)]);
+        Path2=matrix_multiplication(Path2, lattice[idx(x,y,z,endPoint[3],3)]);
+        loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_hermitean_conjugate(Path1))));
+
+        //save t-distance in r array (for simplicity)
+        r.push_back(std::sqrt(tDistance*tDistance));
+        tDistance +=1;
+        t+=dt;
+
+                                }
+
+                            }
+
+
+
+
 void temporalGauge(std::vector<Matrix<rSU,rSU>>& lattice){
 
     // only time links are set to identity
