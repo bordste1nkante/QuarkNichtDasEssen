@@ -15,7 +15,20 @@
 size_t idx(size_t x, size_t y, size_t z, size_t t, size_t mu){
     return 4*(x+ xAxis*(y+ yAxis*(z+zAxis*t)))+mu;
 }
+std::tuple <size_t, size_t, size_t, size_t, size_t> ReIdx(size_t idx){
 
+    size_t mu = idx%linksPerSite;
+    idx/=linksPerSite;
+    size_t x = idx%xAxis;
+    idx/=xAxis;
+    size_t y = idx%yAxis;
+    idx/=yAxis;
+    size_t z= idx%zAxis;
+    idx /= zAxis;
+    size_t t = idx%tAxis;
+
+    return {mu,x,y,z,t};
+}
 
 
 //updates the whole set of X matrices

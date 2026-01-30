@@ -14,6 +14,8 @@
 // this mimics the behaviour of a 4D lattice from our 1D array
 size_t idx(size_t x, size_t y, size_t z, size_t t, size_t mu);
 
+std::tuple <size_t, size_t, size_t, size_t, size_t> ReIdx(size_t idx);
+
 
 //updates the whole set of X matrices
 void X_updateSU3();
