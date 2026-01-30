@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = -DYAML_CPP_STATIC_DEFINE
 
-CXX_INCLUDES = -I/home/mrv/QuarkNichtDasEssen/TestVincent/../header
+CXX_INCLUDES = -I/home/mrv/QuarkNichtDasEssen/TestVincent/../header -isystem /usr/include/hdf5/serial
 
 CXX_FLAGS = -std=c++20
 

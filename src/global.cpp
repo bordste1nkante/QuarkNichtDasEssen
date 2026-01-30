@@ -70,6 +70,11 @@ std::uniform_int_distribution<int> indexDist (0, 2*NSetXMatrices - 1);
 std::mt19937_64 acceptReject(1949);
 std::uniform_real_distribution<double> uniformAcceptReject(0, 1);
 
+//uniform for refelct overrelaxation
+std::mt19937_64 reflection(2026);
+std::uniform_int_distribution<int> reflectDist (1,3);
+
+
 //Pauli matrices and 2x2 identity
 
 Matrix<2,2> identity2, Pauli1,Pauli2, Pauli3;

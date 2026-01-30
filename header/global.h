@@ -100,6 +100,9 @@ extern std::uniform_int_distribution<int> indexDist;
 extern std::mt19937_64 acceptReject;
 extern std::uniform_real_distribution<double> uniformAcceptReject;
 
+//uniform dist for selecting which reflection to use in overrelaxation
+extern std::mt19937_64 reflection;
+extern std::uniform_int_distribution<int> reflectDist;
 
 
 //Pauli matrices and 2x2 identity
@@ -109,9 +112,9 @@ extern Matrix<2,2> identity2, Pauli1, Pauli2, Pauli3;
 //rsU x cSU identity
 extern Matrix<rSU,cSU> identityMatrix;
 
-//not yet defined
-extern size_t numberOfMultiHit;
-extern size_t overrelaxationStep;
+
+//h5-filename
+extern std::string filenameh5;
 
 
 

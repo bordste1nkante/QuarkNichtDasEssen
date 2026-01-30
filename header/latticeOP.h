@@ -5,6 +5,7 @@
 #include <vector>
 #include <complex>
 #include <random>
+#include <Eigen/Dense>
 #include "../header/global.h"
 
 
@@ -37,7 +38,7 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
 Matrix<rSU,cSU> determineA(const std::vector<Matrix<rSU,rSU>>& lattice ,size_t x, size_t y, size_t z, size_t t, size_t mu);
 
 //determine U' by overrelaxation
-Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& U);
+Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& U);
 
 
 

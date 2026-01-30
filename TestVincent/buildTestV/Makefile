@@ -249,6 +249,30 @@ home/mrv/QuarkNichtDasEssen/src/observables.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.s
 .PHONY : home/mrv/QuarkNichtDasEssen/src/observables.cpp.s
 
+home/mrv/QuarkNichtDasEssen/src/utils.o: home/mrv/QuarkNichtDasEssen/src/utils.cpp.o
+.PHONY : home/mrv/QuarkNichtDasEssen/src/utils.o
+
+# target to build an object file
+home/mrv/QuarkNichtDasEssen/src/utils.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/utils.cpp.o
+.PHONY : home/mrv/QuarkNichtDasEssen/src/utils.cpp.o
+
+home/mrv/QuarkNichtDasEssen/src/utils.i: home/mrv/QuarkNichtDasEssen/src/utils.cpp.i
+.PHONY : home/mrv/QuarkNichtDasEssen/src/utils.i
+
+# target to preprocess a source file
+home/mrv/QuarkNichtDasEssen/src/utils.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/utils.cpp.i
+.PHONY : home/mrv/QuarkNichtDasEssen/src/utils.cpp.i
+
+home/mrv/QuarkNichtDasEssen/src/utils.s: home/mrv/QuarkNichtDasEssen/src/utils.cpp.s
+.PHONY : home/mrv/QuarkNichtDasEssen/src/utils.s
+
+# target to generate assembly for a file
+home/mrv/QuarkNichtDasEssen/src/utils.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/utils.cpp.s
+.PHONY : home/mrv/QuarkNichtDasEssen/src/utils.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -273,6 +297,9 @@ help:
 	@echo "... home/mrv/QuarkNichtDasEssen/src/observables.o"
 	@echo "... home/mrv/QuarkNichtDasEssen/src/observables.i"
 	@echo "... home/mrv/QuarkNichtDasEssen/src/observables.s"
+	@echo "... home/mrv/QuarkNichtDasEssen/src/utils.o"
+	@echo "... home/mrv/QuarkNichtDasEssen/src/utils.i"
+	@echo "... home/mrv/QuarkNichtDasEssen/src/utils.s"
 .PHONY : help
 
 

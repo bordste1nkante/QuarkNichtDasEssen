@@ -13,6 +13,7 @@ TestV.cpp
 ../src/latticeOP.cpp
 ../src/matrixOP.cpp
 ../src/observables.cpp
+../src/utils.cpp
 
 )
 
@@ -21,6 +22,8 @@ target_include_directories(staticquarks PRIVATE ../header)
 
 find_package(yaml-cpp REQUIRED)
 target_link_libraries(staticquarks PRIVATE yaml-cpp::yaml-cpp)
+find_package(HDF5 REQUIRED COMPONENTS CXX)
+target_link_libraries(staticquarks PRIVATE HDF5::HDF5)
 
 
 

@@ -26,8 +26,7 @@ xAxis = int(input("Dimension of X-axis: "))
 yAxis = int(input("Dimension of Y-axis: "))
 zAxis = int(input("Dimension of Z-axis: "))
 tAxis = int(input("Dimension of t-axis: "))
-beta = float(input("Coupling value: "))
-a = float(input("Lattice spacing: "))
+beta = float(input("Beta: "))
 testrun = bool(input("Is this a test or debugging run, 1 yes 0 no: "))
 
 seed1 = random.uniform(0,2)
@@ -105,7 +104,6 @@ data= {
         "z":zAxis,
         "t":tAxis,
         "beta": beta,
-        "lattice spacing": a
     
     },
     "startConfig": start,

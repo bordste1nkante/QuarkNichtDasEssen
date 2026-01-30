@@ -4,6 +4,7 @@
 #include <vector>
 #include <complex>
 #include <random>
+#include <Eigen/Dense>
 #include "../header/matrixOP.h"
 #include "../header/global.h"
 

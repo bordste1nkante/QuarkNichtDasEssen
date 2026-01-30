@@ -5,9 +5,11 @@
 #include <complex>
 #include <random>
 #include <algorithm>
+#include <Eigen/Dense>
 #include "../header/global.h"
 #include "../header/latticeOP.h"
 #include "../header/matrixOP.h"
+#include "../header/utils.h"
 
 // this mimics the behaviour of a 4D lattice from our 1D array
 size_t idx(size_t x, size_t y, size_t z, size_t t, size_t mu){
@@ -759,7 +761,62 @@ Matrix<rSU,cSU> determineA(const std::vector<Matrix<rSU,rSU>>& lattice ,size_t x
     return A;
 }
 
-Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& U){
+Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& U){
+
+    int reflect = reflectDist(reflection);
+
+    Matrix<rSU,cSU> UPrime;
+
+    Eigen::Matrix3cd M = translateMatrices(A);
+    Eigen::Matrix3cd UEigen = translateMatrices(U);    
+
+    Eigen::Matrix3cd K = M.adjoint()*M;
+    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3cd> es(K);
+
+    Eigen::Matrix3cd D_Sqrt=es.eigenvalues().cwiseSqrt().asDiagonal();
+    Eigen::Matrix3cd H = es.eigenvectors()*D_Sqrt*es.eigenvectors().adjoint();
+
+    Eigen::Matrix3cd O=M*H.inverse();
+
+    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3cd> esH(H);
+    Eigen::Matrix3cd V= esH.eigenvectors();
+    Eigen::Matrix3cd Vadjoint = V.adjoint();
+
+
+    Eigen::Matrix3cd Ur = V*UEigen*O*Vadjoint;
+
+    if(reflect = 1){
+        Ur(0,1)= -Ur(0,1);
+        Ur(1,0)=-Ur(1,0);
+        Ur(0,2)=-Ur(0,2);
+        Ur(2,0)=-Ur(2,0);
+
+    }
+    if(reflect = 2){
+        Ur(0,1)= -Ur(0,1);
+        Ur(1,0)=-Ur(1,0);
+        Ur(1,2)=-Ur(1,2);
+        Ur(2,1)=-Ur(2,1);
+
+    }
+    if(reflect = 3){
+        Ur(0,2)= -Ur(0,2);
+        Ur(2,0)=-Ur(2,0);
+        Ur(1,2)=-Ur(1,2);
+        Ur(2,1)=-Ur(2,1);
+
+    }
+    else{
+        std::cout << "reflextion failed due to unexpected value" << std::endl;
+    }
+
+    Eigen::Matrix3cd UR = Vadjoint*Ur*V*O.adjoint();
+
+    UPrime = retranslateMatrices(UR);
+
+    return UPrime;
+
+
 
 }
 

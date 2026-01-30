@@ -15,7 +15,6 @@ void latticeSimulationPureMetropolis(
     const std::vector<size_t>& startingPoint, 
     const std::vector<size_t>& endPoint, 
     const size_t numberOfThermalSweeps, 
-    const size_t roundingFactor, 
     const size_t XUpdate, 
     const size_t NConfigs, 
     const size_t SweepFactor, 
@@ -204,11 +203,11 @@ void latticeSimulationPureMetropolisMultiHit(
     const std::vector<size_t>& startingPoint, 
     const std::vector<size_t>& endPoint, 
     const size_t numberOfThermalSweeps, 
-    const size_t roundingFactor, 
     const size_t XUpdate, 
     const size_t NConfigs, 
     const size_t SweepFactor, 
-    const size_t observable ){
+    const size_t observable,
+    const size_t numberOfMultiHit ){
 
 
     Matrix<rSU, cSU> UPrime;
@@ -418,11 +417,10 @@ void latticeSimulationMixedMetropolisMultiHit(
     const std::vector<size_t>& startingPoint, 
     const std::vector<size_t>& endPoint, 
     const size_t numberOfThermalSweeps, 
-    const size_t roundingFactor, 
     const size_t XUpdate, 
     const size_t NConfigs, 
     const size_t SweepFactor, 
-    const size_t observable ){
+    const size_t observable, const size_t numberOfMultiHit, const size_t overrelaxationStep ){
 
 
     Matrix<rSU, cSU> UPrime;
@@ -444,7 +442,7 @@ void latticeSimulationMixedMetropolisMultiHit(
                             for(int multi = 0; multi < numberOfMultiHit; multi++){
 
                                 if(multi % overrelaxationStep ==0 && multi !=0){
-                                    UPrime = overrelaxation(lattice[idx(l,k,j,i, mu)]);
+                                    //UPrime = overrelaxation(lattice[idx(l,k,j,i, mu)]);
                                 }
                                 else{
                                     size_t index = indexDist(indexing);
@@ -500,7 +498,7 @@ void latticeSimulationMixedMetropolisMultiHit(
                             for(int multi = 0; multi < numberOfMultiHit; multi++){
 
                                 if(multi % overrelaxationStep ==0 && multi !=0){
-                                    UPrime = overrelaxation(lattice[idx(l,k,j,i, mu)]);
+                                   // UPrime = overrelaxation(lattice[idx(l,k,j,i, mu)]);
                                 }
                                 else{
                                     size_t index = indexDist(indexing);

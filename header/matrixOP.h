@@ -5,6 +5,7 @@
 #include <vector>
 #include <complex>
 #include <random>
+#include <Eigen/Dense>
 #include "../header/global.h"
 
 //generates identity and pauli matrices (base of complex 2x2 matrices)

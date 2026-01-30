@@ -5,10 +5,12 @@
 #include <vector>
 #include <complex>
 #include <random>
+#include <H5Cpp.h>  //requires installation of this specific library on Linux: sudo apt install hdf5-tools libhdf5-dev
 #include "../header/global.h"
 #include "../header/latticeOP.h"
 #include "../header/matrixOP.h"
 #include "../header/observables.h"
+#include "../header/utils.h"
 
 
 template <size_t R, size_t C>
@@ -76,26 +78,26 @@ int main(){
     zAxis=1;
     tAxis=1;
     std::vector<Matrix<rSU,cSU>> lattice(4*(xAxis*yAxis*zAxis*tAxis));
-    printArray<rSU,cSU>(identityMatrix);
+    //printArray<rSU,cSU>(identityMatrix);
 
     hot_start(lattice);
-    for(int k = 0; k<100; k++){
-    for(int mu= 0; mu<1; mu++){
-        //printArray<rSU,cSU>(lattice[idx(0,0,0,0,mu)]);
-
-
-        std::complex<double> det = det_A(lattice[idx(0,0,0,0,mu)]);
-        std::complex<double> trace = matrix_trace(matrix_multiplication( matrix_hermitean_conjugate(lattice[idx(0,0,0,0,mu)]),lattice[idx(0,0,0,0,mu)]));
-
-        std::cout << det<< std::endl;
-        std::cout << trace << std::endl;
-        std::cout << "done" << std::endl;
-        X = XSet[indexDist(indexing)];
-        
-        lattice[idx(0,0,0,0,mu)]= matrix_multiplication(X,lattice[idx(0,0,0,0,mu)]);
-        normalizeSU3Matrix(lattice[idx(0,0,0,0,mu)]);
-    }
-    }
+    //for(int k = 0; k<100; k++){
+    //for(int mu= 0; mu<1; mu++){
+    //    //printArray<rSU,cSU>(lattice[idx(0,0,0,0,mu)]);
+//
+//
+    //    std::complex<double> det = det_A(lattice[idx(0,0,0,0,mu)]);
+    //    std::complex<double> trace = matrix_trace(matrix_multiplication( matrix_hermitean_conjugate(lattice[idx(0,0,0,0,mu)]),lattice[idx(0,0,0,0,mu)]));
+//
+    //    std::cout << det<< std::endl;
+    //    std::cout << trace << std::endl;
+    //    std::cout << "done" << std::endl;
+    //    X = XSet[indexDist(indexing)];
+    //    
+    //    lattice[idx(0,0,0,0,mu)]= matrix_multiplication(X,lattice[idx(0,0,0,0,mu)]);
+    //    normalizeSU3Matrix(lattice[idx(0,0,0,0,mu)]);
+    //}
+    //}
 
     //printArray<rSU, cSU>(XSet[2*1+1]);
 
@@ -122,8 +124,34 @@ int main(){
 //
 //
     //}
-    
 
+
+
+    try{
+    H5::H5File file("../testV.h5",H5F_ACC_TRUNC);
+
+    std::vector<double> test = {0.1,0.2,0.3,0.4,0.5};
+
+    hsize_t dimsA[1]= {5};
+    H5::DataSpace spaceA(1,dimsA);
+
+    H5::Group group =file.createGroup("/lattice");
+
+    H5::DataSet dSetA = file.createDataSet(
+        "/lattice/r",
+        H5::PredType::NATIVE_DOUBLE,
+        spaceA
+    );
+
+    dSetA.write(test.data(), H5::PredType::NATIVE_DOUBLE);
+    file.close();
+
+
+    
+}
+catch(H5::Exception& e){
+    e.printErrorStack();
+}
 
 
     return 0;

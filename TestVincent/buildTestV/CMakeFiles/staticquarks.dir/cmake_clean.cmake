@@ -9,6 +9,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/matrixOP.cpp.o.d"
   "CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.o"
   "CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.o.d"
+  "CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/utils.cpp.o"
+  "CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/utils.cpp.o.d"
   "staticquarks"
   "staticquarks.pdb"
 )
