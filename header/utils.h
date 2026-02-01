@@ -1,3 +1,5 @@
+#pragma once
+
 #include <H5Cpp.h>
 #include <stdlib.h>
 #include <yaml-cpp/yaml.h> //requires installation of this specific library on Linux: sudo apt install libyaml-cpp-dev
@@ -9,6 +11,7 @@
 #include <Eigen/Dense>
 #include "global.h"
 
+void ensureGroup(H5::H5File& file, const std::string& path);
 
 bool Setup_H5(bool ColdOrHot, 
     const std::vector<size_t>& startingPoint, 
@@ -20,7 +23,9 @@ bool Setup_H5(bool ColdOrHot,
     const size_t observable);
 
 
-bool saveArrayH5(const std::vector<size_t>& array, std::string dataSetPath);
+bool saveArrayH5(const std::vector<double>& array, std::string dataSetPath);
+
+bool saveArrayH5complex(const std::vector<std::complex<double>>& array, std::string dataSetPath);
 
 
 Eigen::Matrix3d translateMatrices(const Matrix<rSU,cSU>& A);

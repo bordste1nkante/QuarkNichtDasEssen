@@ -4,6 +4,8 @@
 #include <vector>
 #include <complex>
 #include <random>
+#include <execution>
+#include <thread>
 #include <algorithm>
 #include <Eigen/Dense>
 #include "../header/global.h"
@@ -29,12 +31,7 @@ std::tuple <size_t, size_t, size_t, size_t, size_t> ReIdx(size_t idx){
 
     return {mu,x,y,z,t};
 }
-
-
-//updates the whole set of X matrices
 void X_updateSU3(){
-
-
     for(int p=0; p<NSetXMatrices; p++){
         //final matrices
         Matrix<rSU,cSU> X;
@@ -163,29 +160,9 @@ void X_updateSU3(){
         T(2,2)=Tsmall(1,1);
 
         //matrix multiplication S*T = ST
-        for(int i=0; i<rSU; i++){
-            for(int j=0; j<cSU; j++){
-                std::complex<double> sum;
-                for(int k = 0; k<rSU; k++){
-                    sum += S(i,k)*T(k,j);
-
-                }
-                ST(i,j)= sum;
-            }
-
-        }
+        ST=matrix_multiplication(S,T);
         //matrix multiplication R*ST = X
-        for(int i=0; i<rSU; i++){
-            for(int j=0; j<cSU; j++){
-                std::complex<double> sum;
-                for(int k = 0; k<rSU; k++){
-                    sum += R(i,k)*ST(k,j);
-
-                }
-                X(i,j)= sum;
-            }
-
-        }
+        X=matrix_multiplication(R,ST);
 
         ////inverting X
         //std::complex<double> detX = X(0,0)*(X(1,1)*X(2,2)-X(1,2)*X(2,1))-X(0,1)*(X(1,0)*X(2,2)-X(1,2)*X(2,0))+X(0,2)*(X(1,0)*X(2,1)-X(1,1)*X(2,0));
@@ -204,46 +181,393 @@ void X_updateSU3(){
             p = p - 1;
         }
         else{
-            //normalizes det to 1
-            // not sure if this needs to be done by dividing over third root //Vincent: ?
-            for(int i=0; i<rSU; i++){
-                for(int j=0; j<rSU; j++){
-                    X(i,j)= X(i,j)/pow(detX, 1.0/double(rSU));
-                }
-            }
-            //detX = det_A(X);
-            //std::cout << detX << std::endl;
-
-
-//            //the X are already normalized to be detX=1, therefore it becomes redundant to divide by detX
-//            invX(0,0)= (X(1,1)*X(2,2)-X(1,2)*X(2,1));
-//            invX(0,1)=-(X(0,1)*X(2,2)-X(0,2)*X(2,1));
-//            invX(0,2)= (X(0,1)*X(1,2)-X(0,2)*X(1,1));
-//
-//            invX(1,0)=-(X(1,0)*X(2,2)-X(1,2)*X(2,0));
-//            invX(1,1)=(X(0,0)*X(2,2)-X(0,2)*X(2,0));
-//            invX(1,2)=-(X(0,0)*X(1,2)-X(0,2)*X(1,0));
-//
-//            invX(2,0)=(X(1,0)*X(2,1)-X(1,1)*X(2,0));
-//            invX(2,1)=-(X(0,0)*X(2,1)-X(0,1)*X(2,0));
-//            invX(2,2)=(X(0,0)*X(1,1)-X(0,1)*X(1,0));
-//
+            normalizeSU3Matrix(X);
 
             invX = inverse_A(X);
-            //std::cout << "invertiert" << std::endl;
-            //save X and invX in our set of matrices
-            //std::cout << X(0,0) << std::endl;
+
             XSet[2*p]= X;
             XSet[2*p+1]=invX;
 
-            //std::cout << "X generated" << std::endl;
-
-            //std::cout << "X abgespeichert" << std::endl;
 
         }
 
 
     }
+
+
+}
+
+//parallel
+void X_updateSU3(size_t input){
+
+
+    //for(int p=0; p<NSetXMatrices; p++){
+    //    //final matrices
+    //    Matrix<rSU,cSU> X;
+    //    Matrix<rSU,cSU> invX;
+//
+//
+    //    //X=RST
+    //    Matrix<rSU,cSU> R;
+    //    Matrix<rSU,cSU> S;
+    //    Matrix<rSU,cSU> T;
+//
+    //    Matrix<2,2> Rsmall;
+    //    Matrix<2,2> Ssmall;
+    //    Matrix<2,2> Tsmall;
+//
+    //    Matrix<rSU,cSU> ST;
+//
+    //    //std::cout << "Matrix declared" << std::endl;
+//
+//
+//
+    //    //number required to generate 3 SU(2) matrices, from these we form a SU(3)
+//
+    //    double r[3];
+    //    double r0 = dist(rng1); 
+    //    double s[3];
+    //    double s0 = dist(rng2); 
+    //    double t[3];
+    //    double t0 = dist(rng3);
+//
+    //    r[0]= dist(hotNumbR1);
+    //    r[1]= dist(hotNumbR2);
+    //    r[2]= dist(hotNumbR3);  
+//
+    //    double er = dist(hotNumb1Extra);
+//
+    //    double rLength = std::sqrt(r[0]*r[0]+r[1]*r[1]+r[2]*r[2]);
+    //    r0=r0/std::sqrt(r0*r0)*std::sqrt(1-er*er);
+//
+//
+    //    s[0]= dist(hotNumbS1);
+    //    s[1]= dist(hotNumbS2);
+    //    s[2]= dist(hotNumbS3);                     
+//
+    //    double es = dist(hotNumb2Extra);    
+//
+    //    double sLength = std::sqrt(s[0]*s[0]+s[1]*s[1]+s[2]*s[2]);
+    //    s0=s0/std::sqrt(s0*s0)*std::sqrt(1-es*es);
+//
+//
+//
+    //    t[0]= dist(hotNumbT1);
+    //    t[1]= dist(hotNumbT2);
+    //    t[2]= dist(hotNumbT3);                    
+//
+    //    double et = dist(hotNumb3Extra);
+    //    double tLength = std::sqrt(t[0]*t[0]+t[1]*t[1]+t[2]*t[2]);
+    //    t0=t0/std::sqrt(t0*t0)*std::sqrt(1-et*et);
+  //
+    //    for(int i=0; i<3; i++){
+    //        s[i]=es*s[i]/sLength;
+    //        t[i]=et*t[i]/tLength;
+    //        r[i]=er*r[i]/rLength;
+//
+    //    }
+    //    //std::cout << "vectors done" << std::endl;
+//
+    //    for(int i=0; i<4; i++){
+//
+    //        if(i==0){
+    //            for(int j=0; j<2; j++){
+    //                for(int k=0; k<2; k++){
+    //                    
+//
+    //                    Ssmall(j,k)= pauliMatrices[i](j,k)*s0;
+    //                    Rsmall(j,k)= pauliMatrices[i](j,k)*r0;
+    //                    Tsmall(j,k)= pauliMatrices[i](j,k)*t0;
+//
+    //                }
+    //            } 
+    //        }
+    //        else{
+    //        for(int j=0; j<2; j++){
+    //            for(int k=0; k<2; k++){
+    //                Ssmall(j,k)+= pauliMatrices[i](j,k)*s[i-1];
+    //                Rsmall(j,k)+= pauliMatrices[i](j,k)*r[i-1];
+    //                Tsmall(j,k)+= pauliMatrices[i](j,k)*t[i-1];
+    //                }
+    //            }
+    //        }
+    //    }       
+//
+    //    //std::cout << "2D - matrix done" << std::endl;
+    //    //fill R,S,T
+    //    std::complex<double> uno= {1.0,0.0};
+    //    std::complex<double> zero = {0.0,0.0};
+//
+    //    R(0,0)=Rsmall(0,0);
+    //    R(1,0)=Rsmall(1,0);
+    //    R(2,0)=zero;
+    //    R(0,1)=Rsmall(0,1);
+    //    R(1,1)=Rsmall(1,1);
+    //    R(2,1)=zero;
+    //    R(0,2)=zero;
+    //    R(1,2)=zero;
+    //    R(2,2)=uno;
+//
+    //    S(0,0)=Ssmall(0,0);
+    //    S(1,0)=zero;
+    //    S(2,0)=Ssmall(0,1);
+    //    S(0,1)=zero;
+    //    S(1,1)=uno;
+    //    S(2,1)=Ssmall(1,0);
+    //    S(0,2)=zero;
+    //    S(1,2)=zero;
+    //    S(2,2)=Ssmall(1,1);
+//
+    //    T(0,0)=uno;
+    //    T(1,0)=zero;
+    //    T(2,0)=zero;
+    //    T(0,1)=zero;
+    //    T(1,1)=Tsmall(0,0);
+    //    T(2,1)=Tsmall(1,0);
+    //    T(0,2)=zero;
+    //    T(1,2)=Tsmall(0,1);
+    //    T(2,2)=Tsmall(1,1);
+//
+    //    //matrix multiplication S*T = ST
+    //    for(int i=0; i<rSU; i++){
+    //        for(int j=0; j<cSU; j++){
+    //            std::complex<double> sum;
+    //            for(int k = 0; k<rSU; k++){
+    //                sum += S(i,k)*T(k,j);
+//
+    //            }
+    //            ST(i,j)= sum;
+    //        }
+//
+    //    }
+    //    //matrix multiplication R*ST = X
+    //    for(int i=0; i<rSU; i++){
+    //        for(int j=0; j<cSU; j++){
+    //            std::complex<double> sum;
+    //            for(int k = 0; k<rSU; k++){
+    //                sum += R(i,k)*ST(k,j);
+//
+    //            }
+    //            X(i,j)= sum;
+    //        }
+//
+    //    }
+//
+    //    ////inverting X
+    //    //std::complex<double> detX = X(0,0)*(X(1,1)*X(2,2)-X(1,2)*X(2,1))-X(0,1)*(X(1,0)*X(2,2)-X(1,2)*X(2,0))+X(0,2)*(X(1,0)*X(2,1)-X(1,1)*X(2,0));
+    //    std::complex<double> detX = det_A(X);
+//
+    //    //std::cout << detX << std::endl;
+//
+    //    // should insure that if det(X) \approx zero we just repeat the process and generate a new X
+//
+    //    double tol = 1e-11;
+    //        
+    //    if (detX.real() > -tol && detX.real() < tol &&
+    //        detX.imag() > -tol && detX.imag() < tol)
+    //    {
+    //        std::cout << "Stuck in loop" << std::endl;
+    //        p = p - 1;
+    //    }
+    //    else{
+    //        //normalizes det to 1
+    //        // not sure if this needs to be done by dividing over third root //Vincent: ?
+    //        for(int i=0; i<rSU; i++){
+    //            for(int j=0; j<rSU; j++){
+    //                X(i,j)= X(i,j)/pow(detX, 1.0/double(rSU));
+    //            }
+    //        }
+    //        //detX = det_A(X);
+    //        //std::cout << detX << std::endl;
+//
+//
+//  //          //the X are already normalized to be detX=1, therefore it becomes redundant to divide by detX
+//  //          invX(0,0)= (X(1,1)*X(2,2)-X(1,2)*X(2,1));
+//  //          invX(0,1)=-(X(0,1)*X(2,2)-X(0,2)*X(2,1));
+//  //          invX(0,2)= (X(0,1)*X(1,2)-X(0,2)*X(1,1));
+////
+//  //          invX(1,0)=-(X(1,0)*X(2,2)-X(1,2)*X(2,0));
+//  //          invX(1,1)=(X(0,0)*X(2,2)-X(0,2)*X(2,0));
+//  //          invX(1,2)=-(X(0,0)*X(1,2)-X(0,2)*X(1,0));
+////
+//  //          invX(2,0)=(X(1,0)*X(2,1)-X(1,1)*X(2,0));
+//  //          invX(2,1)=-(X(0,0)*X(2,1)-X(0,1)*X(2,0));
+//  //          invX(2,2)=(X(0,0)*X(1,1)-X(0,1)*X(1,0));
+////
+//
+    //        invX = inverse_A(X);
+    //        //std::cout << "invertiert" << std::endl;
+    //        //save X and invX in our set of matrices
+    //        //std::cout << X(0,0) << std::endl;
+    //        XSet[2*p]= X;
+    //        XSet[2*p+1]=invX;
+//
+    //        //std::cout << "X generated" << std::endl;
+//
+    //        //std::cout << "X abgespeichert" << std::endl;
+//
+    //    }
+//
+//
+    //}
+
+    std::vector<Matrix<rSU,rSU>> bufferSet(XSet.size());
+    std::vector<size_t> indices(NSetXMatrices);
+    std::iota(indices.begin(), indices.end(),0);
+    std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t index){
+        Matrix<rSU,cSU> X;
+        Matrix<rSU,cSU> invX;
+
+        //X=RST
+        Matrix<rSU,cSU> R;
+        Matrix<rSU,cSU> S;
+        Matrix<rSU,cSU> T;
+
+        Matrix<2,2> Rsmall;
+        Matrix<2,2> Ssmall;
+        Matrix<2,2> Tsmall;
+
+        Matrix<rSU,cSU> ST;
+
+        std::mt19937_64 hottestNumbR1(index*dhotNumbR1+input);
+        std::mt19937_64 hottestNumbR2(index*dhotNumbR2+input);
+        std::mt19937_64 hottestNumbR3(index*dhotNumbR3+input);
+        std::mt19937_64 hottestNumbR0(index*drng1+input);
+        std::mt19937_64 hottestNumbRE(index*dhotNumb1Extra+input);
+
+        std::mt19937_64 hottestNumbS1(index*dhotNumbS1+input);
+        std::mt19937_64 hottestNumbS2(index*dhotNumbS2+input);
+        std::mt19937_64 hottestNumbS3(index*dhotNumbS3+input);
+        std::mt19937_64 hottestNumbS0(index*drng2+input);
+        std::mt19937_64 hottestNumbSE(index*dhotNumb2Extra+input);
+
+        std::mt19937_64 hottestNumbT1(index*dhotNumbT1+input);
+        std::mt19937_64 hottestNumbT2(index*dhotNumbT2+input);
+        std::mt19937_64 hottestNumbT3(index*dhotNumbT3+input);
+        std::mt19937_64 hottestNumbT0(index*drng3+input);
+        std::mt19937_64 hottestNumbTE(index*dhotNumb3Extra+input);
+
+
+
+        double r[3];
+        double r0 = dist(hottestNumbR0); 
+        double s[3];
+        double s0 = dist(hottestNumbS0); 
+        double t[3];
+        double t0 = dist(hottestNumbT0);
+
+        r[0]= dist(hottestNumbR1);
+        r[1]= dist(hottestNumbR2);
+        r[2]= dist(hottestNumbR3);  
+
+        double er = dist(hottestNumbSE);
+
+        double rLength = std::sqrt(r[0]*r[0]+r[1]*r[1]+r[2]*r[2]);
+        r0=r0/std::sqrt(r0*r0)*std::sqrt(1-er*er);
+
+
+        s[0]= dist(hottestNumbS1);
+        s[1]= dist(hottestNumbS2);
+        s[2]= dist(hottestNumbS3);                     
+
+        double es = dist(hottestNumbSE);    
+
+        double sLength = std::sqrt(s[0]*s[0]+s[1]*s[1]+s[2]*s[2]);
+        s0=s0/std::sqrt(s0*s0)*std::sqrt(1-es*es);
+
+
+        t[0]= dist(hottestNumbT1);
+        t[1]= dist(hottestNumbT2);
+        t[2]= dist(hottestNumbT3);                    
+
+        double et = dist(hottestNumbRE);
+        double tLength = std::sqrt(t[0]*t[0]+t[1]*t[1]+t[2]*t[2]);
+        t0=t0/std::sqrt(t0*t0)*std::sqrt(1-et*et);
+        for(int i=0; i<3; i++){
+            s[i]=es*s[i]/sLength;
+            t[i]=et*t[i]/tLength;
+            r[i]=er*r[i]/rLength;
+
+        }
+
+        for(int i=0; i<4; i++){
+
+            if(i==0){
+                for(int j=0; j<2; j++){
+                    for(int k=0; k<2; k++){
+                        
+
+                        Ssmall(j,k)= pauliMatrices[i](j,k)*s0;
+                        Rsmall(j,k)= pauliMatrices[i](j,k)*r0;
+                        Tsmall(j,k)= pauliMatrices[i](j,k)*t0;
+
+                    }
+                } 
+            }
+            else{
+            for(int j=0; j<2; j++){
+                for(int k=0; k<2; k++){
+                    Ssmall(j,k)+= pauliMatrices[i](j,k)*s[i-1];
+                    Rsmall(j,k)+= pauliMatrices[i](j,k)*r[i-1];
+                    Tsmall(j,k)+= pauliMatrices[i](j,k)*t[i-1];
+                    }
+                }
+            }
+        }       
+
+        //std::cout << "2D - matrix done" << std::endl;
+        //fill R,S,T
+        std::complex<double> uno= {1.0,0.0};
+        std::complex<double> zero = {0.0,0.0};
+
+        R(0,0)=Rsmall(0,0);
+        R(1,0)=Rsmall(1,0);
+        R(2,0)=zero;
+        R(0,1)=Rsmall(0,1);
+        R(1,1)=Rsmall(1,1);
+        R(2,1)=zero;
+        R(0,2)=zero;
+        R(1,2)=zero;
+        R(2,2)=uno;
+
+        S(0,0)=Ssmall(0,0);
+        S(1,0)=zero;
+        S(2,0)=Ssmall(0,1);
+        S(0,1)=zero;
+        S(1,1)=uno;
+        S(2,1)=Ssmall(1,0);
+        S(0,2)=zero;
+        S(1,2)=zero;
+        S(2,2)=Ssmall(1,1);
+
+        T(0,0)=uno;
+        T(1,0)=zero;
+        T(2,0)=zero;
+        T(0,1)=zero;
+        T(1,1)=Tsmall(0,0);
+        T(2,1)=Tsmall(1,0);
+        T(0,2)=zero;
+        T(1,2)=Tsmall(0,1);
+        T(2,2)=Tsmall(1,1);
+
+        //matrix multiplication S*T = ST
+        ST =matrix_multiplication(S,T);
+        //matrix multiplication R*ST = X
+        X=matrix_multiplication(R,ST);
+        normalizeSU3Matrix(X);
+            
+
+        invX = inverse_A(X);
+
+        bufferSet[2*index]= X;
+        bufferSet[2*index+1]=invX;
+
+
+
+        });
+    std::swap(bufferSet,XSet);
+
+
 }
 
 //rounding errors causes matrices to potentially digress from det = 1, we correct that from time to time.
@@ -321,192 +645,391 @@ void normalizeSU3Matrix(Matrix<rSU,rSU>& U){
 //sets all matrices to identity, a potential starting config
 void cold_start(std::vector<Matrix<rSU,rSU>>& lattice){
 
-    for(int i = 0; i<tAxis; i++){
-        for(int j= 0; j<zAxis; j++){
-            for(int k=0; k<yAxis; k++){
-                for(int l=0; l<xAxis; l++){
-                    for(int mu = 0; mu<linksPerSite; mu++){
-                        lattice[idx(l,k,j,i,mu)]=identityMatrix;
+//    for(int i = 0; i<tAxis; i++){
+//        for(int j= 0; j<zAxis; j++){
+//            for(int k=0; k<yAxis; k++){
+//                for(int l=0; l<xAxis; l++){
+//                    for(int mu = 0; mu<linksPerSite; mu++){
+//                        lattice[idx(l,k,j,i,mu)]=identityMatrix;
+//
+//                }
+//                }
+//
+//
+//
+//            }
+//        }
+//    }
+    std::vector<Matrix<rSU,rSU>> bufferLattice(lattice.size());
+    std::vector<size_t> indices(lattice.size());
+    std::iota(indices.begin(), indices.end(),0);
 
-                }
-                }
-
-
-
-            }
-        }
-    }
+    std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
+        bufferLattice[i]=identityMatrix;
+    });
+    std::swap(bufferLattice,lattice);
 
     return;
 }
 
 //sets all matrices to random ones, a possible starting config
 void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
-    Matrix<rSU,cSU> U;
-    Matrix<rSU,cSU> R;
-    Matrix<rSU,cSU> S;
-    Matrix<rSU,cSU> T;
-    Matrix<2,2> Rsmall;
-    Matrix<2,2> Ssmall;
-    Matrix<2,2> Tsmall;
-    Matrix<rSU,cSU> ST;
+    //Matrix<rSU,cSU> U;
+    //Matrix<rSU,cSU> R;
+    //Matrix<rSU,cSU> S;
+    //Matrix<rSU,cSU> T;
+    //Matrix<2,2> Rsmall;
+    //Matrix<2,2> Ssmall;
+    //Matrix<2,2> Tsmall;
+    //Matrix<rSU,cSU> ST;
+//
+//
+    ////fixed int c and d
+    //for(int a = 0; a<tAxis; a++){
+    //    for(int b= 0; b<zAxis; b++){
+    //        for(int c=0; c<yAxis; c++){
+    //            for(int d=0; d<xAxis; d++){
+    //                for(int mu = 0; mu<linksPerSite; mu++){
+    //                //number required to generate 3 SU(2) matrices, from these we form a SU(3)
+//
+    //                double r[3];
+    //                r[0]= dist(hotNumbR1);
+    //                r[1]= dist(hotNumbR2);
+    //                r[2]= dist(hotNumbR3); 
+    //                double r0 = dist(hotNumb1); 
+//
+//
+    //                double er = hotDist(hotNumb1Extra);
+//
+    //                double rLength = std::sqrt(r[0]*r[0]+r[1]*r[1]+r[2]*r[2]);
+    //                r0=r0/std::sqrt(r0*r0)*std::sqrt(1-er*er);
+//
+    //                double s[3];
+    //                s[0]= dist(hotNumbS1);
+    //                s[1]= dist(hotNumbS2);
+    //                s[2]= dist(hotNumbS3);                     
+    //                double s0 = dist(hotNumb2); 
+//
+    //                double es = hotDist(hotNumb2Extra);     
+//
+    //                double sLength = std::sqrt(s[0]*s[0]+s[1]*s[1]+s[2]*s[2]);
+    //                s0=s0/std::sqrt(s0*s0)*std::sqrt(1-es*es);
+//
+//
+    //                double t[3];
+    //                t[0]= dist(hotNumbT1);
+    //                t[1]= dist(hotNumbT2);
+    //                t[2]= dist(hotNumbT3);                    
+//
+    //                double t0 = dist(hotNumb3);
+//
+    //                double et = hotDist(hotNumb3Extra);
+//
+    //                double tLength = std::sqrt(t[0]*t[0]+t[1]*t[1]+t[2]*t[2]);
+    //                t0=t0/std::sqrt(t0*t0)*std::sqrt(1-et*et);
+//
+    //                for(int i=0; i<3; i++){
+    //                    s[i]=es*s[i]/sLength;
+    //                    t[i]=et*t[i]/tLength;
+    //                    r[i]=er*r[i]/rLength;
+    //                
+    //                }
+    //            
+    //                for(int i=0; i<4; i++){
+    //                
+    //                    if(i==0){
+    //                        for(int j=0; j<2; j++){
+    //                            for(int k=0; k<2; k++){
+    //                            
+    //                                Ssmall(j,k)= pauliMatrices[i](j,k)*s0;
+    //                                Rsmall(j,k)= pauliMatrices[i](j,k)*r0;
+    //                                Tsmall(j,k)= pauliMatrices[i](j,k)*t0;
+    //                            
+    //                            }
+    //                        } 
+    //                    }
+    //                    else{
+    //                    for(int j=0; j<2; j++){
+    //                        for(int k=0; k<2; k++){
+    //                            Ssmall(j,k)+= pauliMatrices[i](j,k)*s[i-1];
+    //                            Rsmall(j,k)+= pauliMatrices[i](j,k)*r[i-1];
+    //                            Tsmall(j,k)+= pauliMatrices[i](j,k)*t[i-1];
+    //                    }
+    //                    }  
+    //                }     
+    //                }               
+//
+    //                    //fill R,S,T
+    //                    std::complex<double> uno= {1.0,0.0};
+    //                    std::complex<double> zero = {0.0,0.0};
+//
+    //                    R(0,0)=Rsmall(0,0);
+    //                    R(1,0)=Rsmall(1,0);
+    //                    R(2,0)=zero;
+    //                    R(0,1)=Rsmall(0,1);
+    //                    R(1,1)=Rsmall(1,1);
+    //                    R(2,1)=zero;
+    //                    R(0,2)=zero;
+    //                    R(1,2)=zero;
+    //                    R(2,2)=uno;
+//
+    //                    S(0,0)=Ssmall(0,0);
+    //                    S(1,0)=zero;
+    //                    S(2,0)=Ssmall(0,1);
+    //                    S(0,1)=zero;
+    //                    S(1,1)=uno;
+    //                    S(2,1)=Ssmall(1,0);
+    //                    S(0,2)=zero;
+    //                    S(1,2)=zero;
+    //                    S(2,2)=Ssmall(1,1);
+//
+    //                    T(0,0)=uno;
+    //                    T(1,0)=zero;
+    //                    T(2,0)=zero;
+    //                    T(0,1)=zero;
+    //                    T(1,1)=Tsmall(0,0);
+    //                    T(2,1)=Tsmall(1,0);
+    //                    T(0,2)=zero;
+    //                    T(1,2)=Tsmall(0,1);
+    //                    T(2,2)=Tsmall(1,1);
+//
+    //                    //matrix multiplication S*T = ST
+    //                    for(int i=0; i<rSU; i++){
+    //                        for(int j=0; j<cSU; j++){
+    //                            std::complex<double> sum;
+    //                            for(int k = 0; k<rSU; k++){
+    //                                sum += S(i,k)*T(k,j);
+    //                            
+    //                            }
+    //                            ST(i,j)= sum;
+    //                        }
+    //                    
+    //                    }
+    //                    //matrix multiplication R*ST = X
+    //                    for(int i=0; i<rSU; i++){
+    //                        for(int j=0; j<cSU; j++){
+    //                            std::complex<double> sum;
+    //                            for(int k = 0; k<rSU; k++){
+    //                                sum += R(i,k)*ST(k,j);
+    //                            
+    //                            }
+    //                            U(i,j)= sum;
+    //                        }
+    //                    
+    //                    }
+    //                    //normalize to det(U)=1
+    //                    std::complex<double> detU = det_A(U);
+    //                    
+    //                    for(int i = 0; i<rSU; i++){
+    //                        for(int j = 0; j<cSU; j++){
+    //                            U(i,j)=U(i,j)/pow(detU, 1.0/double(rSU));
+    //                        }
+    //                    }
+    //                
+    //                    lattice[idx(a,b,c,d, mu)]=U;
+    //            }
+    //                
+    //            }
+//
+//
+    //        }
+    //    }
+    //}
+    std::vector<Matrix<rSU,rSU>> bufferLattice(lattice.size());
+    std::vector<size_t> indices(lattice.size());
+    std::iota(indices.begin(), indices.end(),0);
 
 
-    //fixed int c and d
-    for(int a = 0; a<tAxis; a++){
-        for(int b= 0; b<zAxis; b++){
-            for(int c=0; c<yAxis; c++){
-                for(int d=0; d<xAxis; d++){
-                    for(int mu = 0; mu<linksPerSite; mu++){
-                    //number required to generate 3 SU(2) matrices, from these we form a SU(3)
+    std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
 
-                    double r[3];
-                    r[0]= dist(hotNumbR1);
-                    r[1]= dist(hotNumbR2);
-                    r[2]= dist(hotNumbR3); 
-                    double r0 = dist(hotNumb1); 
+            
+  
+        Matrix<rSU,cSU> U;
+        Matrix<rSU,cSU> R;
+        Matrix<rSU,cSU> S;
+        Matrix<rSU,cSU> T;
+        Matrix<2,2> Rsmall;
+        Matrix<2,2> Ssmall;
+        Matrix<2,2> Tsmall;
+        Matrix<rSU,cSU> ST;
+        
+        std::mt19937_64 hottestNumbR1(i*dhotNumbR1);
+        std::mt19937_64 hottestNumbR2(i*dhotNumbR2);
+        std::mt19937_64 hottestNumbR3(i*dhotNumbR3);
+        std::mt19937_64 hottestNumbR0(i*dhotNumb1);
+        std::mt19937_64 hottestNumbRE(i*dhotNumb1Extra);
+
+        std::mt19937_64 hottestNumbS1(i*dhotNumbS1);
+        std::mt19937_64 hottestNumbS2(i*dhotNumbS2);
+        std::mt19937_64 hottestNumbS3(i*dhotNumbS3);
+        std::mt19937_64 hottestNumbS0(i*dhotNumb2);
+        std::mt19937_64 hottestNumbSE(i*dhotNumb2Extra);
+
+        std::mt19937_64 hottestNumbT1(i*dhotNumbT1);
+        std::mt19937_64 hottestNumbT2(i*dhotNumbT2);
+        std::mt19937_64 hottestNumbT3(i*dhotNumbT3);
+        std::mt19937_64 hottestNumbT0(i*dhotNumb3);
+        std::mt19937_64 hottestNumbTE(i*dhotNumb3Extra);
 
 
-                    double er = hotDist(hotNumb1Extra);
-
-                    double rLength = std::sqrt(r[0]*r[0]+r[1]*r[1]+r[2]*r[2]);
-                    r0=r0/std::sqrt(r0*r0)*std::sqrt(1-er*er);
-
-                    double s[3];
-                    s[0]= dist(hotNumbS1);
-                    s[1]= dist(hotNumbS2);
-                    s[2]= dist(hotNumbS3);                     
-                    double s0 = dist(hotNumb2); 
-
-                    double es = hotDist(hotNumb2Extra);     
-
-                    double sLength = std::sqrt(s[0]*s[0]+s[1]*s[1]+s[2]*s[2]);
-                    s0=s0/std::sqrt(s0*s0)*std::sqrt(1-es*es);
 
 
-                    double t[3];
-                    t[0]= dist(hotNumbT1);
-                    t[1]= dist(hotNumbT2);
-                    t[2]= dist(hotNumbT3);                    
+        std::uniform_real_distribution<double> distribution(-0.5,0.5);
+        std::uniform_real_distribution<double> hotDistribution(-hotEpsilon,hotEpsilon);
 
-                    double t0 = dist(hotNumb3);
 
-                    double et = hotDist(hotNumb3Extra);
 
-                    double tLength = std::sqrt(t[0]*t[0]+t[1]*t[1]+t[2]*t[2]);
-                    t0=t0/std::sqrt(t0*t0)*std::sqrt(1-et*et);
+        //number required to generate 3 SU(2) matrices, from these we form a SU(3)
+        double r[3];
+        r[0]= distribution(hottestNumbR1);
+        r[1]= distribution(hottestNumbR2);
+        r[2]= distribution(hottestNumbR3); 
 
-                    for(int i=0; i<3; i++){
-                        s[i]=es*s[i]/sLength;
-                        t[i]=et*t[i]/tLength;
-                        r[i]=er*r[i]/rLength;
+        double r0 = distribution(hottestNumbR0); 
+        double er = hotDistribution(hottestNumbRE);
+
+        double rLength = std::sqrt(r[0]*r[0]+r[1]*r[1]+r[2]*r[2]);
+        r0=r0/std::sqrt(r0*r0)*std::sqrt(1-er*er);
+
+        double s[3];
+        s[0]= distribution(hottestNumbS1);
+        s[1]= distribution(hottestNumbS2);
+        s[2]= distribution(hottestNumbS3);        
+
+        double s0 = distribution(hottestNumbS0); 
+        double es = hotDistribution(hottestNumbSE);  
+
+        double sLength = std::sqrt(s[0]*s[0]+s[1]*s[1]+s[2]*s[2]);
+        s0=s0/std::sqrt(s0*s0)*std::sqrt(1-es*es);
+
+        double t[3];
+        t[0]= distribution(hottestNumbT1);
+        t[1]= distribution(hottestNumbT2);
+        t[2]= distribution(hottestNumbT3);   
+
+        double t0 = distribution(hottestNumbT0);
+
+        double et = hotDistribution(hottestNumbTE);
+
+        double tLength = std::sqrt(t[0]*t[0]+t[1]*t[1]+t[2]*t[2]);
+        t0=t0/std::sqrt(t0*t0)*std::sqrt(1-et*et);
+
+        for(int i=0; i<3; i++){
+            s[i]=es*s[i]/sLength;
+            t[i]=et*t[i]/tLength;
+            r[i]=er*r[i]/rLength;
                     
-                    }
+                }
                 
-                    for(int i=0; i<4; i++){
+        for(int i=0; i<4; i++){
                     
-                        if(i==0){
-                            for(int j=0; j<2; j++){
-                                for(int k=0; k<2; k++){
+            if(i==0){
+                for(int j=0; j<2; j++){
+                    for(int k=0; k<2; k++){
                                 
-                                    Ssmall(j,k)= pauliMatrices[i](j,k)*s0;
-                                    Rsmall(j,k)= pauliMatrices[i](j,k)*r0;
-                                    Tsmall(j,k)= pauliMatrices[i](j,k)*t0;
+                        Ssmall(j,k)= pauliMatrices[i](j,k)*s0;
+                        Rsmall(j,k)= pauliMatrices[i](j,k)*r0;
+                        Tsmall(j,k)= pauliMatrices[i](j,k)*t0;
                                 
                                 }
                             } 
                         }
-                        else{
-                        for(int j=0; j<2; j++){
-                            for(int k=0; k<2; k++){
-                                Ssmall(j,k)+= pauliMatrices[i](j,k)*s[i-1];
-                                Rsmall(j,k)+= pauliMatrices[i](j,k)*r[i-1];
-                                Tsmall(j,k)+= pauliMatrices[i](j,k)*t[i-1];
+            else{
+                for(int j=0; j<2; j++){
+                    for(int k=0; k<2; k++){
+                        Ssmall(j,k)+= pauliMatrices[i](j,k)*s[i-1];
+                        Rsmall(j,k)+= pauliMatrices[i](j,k)*r[i-1];
+                        Tsmall(j,k)+= pauliMatrices[i](j,k)*t[i-1];
                         }
                         }  
                     }     
                     }               
 
-                        //fill R,S,T
-                        std::complex<double> uno= {1.0,0.0};
-                        std::complex<double> zero = {0.0,0.0};
+        //fill R,S,T
+        std::complex<double> uno= {1.0,0.0};
+        std::complex<double> zero = {0.0,0.0};
 
-                        R(0,0)=Rsmall(0,0);
-                        R(1,0)=Rsmall(1,0);
-                        R(2,0)=zero;
-                        R(0,1)=Rsmall(0,1);
-                        R(1,1)=Rsmall(1,1);
-                        R(2,1)=zero;
-                        R(0,2)=zero;
-                        R(1,2)=zero;
-                        R(2,2)=uno;
+        R(0,0)=Rsmall(0,0);
+        R(1,0)=Rsmall(1,0);
+        R(2,0)=zero;
+        R(0,1)=Rsmall(0,1);
+        R(1,1)=Rsmall(1,1);
+        R(2,1)=zero;
+        R(0,2)=zero;
+        R(1,2)=zero;
+        R(2,2)=uno;
 
-                        S(0,0)=Ssmall(0,0);
-                        S(1,0)=zero;
-                        S(2,0)=Ssmall(0,1);
-                        S(0,1)=zero;
-                        S(1,1)=uno;
-                        S(2,1)=Ssmall(1,0);
-                        S(0,2)=zero;
-                        S(1,2)=zero;
-                        S(2,2)=Ssmall(1,1);
+        S(0,0)=Ssmall(0,0);
+        S(1,0)=zero;
+        S(2,0)=Ssmall(0,1);
+        S(0,1)=zero;
+        S(1,1)=uno;
+        S(2,1)=Ssmall(1,0);
+        S(0,2)=zero;
+        S(1,2)=zero;
+        S(2,2)=Ssmall(1,1);
 
-                        T(0,0)=uno;
-                        T(1,0)=zero;
-                        T(2,0)=zero;
-                        T(0,1)=zero;
-                        T(1,1)=Tsmall(0,0);
-                        T(2,1)=Tsmall(1,0);
-                        T(0,2)=zero;
-                        T(1,2)=Tsmall(0,1);
-                        T(2,2)=Tsmall(1,1);
+        T(0,0)=uno;
+        T(1,0)=zero;
+        T(2,0)=zero;
+        T(0,1)=zero;
+        T(1,1)=Tsmall(0,0);
+        T(2,1)=Tsmall(1,0);
+        T(0,2)=zero;
+        T(1,2)=Tsmall(0,1);
+        T(2,2)=Tsmall(1,1);
 
-                        //matrix multiplication S*T = ST
-                        for(int i=0; i<rSU; i++){
-                            for(int j=0; j<cSU; j++){
-                                std::complex<double> sum;
-                                for(int k = 0; k<rSU; k++){
-                                    sum += S(i,k)*T(k,j);
+        //matrix multiplication S*T = ST
+        for(int i=0; i<rSU; i++){
+            for(int j=0; j<cSU; j++){
+                std::complex<double> sum;
+                for(int k = 0; k<rSU; k++){
+                    sum += S(i,k)*T(k,j);
                                 
-                                }
-                                ST(i,j)= sum;
+                        }
+                    ST(i,j)= sum;
+                    }
+                        
+                    }
+        //matrix multiplication R*ST = X
+        for(int i=0; i<rSU; i++){
+            for(int j=0; j<cSU; j++){
+                std::complex<double> sum;
+                for(int k = 0; k<rSU; k++){
+                    sum += R(i,k)*ST(k,j);
+                                
+                        }
+                        U(i,j)= sum;
                             }
                         
                         }
-                        //matrix multiplication R*ST = X
-                        for(int i=0; i<rSU; i++){
-                            for(int j=0; j<cSU; j++){
-                                std::complex<double> sum;
-                                for(int k = 0; k<rSU; k++){
-                                    sum += R(i,k)*ST(k,j);
-                                
-                                }
-                                U(i,j)= sum;
-                            }
+        //normalize to det(U)=1
+        std::complex<double> detU = det_A(U);
                         
-                        }
-                        //normalize to det(U)=1
-                        std::complex<double> detU = det_A(U);
-                        
-                        for(int i = 0; i<rSU; i++){
-                            for(int j = 0; j<cSU; j++){
-                                U(i,j)=U(i,j)/pow(detU, 1.0/double(rSU));
+        for(int i = 0; i<rSU; i++){
+            for(int j = 0; j<cSU; j++){
+                U(i,j)=U(i,j)/pow(detU, 1.0/double(rSU));
                             }
                         }
                     
-                        lattice[idx(a,b,c,d, mu)]=U;
-                }
-                    
-                }
-
-
-            }
+            bufferLattice[i]=U;
+                
+        
         }
-    }
+                    
+                
 
+
+            
+        
+    
+    );
+    //switch pointers of buffer and original
+    std::swap(bufferLattice,lattice);
     return;
-
 }
+
+
 
 
 
@@ -522,6 +1045,29 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
     probability = std::min(1.0, exp(- SActionDif)); // according to my notes -> check in doubt
 
     r= uniformAcceptReject(acceptReject);
+    if(r<=probability){
+        accept = true;
+    }
+    else{
+        accept = false;
+    }
+
+
+    return accept;
+}
+
+//parallel
+bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU,rSU>& U,  const Matrix<rSU,rSU>& UPrime, const Matrix<rSU,cSU>& A, std::mt19937_64& ActionAccept, std::uniform_real_distribution<double>& Distribution){
+    
+    bool accept;
+    double r;
+    double probability;
+    
+    double SActionDif;
+    SActionDif = -beta/(xAxis*yAxis*zAxis*tAxis)*(matrix_trace(matrix_multiplication(matrix_subtraction(UPrime, U),A))).real();
+    probability = std::min(1.0, exp(- SActionDif)); // according to my notes -> check in doubt
+
+    r= Distribution(ActionAccept);
     if(r<=probability){
         accept = true;
     }
@@ -832,8 +1378,61 @@ Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& 
 
 
 }
+//parallel
+Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& U,std::uniform_int_distribution<int>& distribution,std::mt19937_64& random ){
+    int reflect = distribution(random);
+
+    Matrix<rSU,cSU> UPrime;
+
+    Eigen::Matrix3cd M = translateMatrices(A);
+    Eigen::Matrix3cd UEigen = translateMatrices(U);    
+
+    Eigen::Matrix3cd K = M.adjoint()*M;
+    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3cd> es(K);
+
+    Eigen::Matrix3cd D_Sqrt=es.eigenvalues().cwiseSqrt().asDiagonal();
+    Eigen::Matrix3cd H = es.eigenvectors()*D_Sqrt*es.eigenvectors().adjoint();
+
+    Eigen::Matrix3cd O=M*H.inverse();
+
+    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3cd> esH(H);
+    Eigen::Matrix3cd V= esH.eigenvectors();
+    Eigen::Matrix3cd Vadjoint = V.adjoint();
 
 
+    Eigen::Matrix3cd Ur = V*UEigen*O*Vadjoint;
+
+    if(reflect = 1){
+        Ur(0,1)= -Ur(0,1);
+        Ur(1,0)=-Ur(1,0);
+        Ur(0,2)=-Ur(0,2);
+        Ur(2,0)=-Ur(2,0);
+
+    }
+    if(reflect = 2){
+        Ur(0,1)= -Ur(0,1);
+        Ur(1,0)=-Ur(1,0);
+        Ur(1,2)=-Ur(1,2);
+        Ur(2,1)=-Ur(2,1);
+
+    }
+    if(reflect = 3){
+        Ur(0,2)= -Ur(0,2);
+        Ur(2,0)=-Ur(2,0);
+        Ur(1,2)=-Ur(1,2);
+        Ur(2,1)=-Ur(2,1);
+
+    }
+    else{
+        std::cout << "reflextion failed due to unexpected value" << std::endl;
+    }
+
+    Eigen::Matrix3cd UR = Vadjoint*Ur*V*O.adjoint();
+
+    UPrime = retranslateMatrices(UR);
+
+    return UPrime;
+}
 void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<double>>& loops,
                             std::vector<double>& r,   const std::vector<size_t>& startingPoint, 
     const std::vector<size_t>& endPoint ){

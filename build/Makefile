@@ -153,6 +153,30 @@ Simulation.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/Simulation.cpp.s
 .PHONY : Simulation.cpp.s
 
+src/Finish.o: src/Finish.cpp.o
+.PHONY : src/Finish.o
+
+# target to build an object file
+src/Finish.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/src/Finish.cpp.o
+.PHONY : src/Finish.cpp.o
+
+src/Finish.i: src/Finish.cpp.i
+.PHONY : src/Finish.i
+
+# target to preprocess a source file
+src/Finish.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/src/Finish.cpp.i
+.PHONY : src/Finish.cpp.i
+
+src/Finish.s: src/Finish.cpp.s
+.PHONY : src/Finish.s
+
+# target to generate assembly for a file
+src/Finish.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/src/Finish.cpp.s
+.PHONY : src/Finish.cpp.s
+
 src/global.o: src/global.cpp.o
 .PHONY : src/global.o
 
@@ -249,6 +273,30 @@ src/observables.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/src/observables.cpp.s
 .PHONY : src/observables.cpp.s
 
+src/utils.o: src/utils.cpp.o
+.PHONY : src/utils.o
+
+# target to build an object file
+src/utils.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/src/utils.cpp.o
+.PHONY : src/utils.cpp.o
+
+src/utils.i: src/utils.cpp.i
+.PHONY : src/utils.i
+
+# target to preprocess a source file
+src/utils.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/src/utils.cpp.i
+.PHONY : src/utils.cpp.i
+
+src/utils.s: src/utils.cpp.s
+.PHONY : src/utils.s
+
+# target to generate assembly for a file
+src/utils.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/src/utils.cpp.s
+.PHONY : src/utils.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -261,6 +309,9 @@ help:
 	@echo "... Simulation.o"
 	@echo "... Simulation.i"
 	@echo "... Simulation.s"
+	@echo "... src/Finish.o"
+	@echo "... src/Finish.i"
+	@echo "... src/Finish.s"
 	@echo "... src/global.o"
 	@echo "... src/global.i"
 	@echo "... src/global.s"
@@ -273,6 +324,9 @@ help:
 	@echo "... src/observables.o"
 	@echo "... src/observables.i"
 	@echo "... src/observables.s"
+	@echo "... src/utils.o"
+	@echo "... src/utils.i"
+	@echo "... src/utils.s"
 .PHONY : help
 
 

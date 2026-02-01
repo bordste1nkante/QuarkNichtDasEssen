@@ -113,9 +113,32 @@ extern Matrix<2,2> identity2, Pauli1, Pauli2, Pauli3;
 extern Matrix<rSU,cSU> identityMatrix;
 
 
+
+
 //h5-filename
 extern std::string filenameh5;
 
 
-
+extern double drandNumb;
+extern double drng1;
+extern double drng2;
+extern double drng3;
+extern double dhotNumb1;
+extern double dhotNumb2;
+extern double dhotNumb3;
+extern double dhotNumb1Extra;
+extern double dhotNumb2Extra;
+extern double dhotNumb3Extra;
+extern double dhotNumbS1;
+extern double dhotNumbS2;
+extern double dhotNumbS3;
+extern double dhotNumbT1;
+extern double dhotNumbT2;
+extern double dhotNumbT3;
+extern double dhotNumbR1;
+extern double dhotNumbR2;
+extern double dhotNumbR3;
+extern double dindexing;
+extern double dacceptReject;
+extern double dreflection;
 

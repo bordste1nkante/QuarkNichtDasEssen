@@ -83,3 +83,29 @@ std::vector<Matrix<2,2>> pauliMatrices;
 Matrix<rSU,cSU> identityMatrix;
 
 
+double drandNumb=69;
+double drng1=42;
+double drng2=420;
+double drng3=4200;
+double dhotNumb1=67;
+double dhotNumb2=1;
+double dhotNumb3=2;
+double dhotNumb1Extra=3;
+double dhotNumb2Extra=4;
+double dhotNumb3Extra=5;
+double dhotNumbS1=20;
+double dhotNumbS2=21;
+double dhotNumbS3=22;
+double dhotNumbT1=10;
+double dhotNumbT2=11;
+double dhotNumbT3=12;
+double dhotNumbR1=30;
+double dhotNumbR2=31;
+double dhotNumbR3=32;
+double dindexing=666;
+double dacceptReject=1949;
+double dreflection = 2026;
+
+
+std::string filenameh5 = "mistake";
+

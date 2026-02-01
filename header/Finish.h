@@ -1,9 +1,13 @@
+#pragma once
+
 #include <H5Cpp.h>
 #include <stdlib.h>
 #include <yaml-cpp/yaml.h> //requires installation of this specific library on Linux: sudo apt install libyaml-cpp-dev
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <execution>
+#include <thread>
 #include <complex>
 #include <random>
 #include <Eigen/Dense>

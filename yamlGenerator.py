@@ -14,18 +14,20 @@ if(observable == 1 or observable == 2):
     for i in range(0,4):
         startPoint[i]= int(input(f"Enter start position of {x[i]}-axis: "))
         endPoint[i] =  int(input(f"Enter end position of {x[i]}-axis: "))
-
+xAxis = int(input("Dimension of X-axis: "))
+yAxis = int(input("Dimension of Y-axis: "))
+zAxis = int(input("Dimension of Z-axis: "))
+tAxis = int(input("Dimension of t-axis: "))
 
 
 NumberOfConfigurations = int(input("Enter number of configurations: "))
 NumberOfThermalSweeps = int(input("How many calibration steps should be taken: "))
 SweepFactor = int(input("How many times should the lattice be updated, before a new configuration is saved: "))
-roundingFactor = int(input("After how many global updates should det = 1 be restored: "))
 XUpdate = int(input("After how many global updates should the X be reset: "))
-xAxis = int(input("Dimension of X-axis: "))
-yAxis = int(input("Dimension of Y-axis: "))
-zAxis = int(input("Dimension of Z-axis: "))
-tAxis = int(input("Dimension of t-axis: "))
+Multi = int(input("How many multihits: "))
+over = int(input("After how many steps a overrelaxation step: "))
+epsilon = float(input("What epsilon value: "))
+
 beta = float(input("Beta: "))
 testrun = bool(input("Is this a test or debugging run, 1 yes 0 no: "))
 
@@ -51,6 +53,8 @@ seed3_11= random.uniform(10, 27)
 seed3_12= random.uniform(10, 28)
 seed3_13= random.uniform(10, 29)
 seed3_14= random.uniform(10, 24)
+
+seedOver = random.uniform (100,102)
 
 
 if (testrun==True):
@@ -79,6 +83,7 @@ if (testrun==True):
     seed4 = 666
     seed5 = 1949
 
+    seedOver = 2026
 loop = True
 start = True
 while(loop):
@@ -107,12 +112,14 @@ data= {
     
     },
     "startConfig": start,
+    "epsilon": epsilon,
     "updates":{
         "NConfig": NumberOfConfigurations,
         "NSweepsThermal": NumberOfThermalSweeps,
         "Sweep": SweepFactor,
-        "Rounding": roundingFactor,
-        "XUpdate": XUpdate
+        "XUpdate": XUpdate,
+        "Multi": Multi,
+        "overrelaxation": over
     },
     "seeds":{
         "distEpsilon": seed1,
@@ -137,7 +144,8 @@ data= {
                  "hotNumbR3": seed3_14
                  },
         "indexDist": seed4,
-        "uniformAcceptReject": seed5
+        "uniformAcceptReject": seed5,
+        "overrelaxation": seedOver
     },
     "h5Name":f"{projectName}.h5"
 

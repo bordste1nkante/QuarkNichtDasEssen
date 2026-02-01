@@ -9,7 +9,32 @@
 #include <Eigen/Dense>
 #include "../header/global.h"
 
+void ensureGroup(H5::H5File& file, const std::string& datasetPath)
+{
+    auto lastSlash = datasetPath.find_last_of('/');
+    if (lastSlash == std::string::npos || lastSlash == 0)
+        return;
 
+    std::string parent = datasetPath.substr(0, lastSlash);
+
+    size_t pos = 1;
+    while (true) {
+        size_t next = parent.find('/', pos);
+        std::string group =
+            (next == std::string::npos)
+            ? parent
+            : parent.substr(0, next);
+
+        if (!H5Lexists(file.getId(), group.c_str(), H5P_DEFAULT)) {
+            file.createGroup(group);
+        }
+
+        if (next == std::string::npos)
+            break;
+
+        pos = next + 1;
+    }
+}
 
 
 //store important meta data in h5file
@@ -27,7 +52,7 @@ bool Setup_H5(  bool ColdOrHot,  const std::vector<size_t>& startingPoint,
     try
     {
 
-        std::string fileString = "h5/"+filenameh5;
+        std::string fileString = "../h5/"+filenameh5;
         hsize_t xAxish5 = static_cast<hsize_t>(xAxis);
         hsize_t yAxish5 = static_cast<hsize_t>(yAxis);
         hsize_t zAxish5 = static_cast<hsize_t>(zAxis);
@@ -61,6 +86,7 @@ bool Setup_H5(  bool ColdOrHot,  const std::vector<size_t>& startingPoint,
         H5::Group group =file.createGroup("/metaData");
         H5::Group groupDim =file.createGroup("/metaData/Dimensions");
         H5::Group groupParams =file.createGroup("/metaData/runParams");
+
 
         H5::Attribute attrXAxis = groupDim.createAttribute(
             "xAxis",
@@ -179,6 +205,7 @@ bool Setup_H5(  bool ColdOrHot,  const std::vector<size_t>& startingPoint,
 
         end.write(endh5.data(), H5::PredType::NATIVE_HSIZE);
 
+
         file.close();
 
         
@@ -207,9 +234,10 @@ bool saveArrayH5(const std::vector<double>& array, std::string dataSetPath){
 
     try
     {
-        std::string fileString = "h5/"+filenameh5;
+        std::string fileString = "../h5/"+filenameh5;
         H5::H5File file(fileString,H5F_ACC_RDWR);
 
+        ensureGroup(file, dataSetPath);
 
         hsize_t dim[1] = {array.size()};
         H5::DataSpace dataspace(1,dim);
@@ -238,6 +266,52 @@ bool saveArrayH5(const std::vector<double>& array, std::string dataSetPath){
 }
 
 
+
+
+bool saveArrayH5complex(const std::vector<std::complex<double>>& array, std::string dataSetPath){
+
+    bool success= false;
+    
+
+    try
+    {
+        std::string fileString = "../h5/"+filenameh5;
+        H5::H5File file(fileString,H5F_ACC_RDWR);
+
+
+
+        std::vector<double> arrayCombined(array.size());
+
+        for(size_t i= 0; i<array.size(); i++){
+            arrayCombined[2*i]=array[i].real();
+            arrayCombined[2*i+1]=array[i].imag();
+        }
+        hsize_t dim[2] = {arrayCombined.size(),2};
+        H5::DataSpace dataspace(2,dim);
+
+        H5::DataSet Store = file.createDataSet(
+            dataSetPath,
+            H5::PredType::NATIVE_DOUBLE,
+            dataspace
+        );
+        Store.write(arrayCombined.data(),H5::PredType::NATIVE_DOUBLE);
+
+        file.close();
+        
+
+
+
+        success = true;
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    
+
+    return success;
+
+}
 
 
 //translate our matrices to eigen, they have better support
