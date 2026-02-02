@@ -153,6 +153,30 @@ TestV.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/TestV.cpp.s
 .PHONY : TestV.cpp.s
 
+home/mrv/QuarkNichtDasEssen/src/Finish.o: home/mrv/QuarkNichtDasEssen/src/Finish.cpp.o
+.PHONY : home/mrv/QuarkNichtDasEssen/src/Finish.o
+
+# target to build an object file
+home/mrv/QuarkNichtDasEssen/src/Finish.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/Finish.cpp.o
+.PHONY : home/mrv/QuarkNichtDasEssen/src/Finish.cpp.o
+
+home/mrv/QuarkNichtDasEssen/src/Finish.i: home/mrv/QuarkNichtDasEssen/src/Finish.cpp.i
+.PHONY : home/mrv/QuarkNichtDasEssen/src/Finish.i
+
+# target to preprocess a source file
+home/mrv/QuarkNichtDasEssen/src/Finish.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/Finish.cpp.i
+.PHONY : home/mrv/QuarkNichtDasEssen/src/Finish.cpp.i
+
+home/mrv/QuarkNichtDasEssen/src/Finish.s: home/mrv/QuarkNichtDasEssen/src/Finish.cpp.s
+.PHONY : home/mrv/QuarkNichtDasEssen/src/Finish.s
+
+# target to generate assembly for a file
+home/mrv/QuarkNichtDasEssen/src/Finish.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/Finish.cpp.s
+.PHONY : home/mrv/QuarkNichtDasEssen/src/Finish.cpp.s
+
 home/mrv/QuarkNichtDasEssen/src/global.o: home/mrv/QuarkNichtDasEssen/src/global.cpp.o
 .PHONY : home/mrv/QuarkNichtDasEssen/src/global.o
 
@@ -285,6 +309,9 @@ help:
 	@echo "... TestV.o"
 	@echo "... TestV.i"
 	@echo "... TestV.s"
+	@echo "... home/mrv/QuarkNichtDasEssen/src/Finish.o"
+	@echo "... home/mrv/QuarkNichtDasEssen/src/Finish.i"
+	@echo "... home/mrv/QuarkNichtDasEssen/src/Finish.s"
 	@echo "... home/mrv/QuarkNichtDasEssen/src/global.o"
 	@echo "... home/mrv/QuarkNichtDasEssen/src/global.i"
 	@echo "... home/mrv/QuarkNichtDasEssen/src/global.s"

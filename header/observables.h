@@ -8,8 +8,7 @@
 #include <complex>
 #include <random>
 #include "global.h"
-#include "latticeOP.h"
-#include "matrixOP.h"
+
 
 
 // run the simulation for wilson or polyakov loop, Metropolis

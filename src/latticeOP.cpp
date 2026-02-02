@@ -15,9 +15,13 @@
 
 // this mimics the behaviour of a 4D lattice from our 1D array
 size_t idx(size_t x, size_t y, size_t z, size_t t, size_t mu){
-    return 4*(x+ xAxis*(y+ yAxis*(z+zAxis*t)))+mu;
+
+    return linksPerSite*(x+ xAxis*(y+ yAxis*(z+zAxis*t)))+mu;
 }
+
+
 std::tuple <size_t, size_t, size_t, size_t, size_t> ReIdx(size_t idx){
+
 
     size_t mu = idx%linksPerSite;
     idx/=linksPerSite;
@@ -27,10 +31,12 @@ std::tuple <size_t, size_t, size_t, size_t, size_t> ReIdx(size_t idx){
     idx/=yAxis;
     size_t z= idx%zAxis;
     idx /= zAxis;
-    size_t t = idx%tAxis;
+    size_t t = idx;
 
     return {mu,x,y,z,t};
 }
+
+
 void X_updateSU3(){
     for(int p=0; p<NSetXMatrices; p++){
         //final matrices
@@ -980,49 +986,16 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
         T(2,2)=Tsmall(1,1);
 
         //matrix multiplication S*T = ST
-        for(int i=0; i<rSU; i++){
-            for(int j=0; j<cSU; j++){
-                std::complex<double> sum;
-                for(int k = 0; k<rSU; k++){
-                    sum += S(i,k)*T(k,j);
-                                
-                        }
-                    ST(i,j)= sum;
-                    }
-                        
-                    }
-        //matrix multiplication R*ST = X
-        for(int i=0; i<rSU; i++){
-            for(int j=0; j<cSU; j++){
-                std::complex<double> sum;
-                for(int k = 0; k<rSU; k++){
-                    sum += R(i,k)*ST(k,j);
-                                
-                        }
-                        U(i,j)= sum;
-                            }
-                        
-                        }
-        //normalize to det(U)=1
-        std::complex<double> detU = det_A(U);
-                        
-        for(int i = 0; i<rSU; i++){
-            for(int j = 0; j<cSU; j++){
-                U(i,j)=U(i,j)/pow(detU, 1.0/double(rSU));
-                            }
-                        }
+        ST=matrix_multiplication(S,T);
+        //matrix multiplication R*ST = U
+        U=matrix_multiplication(R,ST);
+        normalizeSU3Matrix(U);
+            
+        bufferLattice[i]=U;
                     
-            bufferLattice[i]=U;
-                
-        
         }
                     
-                
 
-
-            
-        
-    
     );
     //switch pointers of buffer and original
     std::swap(bufferLattice,lattice);
@@ -1064,7 +1037,7 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
     double probability;
     
     double SActionDif;
-    SActionDif = -beta/(xAxis*yAxis*zAxis*tAxis)*(matrix_trace(matrix_multiplication(matrix_subtraction(UPrime, U),A))).real();
+    SActionDif = -beta/(rSU)*(matrix_trace(matrix_multiplication(matrix_subtraction(UPrime, U),A))).real();
     probability = std::min(1.0, exp(- SActionDif)); // according to my notes -> check in doubt
 
     r= Distribution(ActionAccept);

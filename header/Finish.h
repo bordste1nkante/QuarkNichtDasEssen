@@ -12,9 +12,7 @@
 #include <random>
 #include <Eigen/Dense>
 #include "global.h"
-#include "latticeOP.h"
-#include "matrixOP.h"
-#include "utils.h"
+
 
 void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice, 
     const std::vector<size_t>& startingPoint, 

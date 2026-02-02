@@ -28,7 +28,7 @@ bool saveArrayH5(const std::vector<double>& array, std::string dataSetPath);
 bool saveArrayH5complex(const std::vector<std::complex<double>>& array, std::string dataSetPath);
 
 
-Eigen::Matrix3d translateMatrices(const Matrix<rSU,cSU>& A);
+Eigen::Matrix3cd translateMatrices(const Matrix<rSU,cSU>& A);
 
 
 //translate eigen to our matrices, we use them :(

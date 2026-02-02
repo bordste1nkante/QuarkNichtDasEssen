@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/staticquarks.dir/TestV.cpp.o"
   "CMakeFiles/staticquarks.dir/TestV.cpp.o.d"
+  "CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/Finish.cpp.o"
+  "CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/Finish.cpp.o.d"
   "CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/global.cpp.o"
   "CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/global.cpp.o.d"
   "CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/latticeOP.cpp.o"

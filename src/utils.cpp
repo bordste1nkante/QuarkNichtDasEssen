@@ -317,10 +317,12 @@ bool saveArrayH5complex(const std::vector<std::complex<double>>& array, std::str
 //translate our matrices to eigen, they have better support
 Eigen::Matrix3cd translateMatrices(const Matrix<rSU,cSU>& A){
 
+
     Eigen::Matrix3cd M;
     for(int i = 0; i<rSU; i++){
         for(int j = 0; j<cSU; j++){
             M(i,j)= A(i,j);
+
             
         }
 
