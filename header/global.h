@@ -43,7 +43,7 @@ const size_t cSU=3;
 
 
 // list of N matrices and their inverse to generate new link variables -> improves efficiency -> avoids regeneration for every update
-const int NSetXMatrices = 50;
+const int NSetXMatrices = 100;
 extern std::vector<Matrix<rSU,rSU>> XSet;
 
 //required for generation of X. Epsilon affects acceptance rate.

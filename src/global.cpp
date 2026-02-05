@@ -15,8 +15,6 @@ size_t tAxis=0;
 //coupling strength
 double beta=1;
 
-//lattice spacing -> set to 1 in lattice units?
-double a=1;
 
 
 //100 matrices in total -> half X, half inverse of X

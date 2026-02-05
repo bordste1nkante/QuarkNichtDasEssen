@@ -110,10 +110,31 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
         if(p%XUpdate ==0 && p!=0){
             X_updateSU3(p+numberOfThermalSweeps);
                         }
+        
+        double rate = double(acceptanceRate.load())/double(updates.load());
+        if(rate < 0.45){
+            if(rate < 0.35){
+                epsilon *=0.8;
+            }
+            else{
+                epsilon *=0.9;
+            }
+            
+        }
+        if(rate>0.6){
+            if(rate < 0.7){
+                epsilon*=1.2;
+            }
+            else{
+                epsilon*=1.1;
+            }
 
+        }
+        acceptanceRate.store(0);
+        updates.store(0);
     }
-    double rate = double(acceptanceRate.load())/double(updates.load());
-    std::cout << rate << std::endl;
+    //double rate = double(acceptanceRate.load())/double(updates.load());
+    std::cout << epsilon << std::endl;
 
     size_t k = 0;
     for(int p=0; p<NConfigs*SweepFactor/numberOfMultiHit; p++){
