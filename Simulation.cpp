@@ -5,6 +5,7 @@
 #include <vector>
 #include <complex>
 #include <random>
+#include <atomic>
 #include <H5Cpp.h> //requires installation of this specific library on Linux:
 #include <Eigen/Dense> //requires installation of this specific library on Linux:
 #include "header/global.h"

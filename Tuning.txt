@@ -1,0 +1,13 @@
+Epsilontuning:
+-Lattice: 4x4x4x4
+-Thermalizations steps: 1000
+-beta: 5.62
+-cold start
+
+The acceptance rate of proposed matrices for given epsilon:
+Epsilon | acceptance rate
+0.01    | 26.5%
+0.02    | 26.3%
+0.05    | 25.5%
+0.1     | 24.1%
+0.2     |

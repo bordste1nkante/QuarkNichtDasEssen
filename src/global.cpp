@@ -25,7 +25,7 @@ std::vector<Matrix<rSU,rSU>> XSet(2*NSetXMatrices);
 double epsilon = 0.4;
 
 std::mt19937_64 randNumb(69);
-std::uniform_real_distribution<double> distEpsilon(-epsilon,epsilon);
+//std::uniform_real_distribution<double> distEpsilon(-epsilon,epsilon);
 
 //RNG in [-0.5, 0.5]
 std::mt19937_64 rng1(42);

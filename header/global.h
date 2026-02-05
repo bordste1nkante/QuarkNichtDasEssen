@@ -51,7 +51,7 @@ extern double epsilon;
 
 //generate random values scaled with epsilon
 extern std::mt19937_64 randNumb;
-extern std::uniform_real_distribution<double> distEpsilon;
+//extern std::uniform_real_distribution<double> distEpsilon;
 
 //those are the random numbers for updates?
 extern std::mt19937_64 rng1;

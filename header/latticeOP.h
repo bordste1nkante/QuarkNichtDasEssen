@@ -27,6 +27,9 @@ void X_updateSU3(size_t input);
 //rounding errors causes matrices to potentially digress from det = 1, we correct that from time to time, also we project to unitarity.
 void normalizeSU3(std::vector<Matrix<rSU,rSU>>& lattice);
 
+
+void normalizeSU2Matrix(Matrix<2,2>& U);
+
 void normalizeSU3Matrix(Matrix<rSU,rSU>& U);
 
 

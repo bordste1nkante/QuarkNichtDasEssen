@@ -36,6 +36,31 @@ std::tuple <size_t, size_t, size_t, size_t, size_t> ReIdx(size_t idx){
     return {mu,x,y,z,t};
 }
 
+void normalizeSU2Matrix(Matrix<2,2>& U){
+    std::complex<double> sum;
+
+    for(int i = 0; i<2; i++){
+        sum += std::norm(U(0,i));
+}
+    sum= std::sqrt(sum);
+
+    for(int i = 0; i<2; i++){
+    U(0,i)= U(0,i)/sum;
+}
+    U(0,1)= -std::conj(U(1,0));
+    U(1,1)=std::conj(U(1,1));
+    
+
+
+    std::complex<double> detU = U(0,0)*U(1,1)-U(1,0)*U(0,1);
+    for(int m = 0; m< 2; m++){
+        for(int n=0; n<2; n++){
+            U(m,n)= U(m,n)/pow(detU, 1.0/double(2));
+                        }
+                    }
+                }
+
+
 
 void X_updateSU3(){
     for(int p=0; p<NSetXMatrices; p++){
@@ -435,60 +460,87 @@ void X_updateSU3(size_t input){
 
         Matrix<rSU,cSU> ST;
 
-        std::mt19937_64 hottestNumbR1(index*dhotNumbR1+input);
-        std::mt19937_64 hottestNumbR2(index*dhotNumbR2+input);
-        std::mt19937_64 hottestNumbR3(index*dhotNumbR3+input);
-        std::mt19937_64 hottestNumbR0(index*drng1+input);
-        std::mt19937_64 hottestNumbRE(index*dhotNumb1Extra+input);
+        std::uniform_real_distribution<double> distEpsilon(-epsilon,epsilon);
 
-        std::mt19937_64 hottestNumbS1(index*dhotNumbS1+input);
-        std::mt19937_64 hottestNumbS2(index*dhotNumbS2+input);
-        std::mt19937_64 hottestNumbS3(index*dhotNumbS3+input);
-        std::mt19937_64 hottestNumbS0(index*drng2+input);
-        std::mt19937_64 hottestNumbSE(index*dhotNumb2Extra+input);
+        //std::mt19937_64 hottestNumbR1(index*dhotNumbR1*(input+2));
+        //std::mt19937_64 hottestNumbR2(index*dhotNumbR2*(input+2));
+        //std::mt19937_64 hottestNumbR3(index*dhotNumbR3*(input+2));
+        //std::mt19937_64 hottestNumbR0(index*drng1*(input+2));
+        //std::mt19937_64 hottestNumbRE(index*dhotNumb1Extra*(input+2));
 
-        std::mt19937_64 hottestNumbT1(index*dhotNumbT1+input);
-        std::mt19937_64 hottestNumbT2(index*dhotNumbT2+input);
-        std::mt19937_64 hottestNumbT3(index*dhotNumbT3+input);
-        std::mt19937_64 hottestNumbT0(index*drng3+input);
-        std::mt19937_64 hottestNumbTE(index*dhotNumb3Extra+input);
+        //std::mt19937_64 hottestNumbS1(index*dhotNumbS1*(input+2));
+        //std::mt19937_64 hottestNumbS2(index*dhotNumbS2*(input+2));
+        //std::mt19937_64 hottestNumbS3(index*dhotNumbS3*(input+2));
+        //std::mt19937_64 hottestNumbS0(index*drng2*(input+2));
+        //std::mt19937_64 hottestNumbSE(index*dhotNumb2Extra*(input+2));
+
+        //std::mt19937_64 hottestNumbT1(index*dhotNumbT1*(input+2));
+        //std::mt19937_64 hottestNumbT2(index*dhotNumbT2*(input+2));
+        //std::mt19937_64 hottestNumbT3(index*dhotNumbT3*(input+2));
+        //std::mt19937_64 hottestNumbT0(index*drng3*(input+2));
+        //std::mt19937_64 hottestNumbTE(index*dhotNumb3Extra*(input+2));
+
+        std::mt19937_64 zufall((index+3)*drng1*9731+(input+2)*13063);
 
 
 
         double r[3];
-        double r0 = dist(hottestNumbR0); 
+        //double r0 = dist(hottestNumbR0); 
+        double r0 = dist(zufall); 
         double s[3];
-        double s0 = dist(hottestNumbS0); 
+        //double s0 = dist(hottestNumbS0); 
+        double s0 = dist(zufall);
         double t[3];
-        double t0 = dist(hottestNumbT0);
+        //double t0 = dist(hottestNumbT0);
+        double t0 = dist(zufall);
 
-        r[0]= dist(hottestNumbR1);
-        r[1]= dist(hottestNumbR2);
-        r[2]= dist(hottestNumbR3);  
+        //r[0]= dist(hottestNumbR1);
+        //r[1]= dist(hottestNumbR2);
+        //r[2]= dist(hottestNumbR3);  
 
-        double er = dist(hottestNumbSE);
+        r[0]= dist(zufall);
+        r[1]= dist(zufall);
+        r[2]= dist(zufall); 
+
+        //double er = distEpsilon(hottestNumbSE);
+        double er = distEpsilon(zufall);
 
         double rLength = std::sqrt(r[0]*r[0]+r[1]*r[1]+r[2]*r[2]);
-        r0=r0/std::sqrt(r0*r0)*std::sqrt(1-er*er);
+        //r0=r0/std::sqrt(r0*r0)*std::sqrt(1-er*er);
+        r0 = std::sqrt(std::norm(r0))*std::sqrt(1-er*er);
+
+        //s[0]= dist(hottestNumbS1);
+        //s[1]= dist(hottestNumbS2);
+        //s[2]= dist(hottestNumbS3);   
+
+        s[0]= dist(zufall);
+        s[1]= dist(zufall);
+        s[2]= dist(zufall);   
 
 
-        s[0]= dist(hottestNumbS1);
-        s[1]= dist(hottestNumbS2);
-        s[2]= dist(hottestNumbS3);                     
-
-        double es = dist(hottestNumbSE);    
+        //double es = distEpsilon(hottestNumbSE);    
+        double es = distEpsilon(zufall);  
 
         double sLength = std::sqrt(s[0]*s[0]+s[1]*s[1]+s[2]*s[2]);
-        s0=s0/std::sqrt(s0*s0)*std::sqrt(1-es*es);
+        //s0=s0/std::sqrt(s0*s0)*std::sqrt(1-es*es);
+        s0 = std::sqrt(std::norm(s0))*std::sqrt(1-es*es);
 
 
-        t[0]= dist(hottestNumbT1);
-        t[1]= dist(hottestNumbT2);
-        t[2]= dist(hottestNumbT3);                    
+        //t[0]= dist(hottestNumbT1);
+        //t[1]= dist(hottestNumbT2);
+        //t[2]= dist(hottestNumbT3); 
+        
+        t[0]= dist(zufall);
+        t[1]= dist(zufall);
+        t[2]= dist(zufall); 
 
-        double et = dist(hottestNumbRE);
+        //double et = distEpsilon(hottestNumbRE);
+        double et = distEpsilon(zufall);
         double tLength = std::sqrt(t[0]*t[0]+t[1]*t[1]+t[2]*t[2]);
-        t0=t0/std::sqrt(t0*t0)*std::sqrt(1-et*et);
+        //t0=t0/std::sqrt(t0*t0)*std::sqrt(1-et*et);
+        t0 = std::sqrt(std::norm(t0))*std::sqrt(1-et*et);
+
+
         for(int i=0; i<3; i++){
             s[i]=es*s[i]/sLength;
             t[i]=et*t[i]/tLength;
@@ -520,6 +572,9 @@ void X_updateSU3(size_t input){
                 }
             }
         }       
+        normalizeSU2Matrix(Ssmall);
+        normalizeSU2Matrix(Rsmall);
+        normalizeSU2Matrix(Tsmall);
 
         //std::cout << "2D - matrix done" << std::endl;
         //fill R,S,T
@@ -541,8 +596,8 @@ void X_updateSU3(size_t input){
         S(2,0)=Ssmall(0,1);
         S(0,1)=zero;
         S(1,1)=uno;
-        S(2,1)=Ssmall(1,0);
-        S(0,2)=zero;
+        S(2,1)=zero;
+        S(0,2)=Ssmall(1,0);
         S(1,2)=zero;
         S(2,2)=Ssmall(1,1);
 
@@ -858,6 +913,7 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
         Matrix<2,2> Ssmall;
         Matrix<2,2> Tsmall;
         Matrix<rSU,cSU> ST;
+
         
         std::mt19937_64 hottestNumbR1(i*dhotNumbR1);
         std::mt19937_64 hottestNumbR2(i*dhotNumbR2);

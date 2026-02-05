@@ -7,6 +7,7 @@
 #include <execution>
 #include <thread>
 #include <complex>
+#include <atomic>
 #include <random>
 #include <Eigen/Dense>
 #include "global.h"
@@ -26,6 +27,9 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
     const size_t overrelaxationStep ){
 
 
+    std::atomic<int> acceptanceRate=0;
+    std::atomic<int> updates=0;
+
     size_t observableCollected= 0;
     std::vector<Matrix<rSU,rSU>> bufferLattice(4*xAxis*yAxis*zAxis*tAxis);
     std::vector<size_t> indices(lattice.size());
@@ -37,13 +41,13 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
     for(int p=0; p<numberOfThermalSweeps/numberOfMultiHit; p++){
         //parallelization
         std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
-            std::mt19937_64 Threadindexing(dindexing*i+p);
+            thread_local std::mt19937_64 Threadindexing(dindexing*i*17007+ (p+2)* 10111);
             std::uniform_int_distribution<int> threadIndexDist(0, XSet.size()-1);
 
-            std::mt19937_64 Threadaccept(dacceptReject*i+p);
+            //std::mt19937_64 Threadaccept(pow(dacceptReject*i,7)*(p+2));
             std::uniform_real_distribution<double> threadAcceptReject(0,1);
         
-            std::mt19937_64 Threadreflect(dreflection*i+p);
+            //std::mt19937_64 Threadreflect(pow(dreflection*i,4)*(p+2));
             std::uniform_int_distribution<int> threadrefelctDist(1,3);
 
 
@@ -60,13 +64,16 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
             t= std::get<4>(temp);
             A= determineA(lattice, x,y,z,t,mu);
 
+
             for(size_t j= 0; j<numberOfMultiHit; j++){
 
 
                 //in theory automatically accepted
                 if(j%overrelaxationStep==0 && j!=0){
-                    U = overrelaxation(A, U, threadrefelctDist, Threadreflect);
+                    //U = overrelaxation(A, U, threadrefelctDist, Threadreflect);
+                    U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
                     normalizeSU3Matrix(U);
+                    //std::cout << "over?" << std::endl;
 
                 }
                 else{
@@ -76,20 +83,26 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
                     X=XSet[index];
 
                     UPrime = matrix_multiplication(X,lattice[i]);
+                    //UPrime = matrix_multiplication(identityMatrix,lattice[i]);
                     normalizeSU3Matrix(UPrime);
-                    bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadaccept, threadAcceptReject);
+                    //bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadaccept, threadAcceptReject);
+                    bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadindexing, threadAcceptReject);
+                    //std::cout << acceptance << std::endl;
 
                     if(acceptance==true){
                         U=UPrime;
+                        acceptanceRate.fetch_add(1);
                         }
 
                     }
+                    updates.fetch_add(1);
 
 
                 }
             bufferLattice[i]=U;
 
         });
+
 
         //they exchange pointers, so lattice now points to values of buffer and vice versa
         std::swap(lattice, bufferLattice);
@@ -99,6 +112,8 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
                         }
 
     }
+    double rate = double(acceptanceRate.load())/double(updates.load());
+    std::cout << rate << std::endl;
 
     size_t k = 0;
     for(int p=0; p<NConfigs*SweepFactor/numberOfMultiHit; p++){
