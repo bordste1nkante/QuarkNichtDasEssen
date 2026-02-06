@@ -1,12 +1,12 @@
-epsilon: 0.1
-h5Name: Epsilon002.h5
+epsilon: 0.2
+h5Name: HotMultiPlaq.h5
 lattice:
   beta: 5.62
   t: 4
   x: 4
   y: 4
   z: 4
-observable: 1
+observable: 0
 positions:
   endPoint:
   - 0
@@ -42,11 +42,11 @@ seeds:
   indexDist: 666
   overrelaxation: 2026
   uniformAcceptReject: 1949
-startConfig: true
+startConfig: false
 updates:
-  Multi: 1
-  NConfig: 0
-  NSweepsThermal: 1000
+  Multi: 5
+  NConfig: 400
+  NSweepsThermal: 0
   Sweep: 1
   XUpdate: 2
-  overrelaxation: 3
+  overrelaxation: 2

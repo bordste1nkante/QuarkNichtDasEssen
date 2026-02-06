@@ -1,0 +1,52 @@
+epsilon: 0.2
+h5Name: HotPlaq.h5
+lattice:
+  beta: 5.62
+  t: 4
+  x: 4
+  y: 4
+  z: 4
+observable: 0
+positions:
+  endPoint:
+  - 0
+  - 0
+  - 0
+  - 0
+  startPoint:
+  - 0
+  - 0
+  - 0
+  - 0
+seeds:
+  dist:
+    hotNumb1: 67
+    hotNumb1Extra: 3
+    hotNumb2: 1
+    hotNumb2Extra: 4
+    hotNumb3: 2
+    hotNumb3Extra: 5
+    hotNumbR1: 30
+    hotNumbR2: 31
+    hotNumbR3: 32
+    hotNumbS1: 20
+    hotNumbS2: 21
+    hotNumbS3: 22
+    hotNumbT1: 10
+    hotNumbT2: 11
+    hotNumbT3: 12
+    rng1: 42
+    rng2: 420
+    rng3: 4200
+  distEpsilon: 69
+  indexDist: 666
+  overrelaxation: 2026
+  uniformAcceptReject: 1949
+startConfig: false
+updates:
+  Multi: 1
+  NConfig: 2000
+  NSweepsThermal: 0
+  Sweep: 1
+  XUpdate: 2
+  overrelaxation: 3

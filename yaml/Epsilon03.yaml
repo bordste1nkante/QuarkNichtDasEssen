@@ -1,5 +1,5 @@
-epsilon: 0.02
-h5Name: Epsilon002.h5
+epsilon: 0.3
+h5Name: Epsilon03.h5
 lattice:
   beta: 5.62
   t: 4

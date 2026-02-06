@@ -62,7 +62,7 @@ void polyakovLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::comple
     const std::vector<size_t>& endPoint );
 
 
-
+void plaquette(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<double>& plaquette);
 //set all temporal link variables to identity 
 void temporalGauge(std::vector<Matrix<rSU,rSU>>& lattice);
 

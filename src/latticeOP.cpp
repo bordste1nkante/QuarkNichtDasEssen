@@ -1462,6 +1462,9 @@ Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& 
 
     return UPrime;
 }
+
+
+
 void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<double>>& loops,
                             std::vector<double>& r,   const std::vector<size_t>& startingPoint, 
     const std::vector<size_t>& endPoint ){
@@ -1519,6 +1522,7 @@ void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<
     }
 
 
+
 void polyakovLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<double>>& loops,
                             std::vector<double>& r,   const std::vector<size_t>& startingPoint, 
     const std::vector<size_t>& endPoint ){
@@ -1550,6 +1554,30 @@ void polyakovLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::comple
                             }
 
 
+
+void plaquette(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<double>& plaquette){
+    std::vector<size_t> indices(lattice.size());
+    std::iota(indices.begin(), indices.end(),0);
+    std::vector<double> bufferPlaq (indices.size(), 0.0);
+    std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
+
+    Matrix<rSU,cSU> A;
+
+    std::tuple<size_t, size_t, size_t, size_t, size_t> temp =  ReIdx(i);
+    size_t mu,x,y,z,t;
+    mu= std::get<0>(temp);
+    x= std::get<1>(temp);
+    y= std::get<2>(temp);
+    z= std::get<3>(temp);
+    t= std::get<4>(temp);
+
+    A= determineA(lattice,x,y,z,t,mu);
+
+    bufferPlaq[i]= 1.0/double(rSU)* matrix_trace(A).real();
+
+
+    });
+}
 
 
 void temporalGauge(std::vector<Matrix<rSU,rSU>>& lattice){

@@ -1,13 +1,33 @@
-Epsilontuning:
+Epsilontuning (no multiHit):
 -Lattice: 4x4x4x4
 -Thermalizations steps: 1000
 -beta: 5.62
 -cold start
+-Xupdate: 2
 
 The acceptance rate of proposed matrices for given epsilon:
 Epsilon | acceptance rate
-0.01    | 
-0.02    | 
-0.05    | 
-0.1     |
-0.2     |
+0.1     | 74.88%
+0.15    | 64.33%
+0.2     | 55.57%
+0.25    | 47.49%
+0.3     | 41.49%
+
+
+
+Epsilontuning (multiHit):
+-Lattice: 4x4x4x4
+-Thermalizations steps: 1000
+-beta: 5.62
+-cold start
+-Xupdate: 2
+-MultiHit: 5
+-overrelaxation: 2
+
+The acceptance rate of proposed matrices for given epsilon:
+Epsilon | acceptance rate
+0.1     | 72.91%
+0.15    | 61.69%
+0.2     | 52.32%
+0.25    | 44.18%
+0.3     | 37.79%

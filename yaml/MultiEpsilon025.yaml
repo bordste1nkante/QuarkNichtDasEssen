@@ -1,5 +1,5 @@
-epsilon: 0.01
-h5Name: Epsilon001.h5
+epsilon: 0.25
+h5Name: MultiEpsilon025.h5
 lattice:
   beta: 5.62
   t: 4
@@ -44,9 +44,9 @@ seeds:
   uniformAcceptReject: 1949
 startConfig: true
 updates:
-  Multi: 1
+  Multi: 5
   NConfig: 0
   NSweepsThermal: 1000
   Sweep: 1
   XUpdate: 2
-  overrelaxation: 3
+  overrelaxation: 2
