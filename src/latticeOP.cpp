@@ -1577,6 +1577,7 @@ void plaquette(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<double>& plaqu
 
 
     });
+    std::swap(bufferPlaq,plaquette);
 }
 
 
