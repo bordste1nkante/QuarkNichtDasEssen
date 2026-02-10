@@ -1130,14 +1130,14 @@ Matrix<rSU,cSU> determineA(const std::vector<Matrix<rSU,rSU>>& lattice ,size_t x
         };
 
 
-    double tP;
-    double tM;
-    double xP;
-    double xM;
-    double yP;
-    double yM;
-    double zP;
-    double zM;
+    size_t tP;
+    size_t tM;
+    size_t xP;
+    size_t xM;
+    size_t yP;
+    size_t yM;
+    size_t zP;
+    size_t zM;
 
 
     for(int nu=0; nu<linksPerSite; nu++){
@@ -1274,8 +1274,8 @@ Matrix<rSU,cSU> determineA(const std::vector<Matrix<rSU,rSU>>& lattice ,size_t x
                 if(mu==3){
                     tP= bCT(t+1);
                     tM= bCT(t-1);
-                    zP= bCZ(x+1);
-                    zM= bCZ(x-1);
+                    zP= bCZ(z+1);
+                    zM= bCZ(z-1);
                     ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zM,t,mu)]), lattice[idx(x,y,zM,t,nu)]);
                     ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zM,tP,nu)]),ATemp1);
                     ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zP,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
@@ -1558,10 +1558,37 @@ void polyakovLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::comple
 void plaquette(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<double>& plaquette){
     std::vector<size_t> indices(lattice.size());
     std::iota(indices.begin(), indices.end(),0);
-    std::vector<double> bufferPlaq (indices.size(), 0.0);
+    std::vector<double> bufferPlaq (indices.size()*rSU, 0.0);
+
+    double Sum;
+    //enforce periodic boundary condition
+    auto bCX = [](size_t i) -> size_t{
+        return (i+xAxis) % xAxis;
+        };
+    auto bCY = [](size_t i) -> size_t{
+        return (i+yAxis) % yAxis;
+        };
+    auto bCZ = [](size_t i) -> size_t{
+        return (i+zAxis) % zAxis;
+        };
+    auto bCT = [](size_t i) -> size_t{
+        return (i+tAxis) % tAxis;
+        };
+
+
     std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
 
-    Matrix<rSU,cSU> A;
+    Matrix<rSU,cSU> Plaq;
+
+    double tP;
+    double tM;
+    double xP;
+    double xM;
+    double yP;
+    double yM;
+    double zP;
+    double zM;
+
 
     std::tuple<size_t, size_t, size_t, size_t, size_t> temp =  ReIdx(i);
     size_t mu,x,y,z,t;
@@ -1571,9 +1598,189 @@ void plaquette(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<double>& plaqu
     z= std::get<3>(temp);
     t= std::get<4>(temp);
 
-    A= determineA(lattice,x,y,z,t,mu);
+for(int nu=0; nu<linksPerSite; nu++){
+        if(nu!=mu){
 
-    bufferPlaq[i]= 1.0/double(rSU)* matrix_trace(A).real();
+            if(nu==0){
+                //Ich glaube in dieser Schleife ist viel Index-Salat -> Nevermind??
+                if(mu==1){
+
+                    xP= bCX(x+1);
+                    xM= bCX(x-1);
+                    yP= bCY(y+1);
+                    yM= bCY(y-1);
+                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xP,y,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    Plaq = matrix_multiplication(lattice[idx(x,yP,z,t,nu)],Plaq);
+                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
+                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
+                }
+                if(mu==2){
+                    xP= bCX(x+1);
+                    xM= bCX(x-1);
+                    zP= bCZ(z+1);
+                    zM= bCZ(z-1);
+                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xP,y,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    Plaq = matrix_multiplication(lattice[idx(x,y,zP,t,nu)],Plaq);
+                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
+                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
+
+                
+
+                }
+                if(mu==3){
+                    tP= bCT(t+1);
+                    tM= bCT(t-1);
+                    xP= bCX(x+1);
+                    xM= bCX(x-1);
+                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xP,y,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    Plaq = matrix_multiplication(lattice[idx(x,y,zP,t,nu)],Plaq);
+                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
+                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
+                
+
+                }
+
+            }
+            if(nu==1){
+
+                if(mu==0){
+
+                    xP= bCX(x+1);
+                    xM= bCX(x-1);
+                    yP= bCY(y+1);
+                    yM= bCY(y-1);
+                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yP,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    Plaq = matrix_multiplication(lattice[idx(xP,y,z,t,nu)],Plaq);
+                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
+                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
+
+
+                }
+                if(mu==2){
+                    yP= bCY(y+1);
+                    yM= bCY(y-1);
+                    zP= bCZ(z+1);
+                    zM= bCZ(z-1);
+                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yP,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    Plaq = matrix_multiplication(lattice[idx(x,y,zP,t,nu)],Plaq);
+                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
+                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
+
+                
+
+                }
+                if(mu==3){
+                    tP= bCT(t+1);
+                    tM= bCT(t-1);
+                    yP= bCY(y+1);
+                    yM= bCY(y-1);
+                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yP,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    Plaq = matrix_multiplication(lattice[idx(x,y,z,tP,nu)],Plaq);
+                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
+                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
+
+                
+
+                }
+
+            }
+            if(nu==2){
+
+
+                if(mu==1){
+
+                    zP= bCZ(z+1);
+                    zM= bCZ(z-1);
+                    yP= bCY(y+1);
+                    yM= bCY(y-1);
+                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zP,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    Plaq = matrix_multiplication(lattice[idx(x,yP,z,t,nu)],Plaq);
+                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
+                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
+
+
+
+                }
+                if(mu==0){
+                    xP= bCX(x+1);
+                    xM= bCX(x-1);
+                    zP= bCZ(z+1);
+                    zM= bCZ(z-1);
+                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zP,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    Plaq = matrix_multiplication(lattice[idx(xP,y,z,t,nu)],Plaq);
+                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
+                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
+                
+
+                }
+                if(mu==3){
+                    tP= bCT(t+1);
+                    tM= bCT(t-1);
+                    zP= bCZ(z+1);
+                    zM= bCZ(z-1);
+                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zP,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    Plaq = matrix_multiplication(lattice[idx(x,y,z,tP,nu)],Plaq);
+                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
+                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
+                
+
+                }
+
+            }
+            if(nu==3){
+
+
+
+                if(mu==1){
+
+                    tP= bCT(t+1);
+                    tM= bCT(t-1);
+                    yP= bCY(y+1);
+                    yM= bCY(y-1);
+                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,z,tP,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    Plaq = matrix_multiplication(lattice[idx(x,yP,z,t,nu)],Plaq);
+                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
+                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
+
+
+                }
+                if(mu==2){
+                    tP= bCT(t+1);
+                    tM= bCT(t-1);
+                    zP= bCZ(z+1);
+                    zM= bCZ(z-1);
+                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,z,tP,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    Plaq = matrix_multiplication(lattice[idx(x,y,zP,t,nu)],Plaq);
+                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
+                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
+
+                
+
+                }
+                if(mu==0){
+                    tP= bCT(t+1);
+                    tM= bCT(t-1);
+                    xP= bCX(x+1);
+                    xM= bCX(x-1);
+                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,z,tP,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
+                    Plaq = matrix_multiplication(lattice[idx(xP,y,z,t,nu)],Plaq);
+                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
+                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
+
+                
+
+                }
+
+            }
+
+
+
+        }
+    }
+
+     
+
+    //bufferPlaq[i]= 1.0/double(rSU)* matrix_trace(Plaq).real();
 
 
     });
