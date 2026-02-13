@@ -112,7 +112,9 @@ extern Matrix<2,2> identity2, Pauli1, Pauli2, Pauli3;
 //rsU x cSU identity
 extern Matrix<rSU,cSU> identityMatrix;
 
+extern Matrix<rSU,cSU> zeroMatrix;
 
+extern Matrix<2,2> zeroMatrix2;
 
 
 //h5-filename

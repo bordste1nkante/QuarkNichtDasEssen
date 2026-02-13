@@ -107,7 +107,21 @@ std::complex<double> matrix_trace(const Matrix<rSU,rSU>& A){
         }
     return trace;
 }
+void generate_zero(){
 
+    for(int i = 0; i<rSU; i++){
+        for(int j=0; j<cSU; j++){
+            zeroMatrix(i,j)=std::complex<double> {0.0,0.0};
+        }
+
+    }
+    for(int i = 0; i<2; i++){
+        for(int j=0; j<2; j++){
+            zeroMatrix2(i,j)=std::complex<double> {0.0,0.0};
+        }
+
+    }
+}
 
 
 //generates a rSU x cSU identity matrix

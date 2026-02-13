@@ -53,6 +53,10 @@ int main(){
 
 
     epsilon = information["epsilon"].as<double>();
+
+
+    //epsilon spread depends on beta. hopefully speeds up thermalization
+    hotEpsilon /= beta;
     
     //place seeds
     randNumb.seed(information["seeds"]["distEpsilon"].as<double>());
@@ -124,6 +128,7 @@ int main(){
     // our lattice as 1D array of matrices (3x3), factor 4 because every lattice site has 4 link variable (technically 8, but hermitean conjugate reduces it to 4 indepent ones)
     std::vector<Matrix<rSU,rSU>> lattice(4*xAxis*yAxis*zAxis*tAxis);//why 4* ?
 
+    generate_zero();
 
     //std::cout << lattice.size() << std::endl;
     //std::vector<size_t> indices(lattice.size());

@@ -4,10 +4,16 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <execution>
+#include <thread>
 #include <complex>
+#include <atomic>
 #include <random>
 #include <Eigen/Dense>
 #include "../header/global.h"
+#include "../header/latticeOP.h"
+#include "../header/matrixOP.h"
+#include "../header/utils.h"
 
 void ensureGroup(H5::H5File& file, const std::string& datasetPath)
 {
@@ -313,6 +319,208 @@ bool saveArrayH5complex(const std::vector<std::complex<double>>& array, std::str
 
 }
 
+
+
+void ThermalAndCorrelationTune(std::vector<Matrix<rSU,cSU>>& lattice, 
+    const size_t numberOfThermalSweeps, 
+    const size_t XUpdate, 
+    const size_t numberOfMultiHit,
+    const size_t overrelaxationStep){
+
+
+    std::vector<Matrix<rSU,rSU>> bufferLattice(4*xAxis*yAxis*zAxis*tAxis);
+    std::vector<size_t> indices(lattice.size());
+    std::iota(indices.begin(), indices.end(),0);
+
+    bool condition = true;
+    int counter = 0;
+    while(condition){
+        counter++;
+        std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
+            thread_local std::mt19937_64 Threadindexing(dindexing*i*12872+(counter+2)* 7311);
+            std::uniform_int_distribution<int> threadIndexDist(0, XSet.size()-1);
+
+            //std::mt19937_64 Threadaccept(pow(dacceptReject*i,7)*(p+2));
+            std::uniform_real_distribution<double> threadAcceptReject(0,1);
+        
+            //std::mt19937_64 Threadreflect(pow(dreflection*i,4)*(p+2));
+            std::uniform_int_distribution<int> threadrefelctDist(1,3);
+
+
+            Matrix<rSU, cSU> UPrime, X, A, U; 
+
+            U= lattice[i];
+
+            std::tuple<size_t, size_t, size_t, size_t, size_t> temp =  ReIdx(i);
+            size_t mu,x,y,z,t;
+            mu= std::get<0>(temp);
+            x= std::get<1>(temp);
+            y= std::get<2>(temp);
+            z= std::get<3>(temp);
+            t= std::get<4>(temp);
+            A= determineA(lattice, x,y,z,t,mu);
+
+
+            for(size_t j= 0; j<numberOfMultiHit; j++){
+
+
+                //in theory automatically accepted
+                if(j%overrelaxationStep==0 && j!=0){
+                    //U = overrelaxation(A, U, threadrefelctDist, Threadreflect);
+                    U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
+                    normalizeSU3Matrix(U);
+                    //std::cout << "over?" << std::endl;
+
+                }
+                else{
+
+
+                    size_t index = threadIndexDist(Threadindexing);
+                    X=XSet[index];
+
+                    UPrime = matrix_multiplication(X,lattice[i]);
+                    //UPrime = matrix_multiplication(identityMatrix,lattice[i]);
+                    normalizeSU3Matrix(UPrime);
+                    //bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadaccept, threadAcceptReject);
+                    bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadindexing, threadAcceptReject);
+                    //std::cout << acceptance << std::endl;
+
+                    if(acceptance==true){
+                        U=UPrime;
+                        
+                        }
+                    
+                    }
+
+
+                }
+            bufferLattice[i]=U;
+
+        });
+        //they exchange pointers, so lattice now points to values of buffer and vice versa
+        std::swap(lattice, bufferLattice);
+
+
+
+    }
+
+
+
+
+
+    }
+
+void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice, 
+    const size_t numberOfThermalSweeps, 
+    const size_t XUpdate, 
+    const size_t numberOfMultiHit,
+    const size_t overrelaxationStep){
+
+    std::atomic<int> acceptanceRate=0;
+    std::atomic<int> updates=0;
+
+    std::vector<Matrix<rSU,rSU>> bufferLattice(4*xAxis*yAxis*zAxis*tAxis);
+    std::vector<size_t> indices(lattice.size());
+    std::iota(indices.begin(), indices.end(),0);
+    size_t epsilonCounter=0;
+    int counter =0;
+    while(epsilonCounter<2){
+  //parallelization
+        counter++;
+        std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
+            thread_local std::mt19937_64 Threadindexing(dindexing*i*14002+(counter+2)* 12311);
+            std::uniform_int_distribution<int> threadIndexDist(0, XSet.size()-1);
+
+            //std::mt19937_64 Threadaccept(pow(dacceptReject*i,7)*(p+2));
+            std::uniform_real_distribution<double> threadAcceptReject(0,1);
+        
+            //std::mt19937_64 Threadreflect(pow(dreflection*i,4)*(p+2));
+            std::uniform_int_distribution<int> threadrefelctDist(1,3);
+
+
+            Matrix<rSU, cSU> UPrime, X, A, U; 
+
+            U= lattice[i];
+
+            std::tuple<size_t, size_t, size_t, size_t, size_t> temp =  ReIdx(i);
+            size_t mu,x,y,z,t;
+            mu= std::get<0>(temp);
+            x= std::get<1>(temp);
+            y= std::get<2>(temp);
+            z= std::get<3>(temp);
+            t= std::get<4>(temp);
+            A= determineA(lattice, x,y,z,t,mu);
+
+
+            for(size_t j= 0; j<numberOfMultiHit; j++){
+
+
+                //in theory automatically accepted
+                if(j%overrelaxationStep==0 && j!=0){
+                    //U = overrelaxation(A, U, threadrefelctDist, Threadreflect);
+                    U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
+                    normalizeSU3Matrix(U);
+                    //std::cout << "over?" << std::endl;
+
+                }
+                else{
+
+
+                    size_t index = threadIndexDist(Threadindexing);
+                    X=XSet[index];
+
+                    UPrime = matrix_multiplication(X,lattice[i]);
+                    //UPrime = matrix_multiplication(identityMatrix,lattice[i]);
+                    normalizeSU3Matrix(UPrime);
+                    //bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadaccept, threadAcceptReject);
+                    bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadindexing, threadAcceptReject);
+                    //std::cout << acceptance << std::endl;
+
+                    if(acceptance==true){
+                        U=UPrime;
+                        acceptanceRate.fetch_add(1);
+                        }
+                    updates.fetch_add(1);
+                    }
+
+
+                }
+            bufferLattice[i]=U;
+
+        });
+        //they exchange pointers, so lattice now points to values of buffer and vice versa
+        std::swap(lattice, bufferLattice);
+        double rate = double(acceptanceRate.load())/double(updates.load());
+        epsilonCounter++;
+        if(rate < 0.45){
+            epsilonCounter = 0;
+            if(rate < 0.35){
+                epsilon *=0.8;
+            }
+            else{
+                epsilon *=0.9;
+            }
+            
+        }
+        if(rate>0.6){
+            epsilonCounter=0;
+            if(rate < 0.7){
+                epsilon*=1.2;
+            }
+            else{
+                epsilon*=1.1;
+            }
+
+        }
+
+
+        acceptanceRate.store(0);
+        updates.store(0);
+
+
+    }
+
+}
 
 //translate our matrices to eigen, they have better support
 Eigen::Matrix3cd translateMatrices(const Matrix<rSU,cSU>& A){

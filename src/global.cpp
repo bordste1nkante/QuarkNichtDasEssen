@@ -31,7 +31,7 @@ std::mt19937_64 rng2(420);
 std::mt19937_64 rng3(4200);
 std::uniform_real_distribution<double> dist(-0.5,0.5);
 
-double hotEpsilon=0.02;
+double hotEpsilon=0.5;
 
 //uniform dist for generation of random variables in hot_start()
 std::mt19937_64 hotNumb1(67);
@@ -80,6 +80,9 @@ std::vector<Matrix<2,2>> pauliMatrices;
 //rsU x cSU identity
 Matrix<rSU,cSU> identityMatrix;
 
+Matrix<rSU,cSU> zeroMatrix;
+
+Matrix<2,2> zeroMatrix2;
 
 double drandNumb=69;
 double drng1=42;
