@@ -12,7 +12,6 @@ Simulation.cpp
 src/global.cpp
 src/latticeOP.cpp
 src/matrixOP.cpp
-src/observables.cpp
 src/utils.cpp 
 src/Finish.cpp
 )
