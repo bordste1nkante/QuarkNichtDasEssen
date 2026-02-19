@@ -66,15 +66,15 @@ extern std::uniform_real_distribution<double> hotDist;
 
 //uniform dist for selecting indece of XSet
 
-extern std::uniform_int_distribution<int> indexDist;
+//extern std::uniform_int_distribution<int> indexDist;
 
 //uniform for accept/reject of new config
 
-extern std::uniform_real_distribution<double> uniformAcceptReject;
+//extern std::uniform_real_distribution<double> uniformAcceptReject;
 
 //uniform dist for selecting which reflection to use in overrelaxation
 
-extern std::uniform_int_distribution<int> reflectDist;
+//extern std::uniform_int_distribution<int> reflectDist;
 
 
 //Pauli matrices and 2x2 identity

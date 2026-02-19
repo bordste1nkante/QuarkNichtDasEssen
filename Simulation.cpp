@@ -66,14 +66,14 @@ int main(){
     dhotNumb2Extra = information["seeds"]["dist"]["hotNumb2Extra"].as<double>();
     dhotNumb3Extra = information["seeds"]["dist"]["hotNumb3Extra"].as<double>();
     dhotNumbS1= information["seeds"]["dist"]["hotNumbS1"].as<double>();
-    dhotNumbS2= information["seeds"]["dist"]["hotNumbS2"].as<double>();
-    dhotNumbS3= information["seeds"]["dist"]["hotNumbS3"].as<double>();
+    //dhotNumbS2= information["seeds"]["dist"]["hotNumbS2"].as<double>();
+    //dhotNumbS3= information["seeds"]["dist"]["hotNumbS3"].as<double>();
     dhotNumbT1= information["seeds"]["dist"]["hotNumbT1"].as<double>();
-    dhotNumbT2= information["seeds"]["dist"]["hotNumbT2"].as<double>();
-    dhotNumbT3= information["seeds"]["dist"]["hotNumbT3"].as<double>();
+    //dhotNumbT2= information["seeds"]["dist"]["hotNumbT2"].as<double>();
+    //dhotNumbT3= information["seeds"]["dist"]["hotNumbT3"].as<double>();
     dhotNumbR1= information["seeds"]["dist"]["hotNumbR1"].as<double>();
-    dhotNumbR2= information["seeds"]["dist"]["hotNumbR2"].as<double>();
-    dhotNumbR3= information["seeds"]["dist"]["hotNumbR3"].as<double>();
+    //dhotNumbR2= information["seeds"]["dist"]["hotNumbR2"].as<double>();
+    //dhotNumbR3= information["seeds"]["dist"]["hotNumbR3"].as<double>();
     dindexing=information["seeds"]["indexDist"].as<double>();
 
 

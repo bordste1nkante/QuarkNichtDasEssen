@@ -34,14 +34,14 @@ std::uniform_real_distribution<double> hotDist(-hotEpsilon, hotEpsilon);
 
 //uniform dist for selecting indece of XSet
 
-std::uniform_int_distribution<int> indexDist (0, 2*NSetXMatrices - 1);
+//std::uniform_int_distribution<int> indexDist (0, 2*NSetXMatrices - 1);
 
 //uniform for accept/reject of new config
 
-std::uniform_real_distribution<double> uniformAcceptReject(0, 1);
+//std::uniform_real_distribution<double> uniformAcceptReject(0, 1);
 
 //uniform for refelct overrelaxation
-std::uniform_int_distribution<int> reflectDist (1,3);
+//std::uniform_int_distribution<int> reflectDist (1,3);
 
 
 //Pauli matrices and 2x2 identity
@@ -63,14 +63,14 @@ double dhotNumb1Extra=3;
 double dhotNumb2Extra=4;
 double dhotNumb3Extra=5;
 double dhotNumbS1=20;
-double dhotNumbS2=21;
-double dhotNumbS3=22;
+//double dhotNumbS2=21;
+//double dhotNumbS3=22;
 double dhotNumbT1=10;
-double dhotNumbT2=11;
-double dhotNumbT3=12;
+//double dhotNumbT2=11;
+//double dhotNumbT3=12;
 double dhotNumbR1=30;
-double dhotNumbR2=31;
-double dhotNumbR3=32;
+//double dhotNumbR2=31;
+//double dhotNumbR3=32;
 double dindexing=666;
 
 

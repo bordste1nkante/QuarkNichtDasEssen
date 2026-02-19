@@ -326,22 +326,22 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
 
         
         std::mt19937_64 hottestNumbR1(i*dhotNumbR1);
-        std::mt19937_64 hottestNumbR2(i*dhotNumbR2);
-        std::mt19937_64 hottestNumbR3(i*dhotNumbR3);
-        std::mt19937_64 hottestNumbR0(i*dhotNumb1);
-        std::mt19937_64 hottestNumbRE(i*dhotNumb1Extra);
-
+        //std::mt19937_64 hottestNumbR2(i*dhotNumbR2);
+        //std::mt19937_64 hottestNumbR3(i*dhotNumbR3);
+        //std::mt19937_64 hottestNumbR0(i*dhotNumb1);
+        //std::mt19937_64 hottestNumbRE(i*dhotNumb1Extra);
+//
         std::mt19937_64 hottestNumbS1(i*dhotNumbS1);
-        std::mt19937_64 hottestNumbS2(i*dhotNumbS2);
-        std::mt19937_64 hottestNumbS3(i*dhotNumbS3);
-        std::mt19937_64 hottestNumbS0(i*dhotNumb2);
-        std::mt19937_64 hottestNumbSE(i*dhotNumb2Extra);
-
+        //std::mt19937_64 hottestNumbS2(i*dhotNumbS2);
+        //std::mt19937_64 hottestNumbS3(i*dhotNumbS3);
+        //std::mt19937_64 hottestNumbS0(i*dhotNumb2);
+        //std::mt19937_64 hottestNumbSE(i*dhotNumb2Extra);
+//
         std::mt19937_64 hottestNumbT1(i*dhotNumbT1);
-        std::mt19937_64 hottestNumbT2(i*dhotNumbT2);
-        std::mt19937_64 hottestNumbT3(i*dhotNumbT3);
-        std::mt19937_64 hottestNumbT0(i*dhotNumb3);
-        std::mt19937_64 hottestNumbTE(i*dhotNumb3Extra);
+        //std::mt19937_64 hottestNumbT2(i*dhotNumbT2);
+        //std::mt19937_64 hottestNumbT3(i*dhotNumbT3);
+        //std::mt19937_64 hottestNumbT0(i*dhotNumb3);
+        //std::mt19937_64 hottestNumbTE(i*dhotNumb3Extra);
 
 
 
@@ -354,34 +354,34 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
         //number required to generate 3 SU(2) matrices, from these we form a SU(3)
         double r[3];
         r[0]= distribution(hottestNumbR1);
-        r[1]= distribution(hottestNumbR2);
-        r[2]= distribution(hottestNumbR3); 
+        r[1]= distribution(hottestNumbR1);
+        r[2]= distribution(hottestNumbR1); 
 
-        double r0 = distribution(hottestNumbR0); 
-        double er = hotDistribution(hottestNumbRE);
+        double r0 = distribution(hottestNumbR1); 
+        double er = hotDistribution(hottestNumbR1);
 
         double rLength = std::sqrt(r[0]*r[0]+r[1]*r[1]+r[2]*r[2]);
         r0=std::sqrt(r0*r0)*std::sqrt(1-er*er);
 
         double s[3];
         s[0]= distribution(hottestNumbS1);
-        s[1]= distribution(hottestNumbS2);
-        s[2]= distribution(hottestNumbS3);        
+        s[1]= distribution(hottestNumbS1);
+        s[2]= distribution(hottestNumbS1);        
 
-        double s0 = distribution(hottestNumbS0); 
-        double es = hotDistribution(hottestNumbSE);  
+        double s0 = distribution(hottestNumbS1); 
+        double es = hotDistribution(hottestNumbS1);  
 
         double sLength = std::sqrt(s[0]*s[0]+s[1]*s[1]+s[2]*s[2]);
         s0=std::sqrt(s0*s0)*std::sqrt(1-es*es);
 
         double t[3];
         t[0]= distribution(hottestNumbT1);
-        t[1]= distribution(hottestNumbT2);
-        t[2]= distribution(hottestNumbT3);   
+        t[1]= distribution(hottestNumbT1);
+        t[2]= distribution(hottestNumbT1);   
 
-        double t0 = distribution(hottestNumbT0);
+        double t0 = distribution(hottestNumbT1);
 
-        double et = hotDistribution(hottestNumbTE);
+        double et = hotDistribution(hottestNumbT1);
 
         double tLength = std::sqrt(t[0]*t[0]+t[1]*t[1]+t[2]*t[2]);
         t0=std::sqrt(t0*t0)*std::sqrt(1-et*et);
@@ -493,6 +493,10 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
 
     return accept;
 }
+
+
+
+
 
 Matrix<rSU,cSU> determineA(const std::vector<Matrix<rSU,rSU>>& lattice ,size_t x, size_t y, size_t z, size_t t, size_t mu){
     Matrix<rSU,cSU> ATemp1;
