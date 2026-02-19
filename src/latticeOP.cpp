@@ -68,385 +68,12 @@ void normalizeSU2Matrix(Matrix<2,2>& U){
 
 
 
-void X_updateSU3(){
-    for(int p=0; p<NSetXMatrices; p++){
-        //final matrices
-        Matrix<rSU,cSU> X;
-        Matrix<rSU,cSU> invX;
 
-
-        //X=RST
-        Matrix<rSU,cSU> R;
-        Matrix<rSU,cSU> S;
-        Matrix<rSU,cSU> T;
-
-        Matrix<2,2> Rsmall;
-        Matrix<2,2> Ssmall;
-        Matrix<2,2> Tsmall;
-
-        Matrix<rSU,cSU> ST;
-
-        //std::cout << "Matrix declared" << std::endl;
-
-
-
-        //number required to generate 3 SU(2) matrices, from these we form a SU(3)
-
-        double r[3];
-        double r0 = dist(rng1); 
-        double s[3];
-        double s0 = dist(rng2); 
-        double t[3];
-        double t0 = dist(rng3);
-
-        r[0]= dist(hotNumbR1);
-        r[1]= dist(hotNumbR2);
-        r[2]= dist(hotNumbR3);  
-
-        double er = dist(hotNumb1Extra);
-
-        double rLength = std::sqrt(r[0]*r[0]+r[1]*r[1]+r[2]*r[2]);
-        r0=r0/std::sqrt(r0*r0)*std::sqrt(1-er*er);
-
-
-        s[0]= dist(hotNumbS1);
-        s[1]= dist(hotNumbS2);
-        s[2]= dist(hotNumbS3);                     
-
-        double es = dist(hotNumb2Extra);    
-
-        double sLength = std::sqrt(s[0]*s[0]+s[1]*s[1]+s[2]*s[2]);
-        s0=s0/std::sqrt(s0*s0)*std::sqrt(1-es*es);
-
-
-
-        t[0]= dist(hotNumbT1);
-        t[1]= dist(hotNumbT2);
-        t[2]= dist(hotNumbT3);                    
-
-        double et = dist(hotNumb3Extra);
-        double tLength = std::sqrt(t[0]*t[0]+t[1]*t[1]+t[2]*t[2]);
-        t0=t0/std::sqrt(t0*t0)*std::sqrt(1-et*et);
-  
-        for(int i=0; i<3; i++){
-            s[i]=es*s[i]/sLength;
-            t[i]=et*t[i]/tLength;
-            r[i]=er*r[i]/rLength;
-
-        }
-        //std::cout << "vectors done" << std::endl;
-
-        for(int i=0; i<4; i++){
-
-            if(i==0){
-                for(int j=0; j<2; j++){
-                    for(int k=0; k<2; k++){
-                        
-
-                        Ssmall(j,k)= pauliMatrices[i](j,k)*s0;
-                        Rsmall(j,k)= pauliMatrices[i](j,k)*r0;
-                        Tsmall(j,k)= pauliMatrices[i](j,k)*t0;
-
-                    }
-                } 
-            }
-            else{
-            for(int j=0; j<2; j++){
-                for(int k=0; k<2; k++){
-                    Ssmall(j,k)+= pauliMatrices[i](j,k)*s[i-1];
-                    Rsmall(j,k)+= pauliMatrices[i](j,k)*r[i-1];
-                    Tsmall(j,k)+= pauliMatrices[i](j,k)*t[i-1];
-                    }
-                }
-            }
-        }       
-
-        //std::cout << "2D - matrix done" << std::endl;
-        //fill R,S,T
-        std::complex<double> uno= {1.0,0.0};
-        std::complex<double> zero = {0.0,0.0};
-
-        R(0,0)=Rsmall(0,0);
-        R(1,0)=Rsmall(1,0);
-        R(2,0)=zero;
-        R(0,1)=Rsmall(0,1);
-        R(1,1)=Rsmall(1,1);
-        R(2,1)=zero;
-        R(0,2)=zero;
-        R(1,2)=zero;
-        R(2,2)=uno;
-
-        S(0,0)=Ssmall(0,0);
-        S(1,0)=zero;
-        S(2,0)=Ssmall(0,1);
-        S(0,1)=zero;
-        S(1,1)=uno;
-        S(2,1)=Ssmall(1,0);
-        S(0,2)=zero;
-        S(1,2)=zero;
-        S(2,2)=Ssmall(1,1);
-
-        T(0,0)=uno;
-        T(1,0)=zero;
-        T(2,0)=zero;
-        T(0,1)=zero;
-        T(1,1)=Tsmall(0,0);
-        T(2,1)=Tsmall(1,0);
-        T(0,2)=zero;
-        T(1,2)=Tsmall(0,1);
-        T(2,2)=Tsmall(1,1);
-
-        //matrix multiplication S*T = ST
-        ST=matrix_multiplication(S,T);
-        //matrix multiplication R*ST = X
-        X=matrix_multiplication(R,ST);
-
-        ////inverting X
-        //std::complex<double> detX = X(0,0)*(X(1,1)*X(2,2)-X(1,2)*X(2,1))-X(0,1)*(X(1,0)*X(2,2)-X(1,2)*X(2,0))+X(0,2)*(X(1,0)*X(2,1)-X(1,1)*X(2,0));
-        std::complex<double> detX = det_A(X);
-
-        //std::cout << detX << std::endl;
-
-        // should insure that if det(X) \approx zero we just repeat the process and generate a new X
-
-        double tol = 1e-11;
-            
-        if (detX.real() > -tol && detX.real() < tol &&
-            detX.imag() > -tol && detX.imag() < tol)
-        {
-            std::cout << "Stuck in loop" << std::endl;
-            p = p - 1;
-        }
-        else{
-            normalizeSU3Matrix(X);
-
-            invX = inverse_A(X);
-
-            XSet[2*p]= X;
-            XSet[2*p+1]=invX;
-
-
-        }
-
-
-    }
-
-
-}
 
 //parallel
 void X_updateSU3(size_t input){
 
 
-    //for(int p=0; p<NSetXMatrices; p++){
-    //    //final matrices
-    //    Matrix<rSU,cSU> X;
-    //    Matrix<rSU,cSU> invX;
-//
-//
-    //    //X=RST
-    //    Matrix<rSU,cSU> R;
-    //    Matrix<rSU,cSU> S;
-    //    Matrix<rSU,cSU> T;
-//
-    //    Matrix<2,2> Rsmall;
-    //    Matrix<2,2> Ssmall;
-    //    Matrix<2,2> Tsmall;
-//
-    //    Matrix<rSU,cSU> ST;
-//
-    //    //std::cout << "Matrix declared" << std::endl;
-//
-//
-//
-    //    //number required to generate 3 SU(2) matrices, from these we form a SU(3)
-//
-    //    double r[3];
-    //    double r0 = dist(rng1); 
-    //    double s[3];
-    //    double s0 = dist(rng2); 
-    //    double t[3];
-    //    double t0 = dist(rng3);
-//
-    //    r[0]= dist(hotNumbR1);
-    //    r[1]= dist(hotNumbR2);
-    //    r[2]= dist(hotNumbR3);  
-//
-    //    double er = dist(hotNumb1Extra);
-//
-    //    double rLength = std::sqrt(r[0]*r[0]+r[1]*r[1]+r[2]*r[2]);
-    //    r0=r0/std::sqrt(r0*r0)*std::sqrt(1-er*er);
-//
-//
-    //    s[0]= dist(hotNumbS1);
-    //    s[1]= dist(hotNumbS2);
-    //    s[2]= dist(hotNumbS3);                     
-//
-    //    double es = dist(hotNumb2Extra);    
-//
-    //    double sLength = std::sqrt(s[0]*s[0]+s[1]*s[1]+s[2]*s[2]);
-    //    s0=s0/std::sqrt(s0*s0)*std::sqrt(1-es*es);
-//
-//
-//
-    //    t[0]= dist(hotNumbT1);
-    //    t[1]= dist(hotNumbT2);
-    //    t[2]= dist(hotNumbT3);                    
-//
-    //    double et = dist(hotNumb3Extra);
-    //    double tLength = std::sqrt(t[0]*t[0]+t[1]*t[1]+t[2]*t[2]);
-    //    t0=t0/std::sqrt(t0*t0)*std::sqrt(1-et*et);
-  //
-    //    for(int i=0; i<3; i++){
-    //        s[i]=es*s[i]/sLength;
-    //        t[i]=et*t[i]/tLength;
-    //        r[i]=er*r[i]/rLength;
-//
-    //    }
-    //    //std::cout << "vectors done" << std::endl;
-//
-    //    for(int i=0; i<4; i++){
-//
-    //        if(i==0){
-    //            for(int j=0; j<2; j++){
-    //                for(int k=0; k<2; k++){
-    //                    
-//
-    //                    Ssmall(j,k)= pauliMatrices[i](j,k)*s0;
-    //                    Rsmall(j,k)= pauliMatrices[i](j,k)*r0;
-    //                    Tsmall(j,k)= pauliMatrices[i](j,k)*t0;
-//
-    //                }
-    //            } 
-    //        }
-    //        else{
-    //        for(int j=0; j<2; j++){
-    //            for(int k=0; k<2; k++){
-    //                Ssmall(j,k)+= pauliMatrices[i](j,k)*s[i-1];
-    //                Rsmall(j,k)+= pauliMatrices[i](j,k)*r[i-1];
-    //                Tsmall(j,k)+= pauliMatrices[i](j,k)*t[i-1];
-    //                }
-    //            }
-    //        }
-    //    }       
-//
-    //    //std::cout << "2D - matrix done" << std::endl;
-    //    //fill R,S,T
-    //    std::complex<double> uno= {1.0,0.0};
-    //    std::complex<double> zero = {0.0,0.0};
-//
-    //    R(0,0)=Rsmall(0,0);
-    //    R(1,0)=Rsmall(1,0);
-    //    R(2,0)=zero;
-    //    R(0,1)=Rsmall(0,1);
-    //    R(1,1)=Rsmall(1,1);
-    //    R(2,1)=zero;
-    //    R(0,2)=zero;
-    //    R(1,2)=zero;
-    //    R(2,2)=uno;
-//
-    //    S(0,0)=Ssmall(0,0);
-    //    S(1,0)=zero;
-    //    S(2,0)=Ssmall(0,1);
-    //    S(0,1)=zero;
-    //    S(1,1)=uno;
-    //    S(2,1)=Ssmall(1,0);
-    //    S(0,2)=zero;
-    //    S(1,2)=zero;
-    //    S(2,2)=Ssmall(1,1);
-//
-    //    T(0,0)=uno;
-    //    T(1,0)=zero;
-    //    T(2,0)=zero;
-    //    T(0,1)=zero;
-    //    T(1,1)=Tsmall(0,0);
-    //    T(2,1)=Tsmall(1,0);
-    //    T(0,2)=zero;
-    //    T(1,2)=Tsmall(0,1);
-    //    T(2,2)=Tsmall(1,1);
-//
-    //    //matrix multiplication S*T = ST
-    //    for(int i=0; i<rSU; i++){
-    //        for(int j=0; j<cSU; j++){
-    //            std::complex<double> sum;
-    //            for(int k = 0; k<rSU; k++){
-    //                sum += S(i,k)*T(k,j);
-//
-    //            }
-    //            ST(i,j)= sum;
-    //        }
-//
-    //    }
-    //    //matrix multiplication R*ST = X
-    //    for(int i=0; i<rSU; i++){
-    //        for(int j=0; j<cSU; j++){
-    //            std::complex<double> sum;
-    //            for(int k = 0; k<rSU; k++){
-    //                sum += R(i,k)*ST(k,j);
-//
-    //            }
-    //            X(i,j)= sum;
-    //        }
-//
-    //    }
-//
-    //    ////inverting X
-    //    //std::complex<double> detX = X(0,0)*(X(1,1)*X(2,2)-X(1,2)*X(2,1))-X(0,1)*(X(1,0)*X(2,2)-X(1,2)*X(2,0))+X(0,2)*(X(1,0)*X(2,1)-X(1,1)*X(2,0));
-    //    std::complex<double> detX = det_A(X);
-//
-    //    //std::cout << detX << std::endl;
-//
-    //    // should insure that if det(X) \approx zero we just repeat the process and generate a new X
-//
-    //    double tol = 1e-11;
-    //        
-    //    if (detX.real() > -tol && detX.real() < tol &&
-    //        detX.imag() > -tol && detX.imag() < tol)
-    //    {
-    //        std::cout << "Stuck in loop" << std::endl;
-    //        p = p - 1;
-    //    }
-    //    else{
-    //        //normalizes det to 1
-    //        // not sure if this needs to be done by dividing over third root //Vincent: ?
-    //        for(int i=0; i<rSU; i++){
-    //            for(int j=0; j<rSU; j++){
-    //                X(i,j)= X(i,j)/pow(detX, 1.0/double(rSU));
-    //            }
-    //        }
-    //        //detX = det_A(X);
-    //        //std::cout << detX << std::endl;
-//
-//
-//  //          //the X are already normalized to be detX=1, therefore it becomes redundant to divide by detX
-//  //          invX(0,0)= (X(1,1)*X(2,2)-X(1,2)*X(2,1));
-//  //          invX(0,1)=-(X(0,1)*X(2,2)-X(0,2)*X(2,1));
-//  //          invX(0,2)= (X(0,1)*X(1,2)-X(0,2)*X(1,1));
-////
-//  //          invX(1,0)=-(X(1,0)*X(2,2)-X(1,2)*X(2,0));
-//  //          invX(1,1)=(X(0,0)*X(2,2)-X(0,2)*X(2,0));
-//  //          invX(1,2)=-(X(0,0)*X(1,2)-X(0,2)*X(1,0));
-////
-//  //          invX(2,0)=(X(1,0)*X(2,1)-X(1,1)*X(2,0));
-//  //          invX(2,1)=-(X(0,0)*X(2,1)-X(0,1)*X(2,0));
-//  //          invX(2,2)=(X(0,0)*X(1,1)-X(0,1)*X(1,0));
-////
-//
-    //        invX = inverse_A(X);
-    //        //std::cout << "invertiert" << std::endl;
-    //        //save X and invX in our set of matrices
-    //        //std::cout << X(0,0) << std::endl;
-    //        XSet[2*p]= X;
-    //        XSet[2*p+1]=invX;
-//
-    //        //std::cout << "X generated" << std::endl;
-//
-    //        //std::cout << "X abgespeichert" << std::endl;
-//
-    //    }
-//
-//
-    //}
 
     std::vector<Matrix<rSU,rSU>> bufferSet(XSet.size());
     std::vector<size_t> indices(NSetXMatrices);
@@ -468,82 +95,58 @@ void X_updateSU3(size_t input){
 
         std::uniform_real_distribution<double> distEpsilon(-epsilon,epsilon);
 
-        //std::mt19937_64 hottestNumbR1(index*dhotNumbR1*(input+2));
-        //std::mt19937_64 hottestNumbR2(index*dhotNumbR2*(input+2));
-        //std::mt19937_64 hottestNumbR3(index*dhotNumbR3*(input+2));
-        //std::mt19937_64 hottestNumbR0(index*drng1*(input+2));
-        //std::mt19937_64 hottestNumbRE(index*dhotNumb1Extra*(input+2));
-
-        //std::mt19937_64 hottestNumbS1(index*dhotNumbS1*(input+2));
-        //std::mt19937_64 hottestNumbS2(index*dhotNumbS2*(input+2));
-        //std::mt19937_64 hottestNumbS3(index*dhotNumbS3*(input+2));
-        //std::mt19937_64 hottestNumbS0(index*drng2*(input+2));
-        //std::mt19937_64 hottestNumbSE(index*dhotNumb2Extra*(input+2));
-
-        //std::mt19937_64 hottestNumbT1(index*dhotNumbT1*(input+2));
-        //std::mt19937_64 hottestNumbT2(index*dhotNumbT2*(input+2));
-        //std::mt19937_64 hottestNumbT3(index*dhotNumbT3*(input+2));
-        //std::mt19937_64 hottestNumbT0(index*drng3*(input+2));
-        //std::mt19937_64 hottestNumbTE(index*dhotNumb3Extra*(input+2));
 
         std::mt19937_64 zufall((index+3)*drng1*9731+(input+2)*13063);
 
 
 
         double r[3];
-        //double r0 = dist(hottestNumbR0); 
+
         double r0 = dist(zufall); 
         double s[3];
-        //double s0 = dist(hottestNumbS0); 
+
         double s0 = dist(zufall);
         double t[3];
-        //double t0 = dist(hottestNumbT0);
+
         double t0 = dist(zufall);
 
-        //r[0]= dist(hottestNumbR1);
-        //r[1]= dist(hottestNumbR2);
-        //r[2]= dist(hottestNumbR3);  
+  
 
         r[0]= dist(zufall);
         r[1]= dist(zufall);
         r[2]= dist(zufall); 
 
-        //double er = distEpsilon(hottestNumbSE);
+
         double er = distEpsilon(zufall);
 
         double rLength = std::sqrt(r[0]*r[0]+r[1]*r[1]+r[2]*r[2]);
-        //r0=r0/std::sqrt(r0*r0)*std::sqrt(1-er*er);
+
         r0 = std::sqrt(std::norm(r0))*std::sqrt(1-er*er);
 
-        //s[0]= dist(hottestNumbS1);
-        //s[1]= dist(hottestNumbS2);
-        //s[2]= dist(hottestNumbS3);   
+  
 
         s[0]= dist(zufall);
         s[1]= dist(zufall);
         s[2]= dist(zufall);   
 
-
-        //double es = distEpsilon(hottestNumbSE);    
+  
         double es = distEpsilon(zufall);  
 
         double sLength = std::sqrt(s[0]*s[0]+s[1]*s[1]+s[2]*s[2]);
-        //s0=s0/std::sqrt(s0*s0)*std::sqrt(1-es*es);
+
         s0 = std::sqrt(std::norm(s0))*std::sqrt(1-es*es);
 
 
-        //t[0]= dist(hottestNumbT1);
-        //t[1]= dist(hottestNumbT2);
-        //t[2]= dist(hottestNumbT3); 
+
         
         t[0]= dist(zufall);
         t[1]= dist(zufall);
         t[2]= dist(zufall); 
 
-        //double et = distEpsilon(hottestNumbRE);
+
         double et = distEpsilon(zufall);
         double tLength = std::sqrt(t[0]*t[0]+t[1]*t[1]+t[2]*t[2]);
-        //t0=t0/std::sqrt(t0*t0)*std::sqrt(1-et*et);
+
         t0 = std::sqrt(std::norm(t0))*std::sqrt(1-et*et);
 
 
@@ -582,7 +185,7 @@ void X_updateSU3(size_t input){
         normalizeSU2Matrix(Rsmall);
         normalizeSU2Matrix(Tsmall);
 
-        //std::cout << "2D - matrix done" << std::endl;
+
         //fill R,S,T
         std::complex<double> uno= {1.0,0.0};
         std::complex<double> zero = {0.0,0.0};
@@ -637,30 +240,6 @@ void X_updateSU3(size_t input){
 
 }
 
-//rounding errors causes matrices to potentially digress from det = 1, we correct that from time to time.
-void normalizeSU3(std::vector<Matrix<rSU,rSU>>& lattice){
-
-    Matrix<rSU,cSU> U;
-
-    for(int i = 0; i<tAxis; i++){
-        for(int j= 0; j<zAxis; j++){
-            for(int k=0; k<yAxis; k++){
-                for(int l=0; l<xAxis; l++){
-                    for(int mu = 0; mu<linksPerSite; mu++){
-                        U = lattice[idx(l,k,j,i, mu)];
-                        normalizeSU3Matrix(U);
-                        lattice[idx(l,k,j,i, mu)]= U;
-                }
-                }
-
-
-            }
-        }
-    }
-
-
-
-}
 
 
 void normalizeSU3Matrix(Matrix<rSU,rSU>& U){
@@ -712,21 +291,6 @@ void normalizeSU3Matrix(Matrix<rSU,rSU>& U){
 //sets all matrices to identity, a potential starting config
 void cold_start(std::vector<Matrix<rSU,rSU>>& lattice){
 
-//    for(int i = 0; i<tAxis; i++){
-//        for(int j= 0; j<zAxis; j++){
-//            for(int k=0; k<yAxis; k++){
-//                for(int l=0; l<xAxis; l++){
-//                    for(int mu = 0; mu<linksPerSite; mu++){
-//                        lattice[idx(l,k,j,i,mu)]=identityMatrix;
-//
-//                }
-//                }
-//
-//
-//
-//            }
-//        }
-//    }
     std::vector<Matrix<rSU,rSU>> bufferLattice(lattice.size());
     std::vector<size_t> indices(lattice.size());
     std::iota(indices.begin(), indices.end(),0);
@@ -741,167 +305,7 @@ void cold_start(std::vector<Matrix<rSU,rSU>>& lattice){
 
 //sets all matrices to random ones, a possible starting config
 void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
-    //Matrix<rSU,cSU> U;
-    //Matrix<rSU,cSU> R;
-    //Matrix<rSU,cSU> S;
-    //Matrix<rSU,cSU> T;
-    //Matrix<2,2> Rsmall;
-    //Matrix<2,2> Ssmall;
-    //Matrix<2,2> Tsmall;
-    //Matrix<rSU,cSU> ST;
-//
-//
-    ////fixed int c and d
-    //for(int a = 0; a<tAxis; a++){
-    //    for(int b= 0; b<zAxis; b++){
-    //        for(int c=0; c<yAxis; c++){
-    //            for(int d=0; d<xAxis; d++){
-    //                for(int mu = 0; mu<linksPerSite; mu++){
-    //                //number required to generate 3 SU(2) matrices, from these we form a SU(3)
-//
-    //                double r[3];
-    //                r[0]= dist(hotNumbR1);
-    //                r[1]= dist(hotNumbR2);
-    //                r[2]= dist(hotNumbR3); 
-    //                double r0 = dist(hotNumb1); 
-//
-//
-    //                double er = hotDist(hotNumb1Extra);
-//
-    //                double rLength = std::sqrt(r[0]*r[0]+r[1]*r[1]+r[2]*r[2]);
-    //                r0=r0/std::sqrt(r0*r0)*std::sqrt(1-er*er);
-//
-    //                double s[3];
-    //                s[0]= dist(hotNumbS1);
-    //                s[1]= dist(hotNumbS2);
-    //                s[2]= dist(hotNumbS3);                     
-    //                double s0 = dist(hotNumb2); 
-//
-    //                double es = hotDist(hotNumb2Extra);     
-//
-    //                double sLength = std::sqrt(s[0]*s[0]+s[1]*s[1]+s[2]*s[2]);
-    //                s0=s0/std::sqrt(s0*s0)*std::sqrt(1-es*es);
-//
-//
-    //                double t[3];
-    //                t[0]= dist(hotNumbT1);
-    //                t[1]= dist(hotNumbT2);
-    //                t[2]= dist(hotNumbT3);                    
-//
-    //                double t0 = dist(hotNumb3);
-//
-    //                double et = hotDist(hotNumb3Extra);
-//
-    //                double tLength = std::sqrt(t[0]*t[0]+t[1]*t[1]+t[2]*t[2]);
-    //                t0=t0/std::sqrt(t0*t0)*std::sqrt(1-et*et);
-//
-    //                for(int i=0; i<3; i++){
-    //                    s[i]=es*s[i]/sLength;
-    //                    t[i]=et*t[i]/tLength;
-    //                    r[i]=er*r[i]/rLength;
-    //                
-    //                }
-    //            
-    //                for(int i=0; i<4; i++){
-    //                
-    //                    if(i==0){
-    //                        for(int j=0; j<2; j++){
-    //                            for(int k=0; k<2; k++){
-    //                            
-    //                                Ssmall(j,k)= pauliMatrices[i](j,k)*s0;
-    //                                Rsmall(j,k)= pauliMatrices[i](j,k)*r0;
-    //                                Tsmall(j,k)= pauliMatrices[i](j,k)*t0;
-    //                            
-    //                            }
-    //                        } 
-    //                    }
-    //                    else{
-    //                    for(int j=0; j<2; j++){
-    //                        for(int k=0; k<2; k++){
-    //                            Ssmall(j,k)+= pauliMatrices[i](j,k)*s[i-1];
-    //                            Rsmall(j,k)+= pauliMatrices[i](j,k)*r[i-1];
-    //                            Tsmall(j,k)+= pauliMatrices[i](j,k)*t[i-1];
-    //                    }
-    //                    }  
-    //                }     
-    //                }               
-//
-    //                    //fill R,S,T
-    //                    std::complex<double> uno= {1.0,0.0};
-    //                    std::complex<double> zero = {0.0,0.0};
-//
-    //                    R(0,0)=Rsmall(0,0);
-    //                    R(1,0)=Rsmall(1,0);
-    //                    R(2,0)=zero;
-    //                    R(0,1)=Rsmall(0,1);
-    //                    R(1,1)=Rsmall(1,1);
-    //                    R(2,1)=zero;
-    //                    R(0,2)=zero;
-    //                    R(1,2)=zero;
-    //                    R(2,2)=uno;
-//
-    //                    S(0,0)=Ssmall(0,0);
-    //                    S(1,0)=zero;
-    //                    S(2,0)=Ssmall(0,1);
-    //                    S(0,1)=zero;
-    //                    S(1,1)=uno;
-    //                    S(2,1)=Ssmall(1,0);
-    //                    S(0,2)=zero;
-    //                    S(1,2)=zero;
-    //                    S(2,2)=Ssmall(1,1);
-//
-    //                    T(0,0)=uno;
-    //                    T(1,0)=zero;
-    //                    T(2,0)=zero;
-    //                    T(0,1)=zero;
-    //                    T(1,1)=Tsmall(0,0);
-    //                    T(2,1)=Tsmall(1,0);
-    //                    T(0,2)=zero;
-    //                    T(1,2)=Tsmall(0,1);
-    //                    T(2,2)=Tsmall(1,1);
-//
-    //                    //matrix multiplication S*T = ST
-    //                    for(int i=0; i<rSU; i++){
-    //                        for(int j=0; j<cSU; j++){
-    //                            std::complex<double> sum;
-    //                            for(int k = 0; k<rSU; k++){
-    //                                sum += S(i,k)*T(k,j);
-    //                            
-    //                            }
-    //                            ST(i,j)= sum;
-    //                        }
-    //                    
-    //                    }
-    //                    //matrix multiplication R*ST = X
-    //                    for(int i=0; i<rSU; i++){
-    //                        for(int j=0; j<cSU; j++){
-    //                            std::complex<double> sum;
-    //                            for(int k = 0; k<rSU; k++){
-    //                                sum += R(i,k)*ST(k,j);
-    //                            
-    //                            }
-    //                            U(i,j)= sum;
-    //                        }
-    //                    
-    //                    }
-    //                    //normalize to det(U)=1
-    //                    std::complex<double> detU = det_A(U);
-    //                    
-    //                    for(int i = 0; i<rSU; i++){
-    //                        for(int j = 0; j<cSU; j++){
-    //                            U(i,j)=U(i,j)/pow(detU, 1.0/double(rSU));
-    //                        }
-    //                    }
-    //                
-    //                    lattice[idx(a,b,c,d, mu)]=U;
-    //            }
-    //                
-    //            }
-//
-//
-    //        }
-    //    }
-    //}
+
     std::vector<Matrix<rSU,rSU>> bufferLattice(lattice.size());
     std::vector<size_t> indices(lattice.size());
     std::iota(indices.begin(), indices.end(),0);
@@ -1067,30 +471,6 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
 
 
 
-
-
-bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU,rSU>& U,  const Matrix<rSU,rSU>& UPrime ,size_t x, size_t y, size_t z, size_t t, size_t mu, const Matrix<rSU,cSU>& A){
-    
-    bool accept;
-    double r;
-    double probability;
-    
-    double SActionDif;
-    SActionDif = -beta/(xAxis*yAxis*zAxis*tAxis)*(matrix_trace(matrix_multiplication(matrix_subtraction(UPrime, U),A))).real();
-    probability = std::min(1.0, exp(- SActionDif)); // according to my notes -> check in doubt
-
-    r= uniformAcceptReject(acceptReject);
-    if(r<=probability){
-        accept = true;
-    }
-    else{
-        accept = false;
-    }
-
-
-    return accept;
-}
-
 //parallel
 bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU,rSU>& U,  const Matrix<rSU,rSU>& UPrime, const Matrix<rSU,cSU>& A, std::mt19937_64& ActionAccept, std::uniform_real_distribution<double>& Distribution){
     
@@ -1121,29 +501,6 @@ Matrix<rSU,cSU> determineA(const std::vector<Matrix<rSU,rSU>>& lattice ,size_t x
     Matrix<rSU,cSU> A=zeroMatrix;
 
     double Sum;
-    //enforce periodic boundary condition
-    //auto bCX = [](size_t i) -> size_t{
-    //    return (i+xAxis) % xAxis;
-    //    };
-    //auto bCY = [](size_t i) -> size_t{
-    //    return (i+yAxis) % yAxis;
-    //    };
-    //auto bCZ = [](size_t i) -> size_t{
-    //    return (i+zAxis) % zAxis;
-    //    };
-    //auto bCT = [](size_t i) -> size_t{
-    //    return (i+tAxis) % tAxis;
-    //    };
-//
-//
-    //size_t tP;
-    //size_t tM;
-    //size_t xP;
-    //size_t xM;
-    //size_t yP;
-    //size_t yM;
-    //size_t zP;
-    //size_t zM;
 
 
     size_t Pmu_x;
@@ -1222,269 +579,10 @@ Matrix<rSU,cSU> determineA(const std::vector<Matrix<rSU,rSU>>& lattice ,size_t x
         }
     }
 
-            //if(nu==0){
-            //    //Ich glaube in dieser Schleife ist viel Index-Salat -> Nevermind??
-            //    if(mu==1){
-//
-            //        xP= bCX(x+1);
-            //        xM= bCX(x-1);
-            //        yP= bCY(y+1);
-            //        yM= bCY(y-1);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xM,y,z,t,mu)]), lattice[idx(xM,y,z,t,nu)]);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xM,yP,z,t,nu)]),ATemp1);
-            //        ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xP,y,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-            //        ATemp2 = matrix_multiplication(lattice[idx(x,yP,z,t,nu)],ATemp2);
-            //        ATemp3 = matrix_addition(ATemp1,ATemp2);
-            //        A = matrix_addition(A, ATemp3);
-            //        
-//
-            //    }
-            //    if(mu==2){
-            //        xP= bCX(x+1);
-            //        xM= bCX(x-1);
-            //        zP= bCZ(z+1);
-            //        zM= bCZ(z-1);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xM,y,z,t,mu)]), lattice[idx(xM,y,z,t,nu)]);
-            //        ATemp1 = matrix_multiplication
-            //        (matrix_hermitean_conjugate(lattice[idx(xM,y,zP,t,nu)]),ATemp1);
-            //        ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xP,y,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-            //        ATemp2 = matrix_multiplication(lattice[idx(x,y,zP,t,nu)],ATemp2);
-            //        ATemp3 = matrix_addition(ATemp1,ATemp2);
-            //        A = matrix_addition(A, ATemp3);
-            //    
-//
-            //    }
-            //    if(mu==3){
-            //        tP= bCT(t+1);
-            //        tM= bCT(t-1);
-            //        xP= bCX(x+1);
-            //        xM= bCX(x-1);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xM,y,z,t,mu)]), lattice[idx(xM,y,z,t,nu)]);
-            //        ATemp1 = matrix_multiplication
-            //        (matrix_hermitean_conjugate(lattice[idx(xM,y,z,tP,nu)]),ATemp1);
-            //        ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xP,y,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-            //        ATemp2 = matrix_multiplication(lattice[idx(x,y,z,tP,nu)],ATemp2);
-            //        ATemp3 = matrix_addition(ATemp1,ATemp2);
-            //        A = matrix_addition(A, ATemp3);
-            //    
-//
-            //    }
-//
-            //}
-            //if(nu==1){
-//
-            //    if(mu==0){
-//
-            //        xP= bCX(x+1);
-            //        xM= bCX(x-1);
-            //        yP= bCY(y+1);
-            //        yM= bCY(y-1);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yM,z,t,mu)]), lattice[idx(x,yM,z,t,nu)]);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xP,yM,z,t,nu)]),ATemp1);
-            //        ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yP,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-            //        ATemp2 = matrix_multiplication(lattice[idx(xP,y,z,t,nu)],ATemp2);
-            //        ATemp3 = matrix_addition(ATemp1,ATemp2);
-            //        A = matrix_addition(A, ATemp3);
-//
-//
-            //    }
-            //    if(mu==2){
-            //        yP= bCY(y+1);
-            //        yM= bCY(y-1);
-            //        zP= bCZ(z+1);
-            //        zM= bCZ(z-1);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yM,z,t,mu)]), lattice[idx(x,yM,z,t,nu)]);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yM,zP,t,nu)]),ATemp1);
-            //        ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yP,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-            //        ATemp2 = matrix_multiplication(lattice[idx(x,y,zP,t,nu)],ATemp2);
-            //        ATemp3 = matrix_addition(ATemp1,ATemp2);
-            //        A = matrix_addition(A, ATemp3);
-            //    
-//
-            //    }
-            //    if(mu==3){
-            //        tP= bCT(t+1);
-            //        tM= bCT(t-1);
-            //        yP= bCY(y+1);
-            //        yM= bCY(y-1);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yM,z,t,mu)]), lattice[idx(x,yM,z,t,nu)]);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yM,z,tP,nu)]),ATemp1);
-            //        ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yP,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-            //        ATemp2 = matrix_multiplication(lattice[idx(x,y,z,tP,nu)],ATemp2);
-            //        ATemp3 = matrix_addition(ATemp1,ATemp2);
-            //        A = matrix_addition(A, ATemp3);
-            //    
-//
-            //    }
-//
-            //}
-            //if(nu==2){
-//
-//
-            //    if(mu==1){
-//
-            //        zP= bCZ(z+1);
-            //        zM= bCZ(z-1);
-            //        yP= bCY(y+1);
-            //        yM= bCY(y-1);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zM,t,mu)]), lattice[idx(x,y,zM,t,nu)]);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yP,zM,t,nu)]),ATemp1);
-            //        ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zP,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-            //        ATemp2 = matrix_multiplication(lattice[idx(x,yP,z,t,nu)],ATemp2);
-            //        ATemp3 = matrix_addition(ATemp1,ATemp2);
-            //        A = matrix_addition(A, ATemp3);
-//
-//
-            //    }
-            //    if(mu==0){
-            //        xP= bCX(x+1);
-            //        xM= bCX(x-1);
-            //        zP= bCZ(z+1);
-            //        zM= bCZ(z-1);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zM,t,mu)]), lattice[idx(x,y,zM,t,nu)]);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xP,y,zM,t,nu)]),ATemp1);
-            //        ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zP,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-            //        ATemp2 = matrix_multiplication(lattice[idx(xP,y,z,t,nu)],ATemp2);
-            //        ATemp3 = matrix_addition(ATemp1,ATemp2);
-            //        A = matrix_addition(A, ATemp3);
-            //    
-//
-            //    }
-            //    if(mu==3){
-            //        tP= bCT(t+1);
-            //        tM= bCT(t-1);
-            //        zP= bCZ(z+1);
-            //        zM= bCZ(z-1);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zM,t,mu)]), lattice[idx(x,y,zM,t,nu)]);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zM,tP,nu)]),ATemp1);
-            //        ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zP,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-            //        ATemp2 = matrix_multiplication(lattice[idx(x,y,z,tP,nu)],ATemp2);
-            //        ATemp3 = matrix_addition(ATemp1,ATemp2);
-            //        A = matrix_addition(A, ATemp3);
-            //    
-//
-            //    }
-//
-            //}
-            //if(nu==3){
-//
-//
-//
-            //    if(mu==1){
-//
-            //        tP= bCT(t+1);
-            //        tM= bCT(t-1);
-            //        yP= bCY(y+1);
-            //        yM= bCY(y-1);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,z,tM,mu)]), lattice[idx(x,y,z,tM,nu)]);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yP,z,tM,nu)]),ATemp1);
-            //        ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,z,tP,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-            //        ATemp2 = matrix_multiplication(lattice[idx(x,yP,z,t,nu)],ATemp2);
-            //        ATemp3 = matrix_addition(ATemp1,ATemp2);
-            //        A = matrix_addition(A, ATemp3);
-//
-//
-            //    }
-            //    if(mu==2){
-            //        tP= bCT(t+1);
-            //        tM= bCT(t-1);
-            //        zP= bCZ(z+1);
-            //        zM= bCZ(z-1);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,z,tM,mu)]), lattice[idx(x,y,z,tM,nu)]);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zP,tM,nu)]),ATemp1);
-            //        ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,z,tP,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-            //        ATemp2 = matrix_multiplication(lattice[idx(x,y,zP,t,nu)],ATemp2);
-            //        ATemp3 = matrix_addition(ATemp1,ATemp2);
-            //        A = matrix_addition(A, ATemp3);
-            //    
-//
-            //    }
-            //    if(mu==0){
-            //        tP= bCT(t+1);
-            //        tM= bCT(t-1);
-            //        xP= bCX(x+1);
-            //        xM= bCX(x-1);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,z,tM,mu)]), lattice[idx(x,y,z,tM,nu)]);
-            //        ATemp1 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xP,y,z,tM,nu)]),ATemp1);
-            //        ATemp2 = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,z,tP,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-            //        ATemp2 = matrix_multiplication(lattice[idx(xP,y,z,t,nu)],ATemp2);
-            //        ATemp3 = matrix_addition(ATemp1,ATemp2);
-            //        A = matrix_addition(A, ATemp3);
-            //    
-//
-            //    }
-//
-            //}
-//
-//
-//
-
-//
-//
-//
-//
-//
     return A;
 }
 
-Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& U){
 
-    int reflect = reflectDist(reflection);
-
-    Matrix<rSU,cSU> UPrime;
-
-    Eigen::Matrix3cd M = translateMatrices(A);
-    Eigen::Matrix3cd UEigen = translateMatrices(U);    
-
-    Eigen::Matrix3cd K = M.adjoint()*M;
-    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3cd> es(K);
-
-    Eigen::Matrix3cd D_Sqrt=es.eigenvalues().cwiseSqrt().asDiagonal();
-    Eigen::Matrix3cd H = es.eigenvectors()*D_Sqrt*es.eigenvectors().adjoint();
-
-    Eigen::Matrix3cd O=M*H.inverse();
-
-    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3cd> esH(H);
-    Eigen::Matrix3cd V= esH.eigenvectors();
-    Eigen::Matrix3cd Vadjoint = V.adjoint();
-
-
-    Eigen::Matrix3cd Ur = V*UEigen*O*Vadjoint;
-
-    if(reflect = 1){
-        Ur(0,1)= -Ur(0,1);
-        Ur(1,0)=-Ur(1,0);
-        Ur(0,2)=-Ur(0,2);
-        Ur(2,0)=-Ur(2,0);
-
-    }
-    if(reflect = 2){
-        Ur(0,1)= -Ur(0,1);
-        Ur(1,0)=-Ur(1,0);
-        Ur(1,2)=-Ur(1,2);
-        Ur(2,1)=-Ur(2,1);
-
-    }
-    if(reflect = 3){
-        Ur(0,2)= -Ur(0,2);
-        Ur(2,0)=-Ur(2,0);
-        Ur(1,2)=-Ur(1,2);
-        Ur(2,1)=-Ur(2,1);
-
-    }
-    else{
-        std::cout << "reflextion failed due to unexpected value" << std::endl;
-    }
-
-    Eigen::Matrix3cd UR = Vadjoint*Ur*V*O.adjoint();
-
-    UPrime = retranslateMatrices(UR);
-
-    return UPrime;
-
-
-
-}
 //parallel
 Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& U,std::uniform_int_distribution<int>& distribution,std::mt19937_64& random ){
     int reflect = distribution(random);
@@ -1638,21 +736,6 @@ void plaquette(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<double>& plaqu
     std::iota(indices.begin(), indices.end(),0);
     std::vector<double> bufferPlaq (indices.size(), 0.0);
 
-    //double Sum;
-    ////enforce periodic boundary condition
-    //auto bCX = [](size_t i) -> size_t{
-    //    return (i+xAxis) % xAxis;
-    //    };
-    //auto bCY = [](size_t i) -> size_t{
-    //    return (i+yAxis) % yAxis;
-    //    };
-    //auto bCZ = [](size_t i) -> size_t{
-    //    return (i+zAxis) % zAxis;
-    //    };
-    //auto bCT = [](size_t i) -> size_t{
-    //    return (i+tAxis) % tAxis;
-    //    };
-//
 
     std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
 
@@ -1676,185 +759,7 @@ void plaquette(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<double>& plaqu
     z= std::get<3>(temp);
     t= std::get<4>(temp);
 
-//for(int nu=0; nu<linksPerSite; nu++){
-//        if(nu!=mu){
-//
-//            if(nu==0){
-//                //Ich glaube in dieser Schleife ist viel Index-Salat -> Nevermind??
-//                if(mu==1){
-//
-//                    xP= bCX(x+1);
-//                    xM= bCX(x-1);
-//                    yP= bCY(y+1);
-//                    yM= bCY(y-1);
-//                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xP,y,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-//                    Plaq = matrix_multiplication(lattice[idx(x,yP,z,t,nu)],Plaq);
-//                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
-//                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
-//                }
-//                if(mu==2){
-//                    xP= bCX(x+1);
-//                    xM= bCX(x-1);
-//                    zP= bCZ(z+1);
-//                    zM= bCZ(z-1);
-//                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xP,y,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-//                    Plaq = matrix_multiplication(lattice[idx(x,y,zP,t,nu)],Plaq);
-//                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
-//                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
-//
-//                
-//
-//                }
-//                if(mu==3){
-//                    tP= bCT(t+1);
-//                    tM= bCT(t-1);
-//                    xP= bCX(x+1);
-//                    xM= bCX(x-1);
-//                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(xP,y,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-//                    Plaq = matrix_multiplication(lattice[idx(x,y,zP,t,nu)],Plaq);
-//                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
-//                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
-//                
-//
-//                }
-//
-//            }
-//            if(nu==1){
-//
-//                if(mu==0){
-//
-//                    xP= bCX(x+1);
-//                    xM= bCX(x-1);
-//                    yP= bCY(y+1);
-//                    yM= bCY(y-1);
-//                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yP,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-//                    Plaq = matrix_multiplication(lattice[idx(xP,y,z,t,nu)],Plaq);
-//                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
-//                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
-//
-//
-//                }
-//                if(mu==2){
-//                    yP= bCY(y+1);
-//                    yM= bCY(y-1);
-//                    zP= bCZ(z+1);
-//                    zM= bCZ(z-1);
-//                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yP,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-//                    Plaq = matrix_multiplication(lattice[idx(x,y,zP,t,nu)],Plaq);
-//                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
-//                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
-//
-//                
-//
-//                }
-//                if(mu==3){
-//                    tP= bCT(t+1);
-//                    tM= bCT(t-1);
-//                    yP= bCY(y+1);
-//                    yM= bCY(y-1);
-//                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,yP,z,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-//                    Plaq = matrix_multiplication(lattice[idx(x,y,z,tP,nu)],Plaq);
-//                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
-//                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
-//
-//                
-//
-//                }
-//
-//            }
-//            if(nu==2){
-//
-//
-//                if(mu==1){
-//
-//                    zP= bCZ(z+1);
-//                    zM= bCZ(z-1);
-//                    yP= bCY(y+1);
-//                    yM= bCY(y-1);
-//                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zP,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-//                    Plaq = matrix_multiplication(lattice[idx(x,yP,z,t,nu)],Plaq);
-//                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
-//                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
-//
-//
-//
-//                }
-//                if(mu==0){
-//                    xP= bCX(x+1);
-//                    xM= bCX(x-1);
-//                    zP= bCZ(z+1);
-//                    zM= bCZ(z-1);
-//                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zP,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-//                    Plaq = matrix_multiplication(lattice[idx(xP,y,z,t,nu)],Plaq);
-//                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
-//                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
-//                
-//
-//                }
-//                if(mu==3){
-//                    tP= bCT(t+1);
-//                    tM= bCT(t-1);
-//                    zP= bCZ(z+1);
-//                    zM= bCZ(z-1);
-//                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,zP,t,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-//                    Plaq = matrix_multiplication(lattice[idx(x,y,z,tP,nu)],Plaq);
-//                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
-//                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
-//                
-//
-//                }
-//
-//            }
-//            if(nu==3){
-//
-//
-//
-//                if(mu==1){
-//
-//                    tP= bCT(t+1);
-//                    tM= bCT(t-1);
-//                    yP= bCY(y+1);
-//                    yM= bCY(y-1);
-//                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,z,tP,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-//                    Plaq = matrix_multiplication(lattice[idx(x,yP,z,t,nu)],Plaq);
-//                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
-//                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
-//
-//
-//                }
-//                if(mu==2){
-//                    tP= bCT(t+1);
-//                    tM= bCT(t-1);
-//                    zP= bCZ(z+1);
-//                    zM= bCZ(z-1);
-//                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,z,tP,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-//                    Plaq = matrix_multiplication(lattice[idx(x,y,zP,t,nu)],Plaq);
-//                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
-//                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
-//
-//                
-//
-//                }
-//                if(mu==0){
-//                    tP= bCT(t+1);
-//                    tM= bCT(t-1);
-//                    xP= bCX(x+1);
-//                    xM= bCX(x-1);
-//                    Plaq = matrix_multiplication(matrix_hermitean_conjugate(lattice[idx(x,y,z,tP,mu)]),matrix_hermitean_conjugate(lattice[idx(x,y,z,t,nu)]));
-//                    Plaq = matrix_multiplication(lattice[idx(xP,y,z,t,nu)],Plaq);
-//                    Plaq = matrix_multiplication(lattice[idx(x,y,z,t,mu)],Plaq);
-//                    bufferPlaq[(rSU)*i+nu]= 1.0/float(rSU)*matrix_trace(Plaq).real();
-//
-//                
-//
-//                }
-//
-//            }
-//
-//
-//
-//        }
-//    }
+
     for(int mu = 0; mu<linksPerSite; mu++){
         for (int nu = mu+1; nu < linksPerSite; ++nu) {
             // Forward shift coordinates
@@ -1884,42 +789,5 @@ void plaquette(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<double>& plaqu
 }
 
 
-void temporalGauge(std::vector<Matrix<rSU,rSU>>& lattice){
 
-    // only time links are set to identity
-    size_t muT= 3; //4; // spatial ones are in {0,1,2}, right? 
 
-    for(int i = 0; i<tAxis; i++){
-        for(int j= 0; j<zAxis; j++){
-            for(int k=0; k<yAxis; k++){
-                for(int l=0; l<xAxis; l++){
-                    
-                        lattice[idx(l,k,j,i,muT)]=identityMatrix;
-
-                }
-            }
-        }
-    }    
-
-}
-
-void spacialGauge(std::vector<Matrix<rSU,rSU>>& lattice){
-
-    //set all spacial links to identity
-    size_t spacialDimensions = 3;
-    for(int i = 0; i<tAxis; i++){
-        for(int j= 0; j<zAxis; j++){
-            for(int k=0; k<yAxis; k++){
-                for(int l=0; l<xAxis; l++){
-                    //for(int mu= 0; 0<spacialDimensions; mu++)
-                    //a loop till the end of time :D
-                    for(int mu= 0; mu<spacialDimensions; mu++)
-                    
-                        lattice[idx(l,k,j,i,mu)]=identityMatrix;
-
-                }
-            }
-        }
-    }    
-
-}

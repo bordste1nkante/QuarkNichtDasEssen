@@ -180,7 +180,9 @@ int main(){
     generate_identity();
     //std::cout << "identity" << std::endl;
     //create the first set of matrices X
-    X_updateSU3();
+
+    //get a random number
+    X_updateSU3(100);
 
 
     //std::cout << XSet.size() << std::endl;
