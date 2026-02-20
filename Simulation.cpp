@@ -66,14 +66,8 @@ int main(){
     dhotNumb2Extra = information["seeds"]["dist"]["hotNumb2Extra"].as<double>();
     dhotNumb3Extra = information["seeds"]["dist"]["hotNumb3Extra"].as<double>();
     dhotNumbS1= information["seeds"]["dist"]["hotNumbS1"].as<double>();
-    //dhotNumbS2= information["seeds"]["dist"]["hotNumbS2"].as<double>();
-    //dhotNumbS3= information["seeds"]["dist"]["hotNumbS3"].as<double>();
     dhotNumbT1= information["seeds"]["dist"]["hotNumbT1"].as<double>();
-    //dhotNumbT2= information["seeds"]["dist"]["hotNumbT2"].as<double>();
-    //dhotNumbT3= information["seeds"]["dist"]["hotNumbT3"].as<double>();
     dhotNumbR1= information["seeds"]["dist"]["hotNumbR1"].as<double>();
-    //dhotNumbR2= information["seeds"]["dist"]["hotNumbR2"].as<double>();
-    //dhotNumbR3= information["seeds"]["dist"]["hotNumbR3"].as<double>();
     dindexing=information["seeds"]["indexDist"].as<double>();
 
 
@@ -97,7 +91,7 @@ int main(){
 
 
     // our lattice as 1D array of matrices (3x3), factor 4 because every lattice site has 4 link variable (technically 8, but hermitean conjugate reduces it to 4 indepent ones)
-    std::vector<Matrix<rSU,rSU>> lattice(4*xAxis*yAxis*zAxis*tAxis);//why 4* ?
+    std::vector<Matrix<rSU,rSU>> lattice(linksPerSite*xAxis*yAxis*zAxis*tAxis);
 
     generate_zero();
 
@@ -109,6 +103,7 @@ int main(){
     //generate rSU x cSU identity
     generate_identity();
 
+    
     //create the first set of matrices X
 
     //get a random number

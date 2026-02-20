@@ -44,10 +44,8 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
             thread_local std::mt19937_64 Threadindexing(dindexing*i*17007+ (p+2)* 10111);
             std::uniform_int_distribution<int> threadIndexDist(0, XSet.size()-1);
 
-            //std::mt19937_64 Threadaccept(pow(dacceptReject*i,7)*(p+2));
             std::uniform_real_distribution<double> threadAcceptReject(0,1);
         
-            //std::mt19937_64 Threadreflect(pow(dreflection*i,4)*(p+2));
             std::uniform_int_distribution<int> threadrefelctDist(1,3);
 
 
@@ -70,10 +68,8 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
 
                 //in theory automatically accepted
                 if(j%overrelaxationStep==0 && j!=0){
-                    //U = overrelaxation(A, U, threadrefelctDist, Threadreflect);
                     U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
                     normalizeSU3Matrix(U);
-                    //std::cout << "over?" << std::endl;
 
                 }
                 else{
@@ -83,11 +79,9 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
                     X=XSet[index];
 
                     UPrime = matrix_multiplication(X,lattice[i]);
-                    //UPrime = matrix_multiplication(identityMatrix,lattice[i]);
                     normalizeSU3Matrix(UPrime);
-                    //bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadaccept, threadAcceptReject);
                     bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadindexing, threadAcceptReject);
-                    //std::cout << acceptance << std::endl;
+
 
                     if(acceptance==true){
                         U=UPrime;
@@ -136,7 +130,7 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
     //std::cout << rate << std::endl;
 
 
-    //epsilonTune(lattice, numberOfThermalSweeps, XUpdate, numberOfMultiHit,overrelaxationStep);
+    epsilonTune(lattice, numberOfThermalSweeps, XUpdate, numberOfMultiHit,overrelaxationStep);
 
     
 
@@ -149,10 +143,10 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
             thread_local std::mt19937_64 Threadindexing(dindexing*i*19007+ (p+2)* 12111+ 3011);
             std::uniform_int_distribution<int> threadIndexDist(0, XSet.size()-1);
 
-            //std::mt19937_64 Threadaccept(pow(dacceptReject*i,7)*(p+2));
+
             std::uniform_real_distribution<double> threadAcceptReject(0,1);
         
-            //std::mt19937_64 Threadreflect(pow(dreflection*i,4)*(p+2));
+
             std::uniform_int_distribution<int> threadrefelctDist(1,3);
 
 
@@ -174,7 +168,6 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
 
                 //in theory automatically accepted
                 if(j%overrelaxationStep==0 && j!=0){
-                    //U = overrelaxation(A, U, threadrefelctDist, Threadreflect);
                     U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
                     normalizeSU3Matrix(U);
 
@@ -187,7 +180,6 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
 
                     UPrime = matrix_multiplication(X,lattice[i]);
                     normalizeSU3Matrix(UPrime);
-                    //bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadaccept ,threadAcceptReject);
                     bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadindexing, threadAcceptReject);
                     if(acceptance==true){
                         U=UPrime;
@@ -201,7 +193,7 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
 
         });
 
-        //k+=numberOfMultiHit;
+
 
         //they exchange pointers, so lattice now points to values of buffer and vice versa
         std::swap(lattice, bufferLattice);

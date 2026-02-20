@@ -326,22 +326,13 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
 
         
         std::mt19937_64 hottestNumbR1(i*dhotNumbR1);
-        //std::mt19937_64 hottestNumbR2(i*dhotNumbR2);
-        //std::mt19937_64 hottestNumbR3(i*dhotNumbR3);
-        //std::mt19937_64 hottestNumbR0(i*dhotNumb1);
-        //std::mt19937_64 hottestNumbRE(i*dhotNumb1Extra);
-//
+
+
         std::mt19937_64 hottestNumbS1(i*dhotNumbS1);
-        //std::mt19937_64 hottestNumbS2(i*dhotNumbS2);
-        //std::mt19937_64 hottestNumbS3(i*dhotNumbS3);
-        //std::mt19937_64 hottestNumbS0(i*dhotNumb2);
-        //std::mt19937_64 hottestNumbSE(i*dhotNumb2Extra);
-//
+
+
         std::mt19937_64 hottestNumbT1(i*dhotNumbT1);
-        //std::mt19937_64 hottestNumbT2(i*dhotNumbT2);
-        //std::mt19937_64 hottestNumbT3(i*dhotNumbT3);
-        //std::mt19937_64 hottestNumbT0(i*dhotNumb3);
-        //std::mt19937_64 hottestNumbTE(i*dhotNumb3Extra);
+
 
 
 
@@ -480,7 +471,7 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
     
     double SActionDif;
     SActionDif = -beta/(rSU)*(matrix_trace(matrix_multiplication(matrix_subtraction(UPrime, U),A))).real();
-    probability = std::min(1.0, exp(- SActionDif)); // according to my notes -> check in doubt
+    probability = std::min(1.0, exp(- SActionDif)); 
 
     r= Distribution(ActionAccept);
     if(r<=probability){

@@ -340,10 +340,7 @@ void ThermalAndCorrelationTune(std::vector<Matrix<rSU,cSU>>& lattice,
             thread_local std::mt19937_64 Threadindexing(dindexing*i*12872+(counter+2)* 7311);
             std::uniform_int_distribution<int> threadIndexDist(0, XSet.size()-1);
 
-            //std::mt19937_64 Threadaccept(pow(dacceptReject*i,7)*(p+2));
             std::uniform_real_distribution<double> threadAcceptReject(0,1);
-        
-            //std::mt19937_64 Threadreflect(pow(dreflection*i,4)*(p+2));
             std::uniform_int_distribution<int> threadrefelctDist(1,3);
 
 
@@ -366,10 +363,8 @@ void ThermalAndCorrelationTune(std::vector<Matrix<rSU,cSU>>& lattice,
 
                 //in theory automatically accepted
                 if(j%overrelaxationStep==0 && j!=0){
-                    //U = overrelaxation(A, U, threadrefelctDist, Threadreflect);
                     U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
                     normalizeSU3Matrix(U);
-                    //std::cout << "over?" << std::endl;
 
                 }
                 else{
@@ -379,11 +374,8 @@ void ThermalAndCorrelationTune(std::vector<Matrix<rSU,cSU>>& lattice,
                     X=XSet[index];
 
                     UPrime = matrix_multiplication(X,lattice[i]);
-                    //UPrime = matrix_multiplication(identityMatrix,lattice[i]);
                     normalizeSU3Matrix(UPrime);
-                    //bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadaccept, threadAcceptReject);
                     bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadindexing, threadAcceptReject);
-                    //std::cout << acceptance << std::endl;
 
                     if(acceptance==true){
                         U=UPrime;
@@ -431,10 +423,10 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
             thread_local std::mt19937_64 Threadindexing(dindexing*i*14002+(counter+2)* 12311);
             std::uniform_int_distribution<int> threadIndexDist(0, XSet.size()-1);
 
-            //std::mt19937_64 Threadaccept(pow(dacceptReject*i,7)*(p+2));
+
             std::uniform_real_distribution<double> threadAcceptReject(0,1);
         
-            //std::mt19937_64 Threadreflect(pow(dreflection*i,4)*(p+2));
+
             std::uniform_int_distribution<int> threadrefelctDist(1,3);
 
 
@@ -457,10 +449,8 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
 
                 //in theory automatically accepted
                 if(j%overrelaxationStep==0 && j!=0){
-                    //U = overrelaxation(A, U, threadrefelctDist, Threadreflect);
                     U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
                     normalizeSU3Matrix(U);
-                    //std::cout << "over?" << std::endl;
 
                 }
                 else{
@@ -470,11 +460,8 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
                     X=XSet[index];
 
                     UPrime = matrix_multiplication(X,lattice[i]);
-                    //UPrime = matrix_multiplication(identityMatrix,lattice[i]);
                     normalizeSU3Matrix(UPrime);
-                    //bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadaccept, threadAcceptReject);
                     bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadindexing, threadAcceptReject);
-                    //std::cout << acceptance << std::endl;
 
                     if(acceptance==true){
                         U=UPrime;
@@ -498,7 +485,7 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
                 epsilon *=0.8;
             }
             else{
-                epsilon *=0.9;
+                epsilon *=0.95;
             }
             
         }
@@ -508,11 +495,12 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
                 epsilon*=1.2;
             }
             else{
-                epsilon*=1.1;
+                epsilon*=1.05;
             }
 
         }
-
+        std::cout << epsilonCounter << std::endl;
+        std::cout << epsilon << std::endl;
 
         acceptanceRate.store(0);
         updates.store(0);
