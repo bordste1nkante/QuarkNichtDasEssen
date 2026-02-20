@@ -82,12 +82,6 @@ extern std::string filenameh5;
 
 
 extern double drng1;
-extern double dhotNumb1;
-extern double dhotNumb2;
-extern double dhotNumb3;
-extern double dhotNumb1Extra;
-extern double dhotNumb2Extra;
-extern double dhotNumb3Extra;
 extern double dhotNumbS1;
 extern double dhotNumbT1;
 extern double dhotNumbR1;

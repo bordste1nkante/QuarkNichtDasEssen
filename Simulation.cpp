@@ -59,12 +59,6 @@ int main(){
     
 
     drng1=information["seeds"]["dist"]["rng1"].as<double>();
-    dhotNumb1=information["seeds"]["dist"]["hotNumb1"].as<double>();
-    dhotNumb2=information["seeds"]["dist"]["hotNumb2"].as<double>();
-    dhotNumb3=information["seeds"]["dist"]["hotNumb3"].as<double>();
-    dhotNumb1Extra = information["seeds"]["dist"]["hotNumb1Extra"].as<double>();
-    dhotNumb2Extra = information["seeds"]["dist"]["hotNumb2Extra"].as<double>();
-    dhotNumb3Extra = information["seeds"]["dist"]["hotNumb3Extra"].as<double>();
     dhotNumbS1= information["seeds"]["dist"]["hotNumbS1"].as<double>();
     dhotNumbT1= information["seeds"]["dist"]["hotNumbT1"].as<double>();
     dhotNumbR1= information["seeds"]["dist"]["hotNumbR1"].as<double>();

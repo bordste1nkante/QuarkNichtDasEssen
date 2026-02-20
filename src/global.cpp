@@ -44,12 +44,6 @@ Matrix<rSU,cSU> zeroMatrix;
 Matrix<2,2> zeroMatrix2;
 
 double drng1=42;
-double dhotNumb1=67;
-double dhotNumb2=1;
-double dhotNumb3=2;
-double dhotNumb1Extra=3;
-double dhotNumb2Extra=4;
-double dhotNumb3Extra=5;
 double dhotNumbS1=20;
 double dhotNumbT1=10;
 double dhotNumbR1=30;
