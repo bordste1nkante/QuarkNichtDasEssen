@@ -17,6 +17,7 @@ MeanCold = []
 StdCold=[]
 #read out all data into array
 with h5py.File("../h5/ColdPlaq.h5", "r") as f:
+#with h5py.File("../h5/ColdMultiPlaq.h5", "r") as f:
     for i in range(n):
         dataset = f[f"Configuration/{i}/plaquette"]
         #print(dataset[3])
@@ -29,6 +30,7 @@ MeanHot = []
 StdHot=[]
 #read out all data into array
 with h5py.File("../h5/HotPlaq.h5", "r") as f:
+#with h5py.File("../h5/HotMultiPlaq.h5", "r") as f:
     for i in range(n):
         dataset = f[f"Configuration/{i}/plaquette"]
 
@@ -43,6 +45,7 @@ xHot= np.arange(0,len(MeanHot),1)
 
 plt.errorbar(xCold, MeanCold, yerr = StdCold, label="Cold")
 plt.errorbar(xHot, MeanHot, yerr = StdHot, label="Hot")
+plt.grid()
 plt.legend()
 
 plt.savefig("test_Ylvie.png")

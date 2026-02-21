@@ -249,30 +249,6 @@ src/matrixOP.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/src/matrixOP.cpp.s
 .PHONY : src/matrixOP.cpp.s
 
-src/observables.o: src/observables.cpp.o
-.PHONY : src/observables.o
-
-# target to build an object file
-src/observables.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/src/observables.cpp.o
-.PHONY : src/observables.cpp.o
-
-src/observables.i: src/observables.cpp.i
-.PHONY : src/observables.i
-
-# target to preprocess a source file
-src/observables.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/src/observables.cpp.i
-.PHONY : src/observables.cpp.i
-
-src/observables.s: src/observables.cpp.s
-.PHONY : src/observables.s
-
-# target to generate assembly for a file
-src/observables.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/src/observables.cpp.s
-.PHONY : src/observables.cpp.s
-
 src/utils.o: src/utils.cpp.o
 .PHONY : src/utils.o
 
@@ -321,9 +297,6 @@ help:
 	@echo "... src/matrixOP.o"
 	@echo "... src/matrixOP.i"
 	@echo "... src/matrixOP.s"
-	@echo "... src/observables.o"
-	@echo "... src/observables.i"
-	@echo "... src/observables.s"
 	@echo "... src/utils.o"
 	@echo "... src/utils.i"
 	@echo "... src/utils.s"

@@ -9,8 +9,6 @@ file(REMOVE_RECURSE
   "CMakeFiles/staticquarks.dir/src/latticeOP.cpp.o.d"
   "CMakeFiles/staticquarks.dir/src/matrixOP.cpp.o"
   "CMakeFiles/staticquarks.dir/src/matrixOP.cpp.o.d"
-  "CMakeFiles/staticquarks.dir/src/observables.cpp.o"
-  "CMakeFiles/staticquarks.dir/src/observables.cpp.o.d"
   "CMakeFiles/staticquarks.dir/src/utils.cpp.o"
   "CMakeFiles/staticquarks.dir/src/utils.cpp.o.d"
   "staticquarks"

@@ -7,11 +7,11 @@ Epsilontuning (no multiHit):
 
 The acceptance rate of proposed matrices for given epsilon:
 Epsilon | acceptance rate
-0.1     | 74.88%
-0.15    | 64.33%
-0.2     | 55.57%
-0.25    | 47.49%
-0.3     | 41.49%
+0.1     | %
+0.15    | %
+0.2     | %
+0.25    | %
+0.3     | %
 
 
 
@@ -26,8 +26,8 @@ Epsilontuning (multiHit):
 
 The acceptance rate of proposed matrices for given epsilon:
 Epsilon | acceptance rate
-0.1     | 72.91%
-0.15    | 61.69%
-0.2     | 52.32%
-0.25    | 44.18%
-0.3     | 37.79%
+0.1     | %
+0.15    | %
+0.2     | %
+0.25    | %
+0.3     | %

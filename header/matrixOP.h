@@ -29,6 +29,9 @@ Matrix<rSU,cSU> matrix_hermitean_conjugate(const Matrix<rSU,rSU>& A);
 std::complex<double> matrix_trace(const Matrix<rSU,rSU>& A);
 
 
+//generates zero matrices rsu x csu and 2x2
+void generate_zero();
+
 //generates a rSU x cSU identity matrix
 void generate_identity();
 

@@ -50,13 +50,9 @@ extern std::vector<Matrix<rSU,rSU>> XSet;
 extern double epsilon;
 
 //generate random values scaled with epsilon
-extern std::mt19937_64 randNumb;
-//extern std::uniform_real_distribution<double> distEpsilon;
 
 //those are the random numbers for updates?
-extern std::mt19937_64 rng1;
-extern std::mt19937_64 rng2;
-extern std::mt19937_64 rng3;
+
 extern std::uniform_real_distribution<double> dist;
 
 
@@ -64,45 +60,8 @@ extern std::uniform_real_distribution<double> dist;
 extern double hotEpsilon;
 
 
-//uniform dist for generation of random variables in hot_start()
-extern std::mt19937_64 hotNumb1;
-extern std::mt19937_64 hotNumb2;
-extern std::mt19937_64 hotNumb3;
-
-extern std::mt19937_64 hotNumb1Extra;
-extern std::mt19937_64 hotNumb2Extra;
-extern std::mt19937_64 hotNumb3Extra;
-
-
-extern std::mt19937_64 hotNumbT1;
-extern std::mt19937_64 hotNumbT2;
-extern std::mt19937_64 hotNumbT3;
-
-
-extern std::mt19937_64 hotNumbS1;
-extern std::mt19937_64 hotNumbS2;
-extern std::mt19937_64 hotNumbS3;
-
-
-extern std::mt19937_64 hotNumbR1;
-extern std::mt19937_64 hotNumbR2;
-extern std::mt19937_64 hotNumbR3;
-
 extern std::uniform_real_distribution<double> hotDist;
 
-
-
-//uniform dist for selecting indece of XSet
-extern std::mt19937_64 indexing;
-extern std::uniform_int_distribution<int> indexDist;
-
-//uniform for accept/reject of new config
-extern std::mt19937_64 acceptReject;
-extern std::uniform_real_distribution<double> uniformAcceptReject;
-
-//uniform dist for selecting which reflection to use in overrelaxation
-extern std::mt19937_64 reflection;
-extern std::uniform_int_distribution<int> reflectDist;
 
 
 //Pauli matrices and 2x2 identity
@@ -112,33 +71,20 @@ extern Matrix<2,2> identity2, Pauli1, Pauli2, Pauli3;
 //rsU x cSU identity
 extern Matrix<rSU,cSU> identityMatrix;
 
+extern Matrix<rSU,cSU> zeroMatrix;
 
+extern Matrix<2,2> zeroMatrix2;
 
 
 //h5-filename
 extern std::string filenameh5;
 
 
-extern double drandNumb;
+
 extern double drng1;
-extern double drng2;
-extern double drng3;
-extern double dhotNumb1;
-extern double dhotNumb2;
-extern double dhotNumb3;
-extern double dhotNumb1Extra;
-extern double dhotNumb2Extra;
-extern double dhotNumb3Extra;
 extern double dhotNumbS1;
-extern double dhotNumbS2;
-extern double dhotNumbS3;
 extern double dhotNumbT1;
-extern double dhotNumbT2;
-extern double dhotNumbT3;
 extern double dhotNumbR1;
-extern double dhotNumbR2;
-extern double dhotNumbR3;
 extern double dindexing;
-extern double dacceptReject;
-extern double dreflection;
+
 

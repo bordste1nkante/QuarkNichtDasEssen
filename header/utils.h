@@ -28,6 +28,19 @@ bool saveArrayH5(const std::vector<double>& array, std::string dataSetPath);
 bool saveArrayH5complex(const std::vector<std::complex<double>>& array, std::string dataSetPath);
 
 
+void ThermalAndCorrelationTune(std::vector<Matrix<rSU,cSU>>& lattice, 
+    const size_t numberOfThermalSweeps, 
+    const size_t XUpdate, 
+    const size_t numberOfMultiHit,
+    const size_t overrelaxationStep);
+
+    
+void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice, 
+    const size_t numberOfThermalSweeps, 
+    const size_t XUpdate, 
+    const size_t numberOfMultiHit,
+    const size_t overrelaxationStep);
+
 Eigen::Matrix3cd translateMatrices(const Matrix<rSU,cSU>& A);
 
 

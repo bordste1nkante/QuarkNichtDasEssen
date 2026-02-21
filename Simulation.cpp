@@ -11,7 +11,6 @@
 #include "header/global.h"
 #include "header/latticeOP.h"
 #include "header/matrixOP.h"
-#include "header/observables.h"
 #include "header/utils.h"
 #include "header/Finish.h"
 
@@ -53,54 +52,18 @@ int main(){
 
 
     epsilon = information["epsilon"].as<double>();
+
+
+    //epsilon spread depends on beta. hopefully speeds up thermalization
+    hotEpsilon /= beta;
     
-    //place seeds
-    randNumb.seed(information["seeds"]["distEpsilon"].as<double>());
-    rng1.seed(information["seeds"]["dist"]["rng1"].as<double>());
-    rng2.seed(information["seeds"]["dist"]["rng2"].as<double>());
-    rng3.seed(information["seeds"]["dist"]["rng3"].as<double>());
-    hotNumb1.seed(information["seeds"]["dist"]["hotNumb1"].as<double>());
-    hotNumb2.seed(information["seeds"]["dist"]["hotNumb2"].as<double>());
-    hotNumb3.seed(information["seeds"]["dist"]["hotNumb3"].as<double>());
-    hotNumb1Extra.seed(information["seeds"]["dist"]["hotNumb1Extra"].as<double>());
-    hotNumb2Extra.seed(information["seeds"]["dist"]["hotNumb2Extra"].as<double>());
-    hotNumb3Extra.seed(information["seeds"]["dist"]["hotNumb3Extra"].as<double>());
-    hotNumbS1.seed(information["seeds"]["dist"]["hotNumbS1"].as<double>());
-    hotNumbS2.seed(information["seeds"]["dist"]["hotNumbS2"].as<double>());
-    hotNumbS3.seed(information["seeds"]["dist"]["hotNumbS3"].as<double>());
-    hotNumbT1.seed(information["seeds"]["dist"]["hotNumbT1"].as<double>());
-    hotNumbT2.seed(information["seeds"]["dist"]["hotNumbT2"].as<double>());
-    hotNumbT3.seed(information["seeds"]["dist"]["hotNumbT3"].as<double>());
-    hotNumbR1.seed(information["seeds"]["dist"]["hotNumbR1"].as<double>());
-    hotNumbR2.seed(information["seeds"]["dist"]["hotNumbR2"].as<double>());
-    hotNumbR3.seed(information["seeds"]["dist"]["hotNumbR3"].as<double>());
-    indexing.seed(information["seeds"]["indexDist"].as<double>());
-    acceptReject.seed(information["seeds"]["uniformAcceptReject"].as<double>());
-    reflection.seed(information["seeds"]["overrelaxation"].as<double>());
 
-
-    drandNumb = information["seeds"]["distEpsilon"].as<double>();
     drng1=information["seeds"]["dist"]["rng1"].as<double>();
-    drng2=information["seeds"]["dist"]["rng2"].as<double>();
-    drng3=information["seeds"]["dist"]["rng3"].as<double>();
-    dhotNumb1=information["seeds"]["dist"]["hotNumb1"].as<double>();
-    dhotNumb2=information["seeds"]["dist"]["hotNumb2"].as<double>();
-    dhotNumb3=information["seeds"]["dist"]["hotNumb3"].as<double>();
-    dhotNumb1Extra = information["seeds"]["dist"]["hotNumb1Extra"].as<double>();
-    dhotNumb2Extra = information["seeds"]["dist"]["hotNumb2Extra"].as<double>();
-    dhotNumb3Extra = information["seeds"]["dist"]["hotNumb3Extra"].as<double>();
     dhotNumbS1= information["seeds"]["dist"]["hotNumbS1"].as<double>();
-    dhotNumbS2= information["seeds"]["dist"]["hotNumbS2"].as<double>();
-    dhotNumbS3= information["seeds"]["dist"]["hotNumbS3"].as<double>();
     dhotNumbT1= information["seeds"]["dist"]["hotNumbT1"].as<double>();
-    dhotNumbT2= information["seeds"]["dist"]["hotNumbT2"].as<double>();
-    dhotNumbT3= information["seeds"]["dist"]["hotNumbT3"].as<double>();
     dhotNumbR1= information["seeds"]["dist"]["hotNumbR1"].as<double>();
-    dhotNumbR2= information["seeds"]["dist"]["hotNumbR2"].as<double>();
-    dhotNumbR3= information["seeds"]["dist"]["hotNumbR3"].as<double>();
     dindexing=information["seeds"]["indexDist"].as<double>();
-    dacceptReject=information["seeds"]["uniformAcceptReject"].as<double>();
-    dreflection=information["seeds"]["overrelaxation"].as<double>();
+
 
 
     std::vector<size_t> start = information["positions"]["startPoint"].as<std::vector<size_t>>();
@@ -122,64 +85,25 @@ int main(){
 
 
     // our lattice as 1D array of matrices (3x3), factor 4 because every lattice site has 4 link variable (technically 8, but hermitean conjugate reduces it to 4 indepent ones)
-    std::vector<Matrix<rSU,rSU>> lattice(4*xAxis*yAxis*zAxis*tAxis);//why 4* ?
+    std::vector<Matrix<rSU,rSU>> lattice(linksPerSite*xAxis*yAxis*zAxis*tAxis);
 
+    generate_zero();
 
-    //std::cout << lattice.size() << std::endl;
-    //std::vector<size_t> indices(lattice.size());
-    //std::iota(indices.begin(), indices.end(),0);
-//
-    //for(int i= 0; i<indices.size();i++){
-    //    //std::cout << indices[i] << std::endl;
-    //    std::tuple<size_t, size_t, size_t, size_t, size_t> temp =  ReIdx(i);
-    //    size_t mu,x,y,z,t;
-    //    mu= std::get<0>(temp);
-    //    x= std::get<1>(temp);
-    //    y= std::get<2>(temp);
-    //    z= std::get<3>(temp);
-    //    t= std::get<4>(temp);
-//
-    //    if(t>5){
-    //        std::cout << "t problem" << std::endl;
-    //    }
-    //    if(x>5){
-    //        std::cout << "x problem" << std::endl;
-    //    }
-    //    if(y>5){
-    //        std::cout << "y problem" << std::endl;
-    //    }
-    //    if(z>5){
-    //        std::cout << "z problem" << std::endl;
-    //    }
-    //    if(mu>4){
-    //        std::cout << "mu problem" << std::endl;
-    //    }
-//
-    //}
-//
-    //std::tuple<size_t, size_t, size_t, size_t, size_t> temp =  ReIdx();
-    //size_t mu,x,y,z,t;
-    //mu= std::get<0>(temp);
-    //x= std::get<1>(temp);
-    //y= std::get<2>(temp);
-    //z= std::get<3>(temp);
-    //t= std::get<4>(temp);
-//
-    //std::cout << mu << << std::endl;
-    //std::cout << "lattice vector done" << std::endl;
 
     //generate the pauli matrices 0-3
     generate_Pauli();
 
-    //std::cout << "Pauli" << std::endl;
+
     //generate rSU x cSU identity
     generate_identity();
-    //std::cout << "identity" << std::endl;
+
+    
     //create the first set of matrices X
-    X_updateSU3();
+
+    //get a random number
+    X_updateSU3(100);
 
 
-    //std::cout << XSet.size() << std::endl;
 
     if(coldOrHot == true){
         cold_start(lattice);
@@ -190,7 +114,6 @@ int main(){
     std::cout << "starting configuration created" << std::endl;
 
 
-    //latticeSimulationPureMetropolis(lattice,start, end, numberOfThermalSweeps,XUpdate,NConfigs,SweepFactor,observable);
     Simulation(lattice,start,end,numberOfThermalSweeps,XUpdate,NConfigs,SweepFactor,observable,numberOfMultiHit,overrelaxationStep);
     std::cout << "simulation done" << std::endl;
 
