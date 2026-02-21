@@ -48,7 +48,7 @@ plt.errorbar(xHot, MeanHot, yerr = StdHot, label="Hot")
 plt.grid()
 plt.legend()
 
-plt.savefig("test_Ylvie.png")
+plt.savefig("test.png")
 
 
 

@@ -1,0 +1,52 @@
+epsilon: 1.0
+h5Name: test.h5
+lattice:
+  beta: 1.0
+  t: 1
+  x: 1
+  y: 1
+  z: 1
+observable: 1
+positions:
+  endPoint:
+  - 1
+  - 1
+  - 1
+  - 1
+  startPoint:
+  - 1
+  - 1
+  - 1
+  - 1
+seeds:
+  dist:
+    hotNumb1: 67
+    hotNumb1Extra: 3
+    hotNumb2: 1
+    hotNumb2Extra: 4
+    hotNumb3: 2
+    hotNumb3Extra: 5
+    hotNumbR1: 30
+    hotNumbR2: 31
+    hotNumbR3: 32
+    hotNumbS1: 20
+    hotNumbS2: 21
+    hotNumbS3: 22
+    hotNumbT1: 10
+    hotNumbT2: 11
+    hotNumbT3: 12
+    rng1: 42
+    rng2: 420
+    rng3: 4200
+  distEpsilon: 69
+  indexDist: 666
+  overrelaxation: 2026
+  uniformAcceptReject: 1949
+startConfig: true
+updates:
+  Multi: 1
+  NConfig: 1
+  NSweepsThermal: 1
+  Sweep: 1
+  XUpdate: 1
+  overrelaxation: 1
