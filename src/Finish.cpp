@@ -205,7 +205,7 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
         if(p % SweepFactor==0) {
 
             std::vector<std::complex<double>> loops;
-            std::vector<double> plaquettes(xAxis*yAxis*zAxis+tAxis,0.0);
+            std::vector<double> plaquettes(xAxis*yAxis*zAxis*tAxis,0.0);
             std::vector<double> r;
 
             if(observable==0){

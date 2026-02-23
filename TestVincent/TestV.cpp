@@ -67,80 +67,22 @@ int main(){
 
     std::uniform_int_distribution<int> intro(1,3);
 
-
-    int k = idx(2,2,0,0,1);
-
+    std::cout << "beta: ";
+    std::cin >> beta;
+    std::cout << "Epsilon: ";
+    std::cin >> epsilon;
 
     hot_start(lattice);
 
-for(int k = 0; k<100; k++){
-    std::tuple<size_t, size_t, size_t, size_t, size_t> temp =  ReIdx(1);
-    size_t mu,x,y,z,t;
-    mu= std::get<0>(temp);
-    x= std::get<1>(temp);
-    y= std::get<2>(temp);
-    z= std::get<3>(temp);
-    t= std::get<4>(temp);
-
-    A = determineA(lattice,x,y,z,t,mu);
-
-    U = lattice[1];
+    epsilonTune(lattice,0,2,1,3);
+    ThermalTune(lattice, 0,2,1,3);
+    std::vector<double> plaquettes(xAxis*yAxis*zAxis*tAxis,0.0);
+    plaquette(lattice, plaquettes);
+    double PTest=average(plaquettes);
 
 
 
-
-
-    //std::cout << x<< std::endl;
-    //std::cout << y<< std::endl;
-    //std::cout << z<< std::endl;
-    //std::cout << t<< std::endl;
-    //std::cout << mu<< std::endl;
-
-
-    //X= XSet[21];
-    UPrime=overrelaxation(A,U,intro, mega3);
-
-
-    //UPrime = matrix_multiplication(X,U);
-
-
-    //bool accept;
-    //double r;
-    //double probability;
-    //
-    //double SActionDif;
-    //SActionDif = -beta/(rSU)*(matrix_trace(matrix_multiplication(matrix_subtraction(UPrime, U),A))).real();
-//
-   //// std::cout << SActionDif << std::endl;
-    //probability = std::min(1.0, exp(- SActionDif)); // according to my notes -> check in doubt
-//
-    //std::cout << probability << std::endl;
-
-
-
-
-
-
-    bool accept1 = latticeAction(lattice,U,UPrime,A,mega,distro);
-    if(accept1==true){
-
-        lattice[1]=UPrime;
-    }
-
-    //std::cout << accept << std::endl;
-    std::cout << accept1 << std::endl;
-
-}
-//
-
-
-
-
-
-
-
-
-
+    std::cout << PTest << std::endl;
 
 
 
@@ -148,3 +90,18 @@ for(int k = 0; k<100; k++){
 
     return 0;
 }
+//
+
+
+
+
+
+
+
+
+
+
+
+
+
+

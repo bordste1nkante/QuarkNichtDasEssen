@@ -365,10 +365,12 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
     double avg1,avg2, P;
     //account for the fact that multiHits exist
     PTestSize/=numberOfMultiHit;
+
     //ensure that enough Sets are picked
     if(PTestSize < 20){
         PTestSize = 20;
     }
+    std::cout << PTestSize << std::endl;
     std::vector<double> PTest(PTestSize);
 
     bool condition = true;
@@ -438,7 +440,7 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
             X_updateSU3(counter*drng1+27);
                         }
 
-        std::vector<double> plaquettes(xAxis*yAxis*zAxis+tAxis,0.0);
+        std::vector<double> plaquettes(xAxis*yAxis*zAxis*tAxis,0.0);
         plaquette(lattice, plaquettes);
         PTest[counter]=average(plaquettes);
 
@@ -447,17 +449,17 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
         counter++;
     }
 
-
-    std::vector<double> slice1(PTest.begin(), PTest.begin()+ int(PTest.size()/2) );
-    std::vector<double> slice2(PTest.begin()+ int(PTest.size()/2)+1,PTest.begin()+PTest.size());
+    std::cout << "made it" << std::endl;
+    std::vector<double> slice1(PTest.begin(), PTest.begin()+ int(PTest.size()/2.0) );
+    std::vector<double> slice2(PTest.begin()+ int(PTest.size()/2),PTest.begin()+PTest.size());
 
     avg1 = average(slice1);
     avg2 = average(slice2);
 
 
-    P = (avg1+avg2)/(double(PTestSize/2));
+    P = (avg2-avg1)/(double(PTestSize/2.0));
 
-    if(P < (avg1*changeRateHigh)/(double(PTestSize/2))&& P>(avg1*changeRateLow)/(double(PTestSize/2))){
+    if(P < (avg2*changeRateHigh)/(double(PTestSize/2.0))&& P>(avg2*changeRateLow)/(double(PTestSize/2.0))){
         condition = false;
     }
 
@@ -548,6 +550,7 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
             X_updateSU3(counter*counter*drng1+207);
                         }
         double rate = double(acceptanceRate.load())/double(updates.load());
+        std::cout << rate << std::endl;
         epsilonCounter++;
         if(rate < 0.45){
             epsilonCounter = 0;
@@ -666,7 +669,7 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
         //they exchange pointers, so lattice now points to values of buffer and vice versa
         std::swap(lattice, bufferLattice);
 
-        std::vector<double> plaquettes(xAxis*yAxis*zAxis+tAxis,0.0);
+        std::vector<double> plaquettes(xAxis*yAxis*zAxis*tAxis,0.0);
         plaquette(lattice, plaquettes);
         double CX = correlationFunc(plaquettes, copiedplaquettes);
         CX/=CX0;
