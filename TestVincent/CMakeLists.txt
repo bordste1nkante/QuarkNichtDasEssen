@@ -25,7 +25,7 @@ target_link_libraries(staticquarks PRIVATE yaml-cpp::yaml-cpp)
 find_package(HDF5 REQUIRED COMPONENTS CXX)
 target_include_directories(staticquarks PRIVATE HDF5::HDF5)
 target_link_libraries(staticquarks PRIVATE HDF5::HDF5)
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(Eigen3 REQUIRED NO_MODULE)
 target_link_libraries(staticquarks PRIVATE Eigen3::Eigen)
 
 

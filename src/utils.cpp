@@ -6,6 +6,7 @@
 #include <vector>
 #include <execution>
 #include <thread>
+#include <numeric>
 #include <complex>
 #include <atomic>
 #include <random>
@@ -320,8 +321,36 @@ bool saveArrayH5complex(const std::vector<std::complex<double>>& array, std::str
 }
 
 
+double average(const std::vector<double>& vec) {
+    if (vec.empty()) return 0.0;  // avoid division by zero
+    
+    double sum = std::accumulate(vec.begin(), vec.end(), 0.0);
+    return sum / vec.size();
+}
 
-void ThermalAndCorrelationTune(std::vector<Matrix<rSU,cSU>>& lattice, 
+double correlationFunc(const std::vector<double>& Plaqs,const std::vector<double>&OGPlaqs){
+
+    double CX;
+    double mean, meanOG, correlationMean;
+    std::vector<double> product(Plaqs.size());
+    std::vector<double> productOG(OGPlaqs.size());
+
+
+    mean = average(Plaqs);
+    meanOG = average(OGPlaqs);
+
+    for(size_t k = 0; k< Plaqs.size(); k++){
+        product[k]= Plaqs[k]*OGPlaqs[k];
+    }
+
+    correlationMean=average(product);
+    CX= correlationMean - mean*meanOG;
+    return CX;
+
+
+}
+
+void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice, 
     const size_t numberOfThermalSweeps, 
     const size_t XUpdate, 
     const size_t numberOfMultiHit,
@@ -332,10 +361,22 @@ void ThermalAndCorrelationTune(std::vector<Matrix<rSU,cSU>>& lattice,
     std::vector<size_t> indices(lattice.size());
     std::iota(indices.begin(), indices.end(),0);
 
+
+    double avg1,avg2, P;
+    //account for the fact that multiHits exist
+    PTestSize/=numberOfMultiHit;
+    //ensure that enough Sets are picked
+    if(PTestSize < 20){
+        PTestSize = 20;
+    }
+    std::vector<double> PTest(PTestSize);
+
     bool condition = true;
     int counter = 0;
     while(condition){
-        counter++;
+    
+
+        while(counter < PTestSize){
         std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
             thread_local std::mt19937_64 Threadindexing(dindexing*i*12872+(counter+2)* 7311);
             std::uniform_int_distribution<int> threadIndexDist(0, XSet.size()-1);
@@ -388,16 +429,40 @@ void ThermalAndCorrelationTune(std::vector<Matrix<rSU,cSU>>& lattice,
                 }
             bufferLattice[i]=U;
 
+
         });
         //they exchange pointers, so lattice now points to values of buffer and vice versa
         std::swap(lattice, bufferLattice);
+            //Update X matrices
+        if(counter%XUpdate ==0 && counter!=0){
+            X_updateSU3(counter*drng1+27);
+                        }
+
+        std::vector<double> plaquettes(xAxis*yAxis*zAxis+tAxis,0.0);
+        plaquette(lattice, plaquettes);
+        PTest[counter]=average(plaquettes);
 
 
-
+        //we saved numberofMultiHit many variables in
+        counter++;
     }
 
 
+    std::vector<double> slice1(PTest.begin(), PTest.begin()+ int(PTest.size()/2) );
+    std::vector<double> slice2(PTest.begin()+ int(PTest.size()/2)+1,PTest.begin()+PTest.size());
 
+    avg1 = average(slice1);
+    avg2 = average(slice2);
+
+
+    P = (avg1+avg2)/(double(PTestSize/2));
+
+    if(P < (avg1*changeRateHigh)/(double(PTestSize/2))&& P>(avg1*changeRateLow)/(double(PTestSize/2))){
+        condition = false;
+    }
+
+
+    }
 
 
     }
@@ -477,6 +542,11 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
         });
         //they exchange pointers, so lattice now points to values of buffer and vice versa
         std::swap(lattice, bufferLattice);
+        //Update X matrices
+        if(counter%XUpdate ==0 && counter!=0){
+            
+            X_updateSU3(counter*counter*drng1+207);
+                        }
         double rate = double(acceptanceRate.load())/double(updates.load());
         epsilonCounter++;
         if(rate < 0.45){
@@ -510,6 +580,116 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
 
 }
 
+
+size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice, 
+    const size_t numberOfThermalSweeps, 
+    const size_t XUpdate, 
+    const size_t numberOfMultiHit,
+    const size_t overrelaxationStep){
+
+    
+    std::vector<Matrix<rSU,rSU>> bufferLattice(linksPerSite*xAxis*yAxis*zAxis*tAxis);
+    std::vector<size_t> indices(lattice.size());
+    std::iota(indices.begin(), indices.end(),0);
+
+
+    std::vector<Matrix<rSU,rSU>> copiedlattice(linksPerSite*xAxis*yAxis*zAxis*tAxis);
+    std::vector<double> copiedplaquettes(xAxis*yAxis*zAxis+tAxis,0.0);
+    plaquette(copiedlattice, copiedplaquettes);
+    double CX0 = correlationFunc(copiedplaquettes, copiedplaquettes);
+
+    //that acccounts for CX0/CX0 convention to take the halfs of all
+    double integratedCorrelationTime = 0.5;
+
+
+
+    bool condition = true;
+    int counter = 0;
+
+    while(condition){
+
+
+        std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
+            thread_local std::mt19937_64 Threadindexing(dindexing*i*12872+(counter+2)* 7311);
+            std::uniform_int_distribution<int> threadIndexDist(0, XSet.size()-1);
+
+            std::uniform_real_distribution<double> threadAcceptReject(0,1);
+            std::uniform_int_distribution<int> threadrefelctDist(1,3);
+
+
+            Matrix<rSU, cSU> UPrime, X, A, U; 
+
+            U= lattice[i];
+
+            std::tuple<size_t, size_t, size_t, size_t, size_t> temp =  ReIdx(i);
+            size_t mu,x,y,z,t;
+            mu= std::get<0>(temp);
+            x= std::get<1>(temp);
+            y= std::get<2>(temp);
+            z= std::get<3>(temp);
+            t= std::get<4>(temp);
+            A= determineA(lattice, x,y,z,t,mu);
+
+
+            for(size_t j= 0; j<numberOfMultiHit; j++){
+
+
+                //in theory automatically accepted
+                if(j%overrelaxationStep==0 && j!=0){
+                    U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
+                    normalizeSU3Matrix(U);
+
+                }
+                else{
+
+
+                    size_t index = threadIndexDist(Threadindexing);
+                    X=XSet[index];
+
+                    UPrime = matrix_multiplication(X,lattice[i]);
+                    normalizeSU3Matrix(UPrime);
+                    bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadindexing, threadAcceptReject);
+
+                    if(acceptance==true){
+                        U=UPrime;
+                        
+                        }
+                    
+                    }
+
+
+                }
+            bufferLattice[i]=U;
+
+
+        });
+        //they exchange pointers, so lattice now points to values of buffer and vice versa
+        std::swap(lattice, bufferLattice);
+
+        std::vector<double> plaquettes(xAxis*yAxis*zAxis+tAxis,0.0);
+        plaquette(lattice, plaquettes);
+        double CX = correlationFunc(plaquettes, copiedplaquettes);
+        CX/=CX0;
+        if(CX<=0){
+            condition = false;
+            break;
+        }
+        integratedCorrelationTime += CX;
+
+
+        //Update X matrices
+        if(counter%XUpdate ==0 && counter!=0){
+            X_updateSU3(counter*drng1+27);
+                        }  
+
+    }
+    //apparently that is a factor
+    integratedCorrelationTime *=2;
+    size_t temp = static_cast<size_t>(std::ceil(double(integratedCorrelationTime)/double(numberOfMultiHit)));
+    size_t sweepFactor = temp*numberOfMultiHit;
+
+    return sweepFactor;
+    }
 //translate our matrices to eigen, they have better support
 Eigen::Matrix3cd translateMatrices(const Matrix<rSU,cSU>& A){
 

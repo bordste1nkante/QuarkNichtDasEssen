@@ -125,24 +125,10 @@ CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/matrixOP.cpp.s: cmak
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/matrixOP.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mrv/QuarkNichtDasEssen/src/matrixOP.cpp -o CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/matrixOP.cpp.s
 
-CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.o: CMakeFiles/staticquarks.dir/flags.make
-CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.o: /home/mrv/QuarkNichtDasEssen/src/observables.cpp
-CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.o: CMakeFiles/staticquarks.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mrv/QuarkNichtDasEssen/TestVincent/buildTestV/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.o -MF CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.o.d -o CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.o -c /home/mrv/QuarkNichtDasEssen/src/observables.cpp
-
-CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mrv/QuarkNichtDasEssen/src/observables.cpp > CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.i
-
-CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mrv/QuarkNichtDasEssen/src/observables.cpp -o CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.s
-
 CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/utils.cpp.o: CMakeFiles/staticquarks.dir/flags.make
 CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/utils.cpp.o: /home/mrv/QuarkNichtDasEssen/src/utils.cpp
 CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/utils.cpp.o: CMakeFiles/staticquarks.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mrv/QuarkNichtDasEssen/TestVincent/buildTestV/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/utils.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mrv/QuarkNichtDasEssen/TestVincent/buildTestV/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/utils.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/utils.cpp.o -MF CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/utils.cpp.o.d -o CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/utils.cpp.o -c /home/mrv/QuarkNichtDasEssen/src/utils.cpp
 
 CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/utils.cpp.i: cmake_force
@@ -156,7 +142,7 @@ CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/utils.cpp.s: cmake_f
 CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/Finish.cpp.o: CMakeFiles/staticquarks.dir/flags.make
 CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/Finish.cpp.o: /home/mrv/QuarkNichtDasEssen/src/Finish.cpp
 CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/Finish.cpp.o: CMakeFiles/staticquarks.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mrv/QuarkNichtDasEssen/TestVincent/buildTestV/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/Finish.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mrv/QuarkNichtDasEssen/TestVincent/buildTestV/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/Finish.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/Finish.cpp.o -MF CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/Finish.cpp.o.d -o CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/Finish.cpp.o -c /home/mrv/QuarkNichtDasEssen/src/Finish.cpp
 
 CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/Finish.cpp.i: cmake_force
@@ -173,7 +159,6 @@ staticquarks_OBJECTS = \
 "CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/global.cpp.o" \
 "CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/latticeOP.cpp.o" \
 "CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/matrixOP.cpp.o" \
-"CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.o" \
 "CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/utils.cpp.o" \
 "CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/Finish.cpp.o"
 
@@ -184,7 +169,6 @@ staticquarks: CMakeFiles/staticquarks.dir/TestV.cpp.o
 staticquarks: CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/global.cpp.o
 staticquarks: CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/latticeOP.cpp.o
 staticquarks: CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/matrixOP.cpp.o
-staticquarks: CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.o
 staticquarks: CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/utils.cpp.o
 staticquarks: CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/Finish.cpp.o
 staticquarks: CMakeFiles/staticquarks.dir/build.make
@@ -199,7 +183,7 @@ staticquarks: /usr/lib/x86_64-linux-gnu/libz.so
 staticquarks: /usr/lib/x86_64-linux-gnu/libdl.a
 staticquarks: /usr/lib/x86_64-linux-gnu/libm.so
 staticquarks: CMakeFiles/staticquarks.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/mrv/QuarkNichtDasEssen/TestVincent/buildTestV/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX executable staticquarks"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/mrv/QuarkNichtDasEssen/TestVincent/buildTestV/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable staticquarks"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/staticquarks.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

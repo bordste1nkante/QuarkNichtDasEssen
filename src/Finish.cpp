@@ -21,7 +21,7 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
     const size_t numberOfThermalSweeps, 
     const size_t XUpdate, 
     const size_t NConfigs, 
-    const size_t SweepFactor, 
+    size_t SweepFactor, 
     const size_t observable,
     const size_t numberOfMultiHit,
     const size_t overrelaxationStep ){
@@ -130,12 +130,12 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
     //std::cout << rate << std::endl;
 
 
+    //tune params
     epsilonTune(lattice, numberOfThermalSweeps, XUpdate, numberOfMultiHit,overrelaxationStep);
+    ThermalTune(lattice,numberOfThermalSweeps, XUpdate,numberOfMultiHit,overrelaxationStep);
+    SweepFactor = AutoCorrelationTune(lattice, numberOfThermalSweeps, XUpdate, numberOfMultiHit,overrelaxationStep);
 
-    
 
-
-    size_t k = 0;
     for(int p=0; p<NConfigs*SweepFactor; p++){
 
         //parallelization

@@ -10,7 +10,6 @@
 #include "../header/global.h"
 #include "../header/latticeOP.h"
 #include "../header/matrixOP.h"
-#include "../header/observables.h"
 #include "../header/utils.h"
 
 
@@ -51,7 +50,7 @@ int main(){
 
     generate_identity();
     generate_Pauli();
-    X_updateSU3();
+    X_updateSU3(7);
 
 
     xAxis = 3;
@@ -61,9 +60,9 @@ int main(){
     std::vector<Matrix<rSU,cSU>> lattice(4*(xAxis*yAxis*zAxis*tAxis));
     //printArray<rSU,cSU>(identityMatrix);
 
-    std::mt19937_64 mega(123);
-    std::mt19937_64 mega2(123);
-    std::mt19937_64 mega3(111);
+    std::mt19937_64 mega(12003);
+    std::mt19937_64 mega2(1013);
+    std::mt19937_64 mega3(5479);
     std::uniform_real_distribution<double> distro(0,1);
 
     std::uniform_int_distribution<int> intro(1,3);
@@ -74,12 +73,8 @@ int main(){
 
     hot_start(lattice);
 
-    A = determineA(lattice,2,2,0,0,1 );
-
-    U = lattice[k];
-
-
-    std::tuple<size_t, size_t, size_t, size_t, size_t> temp =  ReIdx(k);
+for(int k = 0; k<100; k++){
+    std::tuple<size_t, size_t, size_t, size_t, size_t> temp =  ReIdx(1);
     size_t mu,x,y,z,t;
     mu= std::get<0>(temp);
     x= std::get<1>(temp);
@@ -87,12 +82,19 @@ int main(){
     z= std::get<3>(temp);
     t= std::get<4>(temp);
 
+    A = determineA(lattice,x,y,z,t,mu);
 
-    std::cout << x<< std::endl;
-    std::cout << y<< std::endl;
-    std::cout << z<< std::endl;
-    std::cout << t<< std::endl;
-    std::cout << mu<< std::endl;
+    U = lattice[1];
+
+
+
+
+
+    //std::cout << x<< std::endl;
+    //std::cout << y<< std::endl;
+    //std::cout << z<< std::endl;
+    //std::cout << t<< std::endl;
+    //std::cout << mu<< std::endl;
 
 
     //X= XSet[21];
@@ -102,33 +104,33 @@ int main(){
     //UPrime = matrix_multiplication(X,U);
 
 
-    bool accept;
-    double r;
-    double probability;
-    
-    double SActionDif;
-    SActionDif = -beta/(rSU)*(matrix_trace(matrix_multiplication(matrix_subtraction(UPrime, U),A))).real();
-
-   // std::cout << SActionDif << std::endl;
-    probability = std::min(1.0, exp(- SActionDif)); // according to my notes -> check in doubt
-
+    //bool accept;
+    //double r;
+    //double probability;
+    //
+    //double SActionDif;
+    //SActionDif = -beta/(rSU)*(matrix_trace(matrix_multiplication(matrix_subtraction(UPrime, U),A))).real();
+//
+   //// std::cout << SActionDif << std::endl;
+    //probability = std::min(1.0, exp(- SActionDif)); // according to my notes -> check in doubt
+//
     //std::cout << probability << std::endl;
 
-    r= distro(mega2);
-    if(r<=probability){
-        accept = true;
-    }
-    else{
-        accept = false;
-    }
+
 
 
 
 
     bool accept1 = latticeAction(lattice,U,UPrime,A,mega,distro);
+    if(accept1==true){
+
+        lattice[1]=UPrime;
+    }
 
     //std::cout << accept << std::endl;
-    //std::cout << accept1 << std::endl;
+    std::cout << accept1 << std::endl;
+
+}
 //
 
 

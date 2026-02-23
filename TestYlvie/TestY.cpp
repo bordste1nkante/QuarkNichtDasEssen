@@ -9,7 +9,6 @@
 #include "../header/global.h"
 #include "../header/latticeOP.h"
 #include "../header/matrixOP.h"
-#include "../header/observables.h"
 #include "../header/utils.h"
 
 

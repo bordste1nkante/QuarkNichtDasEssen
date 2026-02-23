@@ -603,24 +603,24 @@ Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& 
     Eigen::Matrix3cd Ur = V*UEigen*O*Vadjoint;
 
     if(reflect == 1){
-        Ur(0,1)= -Ur(0,1);
-        Ur(1,0)=-Ur(1,0);
-        Ur(0,2)=-Ur(0,2);
-        Ur(2,0)=-Ur(2,0);
+        Ur(0,1)=-UEigen(0,1);
+        Ur(1,0)=-UEigen(1,0);
+        Ur(0,2)=-UEigen(0,2);
+        Ur(2,0)=-UEigen(2,0);
 
     }
-    if(reflect == 2){
-        Ur(0,1)= -Ur(0,1);
-        Ur(1,0)=-Ur(1,0);
-        Ur(1,2)=-Ur(1,2);
-        Ur(2,1)=-Ur(2,1);
+    else if(reflect == 2){
+        Ur(0,1)=-UEigen(0,1);
+        Ur(1,0)=-UEigen(1,0);
+        Ur(1,2)=-UEigen(1,2);
+        Ur(2,1)=-UEigen(2,1);
 
     }
-    if(reflect == 3){
-        Ur(0,2)= -Ur(0,2);
-        Ur(2,0)=-Ur(2,0);
-        Ur(1,2)=-Ur(1,2);
-        Ur(2,1)=-Ur(2,1);
+    else if(reflect == 3){
+        Ur(0,2)=-UEigen(0,2);
+        Ur(2,0)=-UEigen(2,0);
+        Ur(1,2)=-UEigen(1,2);
+        Ur(2,1)=-UEigen(2,1);
 
     }
     else{

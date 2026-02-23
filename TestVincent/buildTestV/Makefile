@@ -249,30 +249,6 @@ home/mrv/QuarkNichtDasEssen/src/matrixOP.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/matrixOP.cpp.s
 .PHONY : home/mrv/QuarkNichtDasEssen/src/matrixOP.cpp.s
 
-home/mrv/QuarkNichtDasEssen/src/observables.o: home/mrv/QuarkNichtDasEssen/src/observables.cpp.o
-.PHONY : home/mrv/QuarkNichtDasEssen/src/observables.o
-
-# target to build an object file
-home/mrv/QuarkNichtDasEssen/src/observables.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.o
-.PHONY : home/mrv/QuarkNichtDasEssen/src/observables.cpp.o
-
-home/mrv/QuarkNichtDasEssen/src/observables.i: home/mrv/QuarkNichtDasEssen/src/observables.cpp.i
-.PHONY : home/mrv/QuarkNichtDasEssen/src/observables.i
-
-# target to preprocess a source file
-home/mrv/QuarkNichtDasEssen/src/observables.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.i
-.PHONY : home/mrv/QuarkNichtDasEssen/src/observables.cpp.i
-
-home/mrv/QuarkNichtDasEssen/src/observables.s: home/mrv/QuarkNichtDasEssen/src/observables.cpp.s
-.PHONY : home/mrv/QuarkNichtDasEssen/src/observables.s
-
-# target to generate assembly for a file
-home/mrv/QuarkNichtDasEssen/src/observables.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/staticquarks.dir/build.make CMakeFiles/staticquarks.dir/home/mrv/QuarkNichtDasEssen/src/observables.cpp.s
-.PHONY : home/mrv/QuarkNichtDasEssen/src/observables.cpp.s
-
 home/mrv/QuarkNichtDasEssen/src/utils.o: home/mrv/QuarkNichtDasEssen/src/utils.cpp.o
 .PHONY : home/mrv/QuarkNichtDasEssen/src/utils.o
 
@@ -321,9 +297,6 @@ help:
 	@echo "... home/mrv/QuarkNichtDasEssen/src/matrixOP.o"
 	@echo "... home/mrv/QuarkNichtDasEssen/src/matrixOP.i"
 	@echo "... home/mrv/QuarkNichtDasEssen/src/matrixOP.s"
-	@echo "... home/mrv/QuarkNichtDasEssen/src/observables.o"
-	@echo "... home/mrv/QuarkNichtDasEssen/src/observables.i"
-	@echo "... home/mrv/QuarkNichtDasEssen/src/observables.s"
 	@echo "... home/mrv/QuarkNichtDasEssen/src/utils.o"
 	@echo "... home/mrv/QuarkNichtDasEssen/src/utils.i"
 	@echo "... home/mrv/QuarkNichtDasEssen/src/utils.s"

@@ -49,6 +49,13 @@ double dhotNumbT1=10;
 double dhotNumbR1=30;
 double dindexing=666;
 
+//equilibrium test
+double PTestSize = 50;
+
+//x+0.95x
+double changeRateLow = 1.95;
+//x + 1.05x
+double changeRateHigh = 2.05;
 
 
 std::string filenameh5 = "mistake";

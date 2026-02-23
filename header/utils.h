@@ -27,8 +27,11 @@ bool saveArrayH5(const std::vector<double>& array, std::string dataSetPath);
 
 bool saveArrayH5complex(const std::vector<std::complex<double>>& array, std::string dataSetPath);
 
+double average(const std::vector<double>& vec);
 
-void ThermalAndCorrelationTune(std::vector<Matrix<rSU,cSU>>& lattice, 
+double correlationFunc(const std::vector<double>& Plaqs,const std::vector<double>&OGPlaqs );
+
+void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice, 
     const size_t numberOfThermalSweeps, 
     const size_t XUpdate, 
     const size_t numberOfMultiHit,
@@ -36,6 +39,12 @@ void ThermalAndCorrelationTune(std::vector<Matrix<rSU,cSU>>& lattice,
 
     
 void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice, 
+    const size_t numberOfThermalSweeps, 
+    const size_t XUpdate, 
+    const size_t numberOfMultiHit,
+    const size_t overrelaxationStep);
+
+size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice, 
     const size_t numberOfThermalSweeps, 
     const size_t XUpdate, 
     const size_t numberOfMultiHit,

@@ -87,4 +87,9 @@ extern double dhotNumbT1;
 extern double dhotNumbR1;
 extern double dindexing;
 
+extern double PTestSize;
 
+//x+0.95x
+extern double changeRateLow;
+//x + 1.05x
+extern double changeRateHigh;
