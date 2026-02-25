@@ -89,7 +89,11 @@ std::atomic<int> acceptanceRate=0;
 
     size_t SweepFactor = 2;
 
+    std::vector<double> plaquettes(xAxis*yAxis*zAxis*tAxis,0.0);
+    plaquette(lattice, plaquettes);
 
+    double PTest=average(plaquettes);
+    std::cout << PTest << std::endl;
 
     //thermalization
     for(int p=0; p<400/5; p++){
@@ -117,11 +121,12 @@ std::atomic<int> acceptanceRate=0;
             A= determineA(lattice, x,y,z,t,mu);
 
 
-            for(size_t j= 0; j<1; j++){
+            for(size_t j= 0; j<5; j++){
 
 
                 //in theory automatically accepted
-                if(j%2==0 && j!=0){
+                if(j==3 || j==4){ //j%3==0 && j!=0
+
                     U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
                     //std::cout <<  (matrix_trace(matrix_multiplication(matrix_subtraction(UPrime, U),A))).real() << std::endl;
                   //Matrix<rSU,cSU> sub = matrix_subtraction(U, UPrime);
@@ -131,7 +136,7 @@ std::atomic<int> acceptanceRate=0;
                     //Matrix<rSU,cSU> mult = matrix_multiplication(sub,A);
                     //double trace = matrix_trace(mult).real();     
                     //bool acceptance = latticeAction(lattice, lattice[i], U, A, Threadindexing, threadAcceptReject);
-                    normalizeSU3Matrix(U);
+                    //normalizeSU3Matrix(U);
 
 
 
@@ -185,22 +190,22 @@ std::atomic<int> acceptanceRate=0;
         
 
     }
-
-    epsilonTune(lattice,0,2,1,3);
-    ThermalTune(lattice, 0,2,1,3);
-    SweepFactor=AutoCorrelationTune(lattice,0,2,1,3);
-
-    std::vector<double> plaquettes(xAxis*yAxis*zAxis*tAxis,0.0);
-    plaquette(lattice, plaquettes);
-    //for(int i =0; i< plaquettes.size(); i++){
-    //    std::cout << plaquettes[i] << std::endl;
-    //}
-    double PTest=average(plaquettes);
-
-
-
     std::cout << PTest << std::endl;
 
+    epsilonTune(lattice,0,2,5,3);
+    ThermalTune(lattice, 0,2,5,3);
+    SweepFactor=AutoCorrelationTune(lattice,0,2,5,3);
+//
+    plaquette(lattice, plaquettes);
+    ////for(int i =0; i< plaquettes.size(); i++){
+    ////    std::cout << plaquettes[i] << std::endl;
+    ////}
+    PTest=average(plaquettes);
+//
+//
+//
+    std::cout << PTest << std::endl;
+//
     std::cout << SweepFactor << std::endl;
 
 

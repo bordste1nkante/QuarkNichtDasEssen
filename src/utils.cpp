@@ -397,9 +397,9 @@ double correlationFunc(const std::vector<double>& Plaqs,const std::vector<double
 
 
     mean = average(Plaqs);
-    std::cout << "mean:" << mean << std::endl;
+    //std::cout << "mean:" << mean << std::endl;
     meanOG = average(OGPlaqs);
-    std::cout << "meanOG:" << meanOG << std::endl;
+    //std::cout << "meanOG:" << meanOG << std::endl;
 
     //all k or all k and i?
     for(size_t k = 0; k< Plaqs.size(); k++){
@@ -407,14 +407,14 @@ double correlationFunc(const std::vector<double>& Plaqs,const std::vector<double
     }
 
     correlationMean=average(product);
-    std::cout << "correlation:" << correlationMean << std::endl;
+    //std::cout << "correlation:" << correlationMean << std::endl;
     CX= correlationMean - mean*meanOG;
     return CX;
 
 
 }
 
-void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice, 
+double ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice, 
     const size_t numberOfThermalSweeps, 
     const size_t XUpdate, 
     const size_t numberOfMultiHit,
@@ -434,7 +434,7 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
     if(PTestSize < 20){
         PTestSize = 20;
     }
-    std::cout << PTestSize << std::endl;
+    //std::cout << PTestSize << std::endl;
     std::vector<double> PTest(PTestSize);
 
     size_t stabilization=0;
@@ -506,7 +506,7 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
 
         std::vector<double> plaquettes(xAxis*yAxis*zAxis*tAxis,0.0);
         plaquette(lattice, plaquettes);
-        std::cout << average(plaquettes) << std::endl;
+        //std::cout << average(plaquettes) << std::endl;
         PTest[counter]=average(plaquettes);
 
 
@@ -524,11 +524,11 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
 
 
     P = (avg2-avg1)/avg1;
-    std::cout << "avg1: " << avg1 << std::endl;
-    std::cout << "avg2: " << avg2 << std::endl;
-    std::cout << "P: " << P << std::endl;
-    std::cout << "Low: " << changeRateLow << std::endl;
-    std::cout << "High: " << changeRateHigh << std::endl;
+    //std::cout << "avg1: " << avg1 << std::endl;
+    //std::cout << "avg2: " << avg2 << std::endl;
+    //std::cout << "P: " << P << std::endl;
+    //std::cout << "Low: " << changeRateLow << std::endl;
+    //std::cout << "High: " << changeRateHigh << std::endl;
 
     
 
@@ -541,6 +541,7 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
 
     allcounter++;
     }
+    return avg2;
 
 
     }
@@ -622,7 +623,7 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
         //Update X matrices
         if(counter%XUpdate ==0 && counter!=0){
             double rate = double(acceptanceRate.load())/double(updates.load());
-            std::cout << rate << std::endl;
+            //std::cout << rate << std::endl;
             epsilonCounter++;
             epsilon *= 1 + alpha * (rate - target_rate);
             if(rate > target_rate + rateInterval){
@@ -639,8 +640,8 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
             if(epsilon>0.7){
                 epsilon=0.7;
             }
-            std::cout << epsilonCounter << std::endl;
-            std::cout << epsilon << std::endl;
+            //std::cout << epsilonCounter << std::endl;
+            //std::cout << epsilon << std::endl;
 
             acceptanceRate.store(0);
             updates.store(0);
@@ -670,7 +671,7 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
     std::vector<double> copiedplaquettes(xAxis*yAxis*zAxis+tAxis,0.0);
     plaquette(lattice, copiedplaquettes);
     double CX0 = correlationFunc(copiedplaquettes, copiedplaquettes);
-    std::cout <<"CX0:"<< CX0 << std::endl;
+    //std::cout <<"CX0:"<< CX0 << std::endl;
 
     //that acccounts for CX0/CX0 convention to take the halfs of all
     double integratedCorrelationTime = 0.5;
@@ -744,7 +745,7 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
         plaquette(lattice, plaquettes);
         double CX = correlationFunc(plaquettes, copiedplaquettes);
         CX/=CX0;
-        std::cout << CX << std::endl;
+        //std::cout << CX << std::endl;
         if(CX<=0){
             condition = false;
             break;
@@ -761,10 +762,11 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
     //necessary factor from definition
     integratedCorrelationTime *=2;
 
-    //why not just ceil on integrated and then time multihit, isn't the current wrong?
-    size_t temp = static_cast<size_t>(std::ceil(double(integratedCorrelationTime)/double(numberOfMultiHit)));
+    //why not just ceil on integrated and then time multihit, isn't the current wrong? it ensure size_t
+    size_t temp = static_cast<size_t>(std::ceil(integratedCorrelationTime/double(numberOfMultiHit)));
     size_t sweepFactor = temp*numberOfMultiHit;
 
+    //size_t sweepFactor = integratedCorrelationTime*numberOfMultiHit;
     return sweepFactor;
     }
 

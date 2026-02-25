@@ -44,9 +44,9 @@ seeds:
   uniformAcceptReject: 1949
 startConfig: false
 updates:
-  Multi: 3
+  Multi: 5
   NConfig: 400
   NSweepsThermal: 0
   Sweep: 1
   XUpdate: 2
-  overrelaxation: 6
+  overrelaxation: 1

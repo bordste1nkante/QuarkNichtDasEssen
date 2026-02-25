@@ -650,13 +650,13 @@ Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& 
     }
 
     Eigen::Matrix3cd UR = V*Ur*Vadjoint*O.adjoint();
-    std::cout << ((UEigen)*M).trace() << std::endl;
-    std::cout << (UR*M).trace() << std::endl;
-
+    //std::cout << ((UEigen)*M).trace() << std::endl;
+    //std::cout << (UR*M).trace() << std::endl;
+//
     UPrime = retranslateMatrices(UR);//UR
     //std::cout << matrix_trace (matrix_multiplication(U,A)) << std::endl;
     //std::cout << matrix_trace (matrix_multiplication(UPrime,A)) << std::endl;
-    
+    //
     //std::cout <<"Output:" << ((UEigen-UR)*M).trace() << std::endl;
    // std::cout <<"subEigen:" << ((UEigen-UR)) << std::endl;
     return UPrime;

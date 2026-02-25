@@ -42,7 +42,7 @@ double correlationFunc(const std::vector<double>& Plaqs,const std::vector<double
 
 
 //test for equilibrium via a mean stabilization
-void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice, 
+double ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice, 
     const size_t numberOfThermalSweeps, 
     const size_t XUpdate, 
     const size_t numberOfMultiHit,
