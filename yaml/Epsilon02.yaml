@@ -46,7 +46,7 @@ startConfig: true
 updates:
   Multi: 1
   NConfig: 0
-  NSweepsThermal: 50
+  NSweepsThermal: 100
   Sweep: 1
   XUpdate: 2
   overrelaxation: 3

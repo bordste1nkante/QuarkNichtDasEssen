@@ -1,4 +1,4 @@
-epsilon: 0.2
+epsilon: 0.1
 h5Name: HotMultiPlaq.h5
 lattice:
   beta: 5.62
@@ -44,9 +44,9 @@ seeds:
   uniformAcceptReject: 1949
 startConfig: false
 updates:
-  Multi: 5
-  NConfig: 2000
+  Multi: 3
+  NConfig: 400
   NSweepsThermal: 0
   Sweep: 1
   XUpdate: 2
-  overrelaxation: 2
+  overrelaxation: 6

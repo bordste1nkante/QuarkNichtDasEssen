@@ -470,10 +470,23 @@ bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU
     double probability;
     
     double SActionDif;
-    SActionDif = -beta/(rSU)*(matrix_trace(matrix_multiplication(matrix_subtraction(UPrime, U),A))).real();
+    Eigen::Matrix3cd M = translateMatrices(A);
+    Eigen::Matrix3cd UEigen = translateMatrices(U);
+    Eigen::Matrix3cd UPrimeEigen = translateMatrices(UPrime);
+
+
+    //Matrix<rSU,cSU> sub = matrix_subtraction(UPrime, U);
+    ////std::cout << "sub: "<< SActionDif << std::endl;
+//
+    //Matrix<rSU,cSU> mult = matrix_multiplication(sub,A);
+    //double trace = matrix_trace(mult).real();
+    SActionDif = -beta/(rSU)*((UPrimeEigen-UEigen)*M).trace().real(); //*(matrix_trace(matrix_multiplication(matrix_subtraction(UPrime, U),A))).real();
     probability = std::min(1.0, exp(- SActionDif)); 
 
+    //std::cout << "SAction: "<< SActionDif << std::endl;
+
     r= Distribution(ActionAccept);
+    //std::cout << r << std::endl;
     if(r<=probability){
         accept = true;
     }
@@ -581,6 +594,13 @@ Matrix<rSU,cSU> determineA(const std::vector<Matrix<rSU,rSU>>& lattice ,size_t x
 //parallel
 Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& U,std::uniform_int_distribution<int>& distribution,std::mt19937_64& random ){
     int reflect = distribution(random);
+    Eigen::Matrix3cd R1 = Eigen::Matrix3cd::Identity();
+    Eigen::Matrix3cd R2 = Eigen::Matrix3cd::Identity();
+    Eigen::Matrix3cd R3 = Eigen::Matrix3cd::Identity();
+    
+    //R1.diagonal() << -1., -1.,  1.;
+    //R2.diagonal() <<  1., -1., -1.;
+    //R3.diagonal() << -1.,  1., -1.;
 
     Matrix<rSU,cSU> UPrime;
 
@@ -594,43 +614,54 @@ Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& 
     Eigen::Matrix3cd H = es.eigenvectors()*D_Sqrt*es.eigenvectors().adjoint();
 
     Eigen::Matrix3cd O=M*H.inverse();
+    
 
     Eigen::SelfAdjointEigenSolver<Eigen::Matrix3cd> esH(H);
     Eigen::Matrix3cd V= esH.eigenvectors();
     Eigen::Matrix3cd Vadjoint = V.adjoint();
 
+    //seems to be the wrong way around in paper
+    Eigen::Matrix3cd Ur = Vadjoint*UEigen*O*V;//O*UEigen.adjoint()*O;//V*UEigen*O*Vadjoint;
 
-    Eigen::Matrix3cd Ur = V*UEigen*O*Vadjoint;
-
+    Ur = Ur.adjoint().eval();
     if(reflect == 1){
-        Ur(0,1)=-UEigen(0,1);
-        Ur(1,0)=-UEigen(1,0);
-        Ur(0,2)=-UEigen(0,2);
-        Ur(2,0)=-UEigen(2,0);
+        Ur = R1*Ur*R1;
+        //Ur(0,1)=-Ur(0,1);
+        //Ur(1,0)=-Ur(1,0);
+        //Ur(0,2)=-Ur(0,2);
+        //Ur(2,0)=-Ur(2,0);
 
     }
     else if(reflect == 2){
-        Ur(0,1)=-UEigen(0,1);
-        Ur(1,0)=-UEigen(1,0);
-        Ur(1,2)=-UEigen(1,2);
-        Ur(2,1)=-UEigen(2,1);
+        Ur=R2*Ur*R2;
+        //Ur(0,1)=-Ur(0,1);
+        //Ur(1,0)=-Ur(1,0);
+        //Ur(1,2)=-Ur(1,2);
+        //Ur(2,1)=-Ur(2,1);
 
     }
     else if(reflect == 3){
-        Ur(0,2)=-UEigen(0,2);
-        Ur(2,0)=-UEigen(2,0);
-        Ur(1,2)=-UEigen(1,2);
-        Ur(2,1)=-UEigen(2,1);
+        Ur=R3*Ur*R3;
+        //Ur(0,2)=-Ur(0,2);
+        //Ur(2,0)=-Ur(2,0);
+        //Ur(1,2)=-Ur(1,2);
+        //Ur(2,1)=-Ur(2,1);
 
     }
     else{
-        std::cout << "reflextion failed due to unexpected value" << std::endl;
+        std::cout << "reflection failed due to unexpected value" << std::endl;
     }
 
-    Eigen::Matrix3cd UR = Vadjoint*Ur*V*O.adjoint();
+    Eigen::Matrix3cd UR = V*Ur*Vadjoint*O.adjoint();
+    std::cout << ((UEigen)*M).trace() << std::endl;
+    std::cout << (UR*M).trace() << std::endl;
 
-    UPrime = retranslateMatrices(UR);
-
+    UPrime = retranslateMatrices(UR);//UR
+    //std::cout << matrix_trace (matrix_multiplication(U,A)) << std::endl;
+    //std::cout << matrix_trace (matrix_multiplication(UPrime,A)) << std::endl;
+    
+    //std::cout <<"Output:" << ((UEigen-UR)*M).trace() << std::endl;
+   // std::cout <<"subEigen:" << ((UEigen-UR)) << std::endl;
     return UPrime;
 }
 

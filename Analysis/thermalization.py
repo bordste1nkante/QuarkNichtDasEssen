@@ -7,7 +7,8 @@ import tools
 
 
 #number of configs
-n=2000
+#n=2000
+n=400
 
 #number of bootstrap iterations
 B=200
@@ -29,8 +30,8 @@ print("done with 1")
 MeanHot = []
 StdHot=[]
 #read out all data into array
-with h5py.File("../h5/HotPlaq.h5", "r") as f:
-#with h5py.File("../h5/HotMultiPlaq.h5", "r") as f:
+#with h5py.File("../h5/HotPlaq.h5", "r") as f:
+with h5py.File("../h5/HotMultiPlaq.h5", "r") as f:
     for i in range(n):
         dataset = f[f"Configuration/{i}/plaquette"]
 
@@ -43,12 +44,12 @@ print("done with 2")
 xCold= np.arange(0,len(MeanCold),1)
 xHot= np.arange(0,len(MeanHot),1)
 
-plt.errorbar(xCold, MeanCold, yerr = StdCold, label="Cold")
-plt.errorbar(xHot, MeanHot, yerr = StdHot, label="Hot")
+plt.errorbar(xCold, MeanCold, yerr = StdCold, label="Cold", fmt=".")
+plt.errorbar(xHot, MeanHot, yerr = StdHot, label="Hot", fmt=".")
 plt.grid()
 plt.legend()
 
-plt.savefig("test.png")
+plt.savefig("testMulti.png")
 
 
 

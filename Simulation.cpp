@@ -56,6 +56,7 @@ int main(){
 
     //epsilon spread depends on beta. hopefully speeds up thermalization
     hotEpsilon /= beta;
+    //hotEpsilon*=3.5;
     
 
     drng1=information["seeds"]["dist"]["rng1"].as<double>();

@@ -337,13 +337,17 @@ double correlationFunc(const std::vector<double>& Plaqs,const std::vector<double
 
 
     mean = average(Plaqs);
+    std::cout << "mean:" << mean << std::endl;
     meanOG = average(OGPlaqs);
+    std::cout << "meanOG:" << meanOG << std::endl;
 
+    //all k or all k and i?
     for(size_t k = 0; k< Plaqs.size(); k++){
         product[k]= Plaqs[k]*OGPlaqs[k];
     }
 
     correlationMean=average(product);
+    std::cout << "correlation:" << correlationMean << std::endl;
     CX= correlationMean - mean*meanOG;
     return CX;
 
@@ -364,7 +368,7 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
 
     double avg1,avg2, P;
     //account for the fact that multiHits exist
-    PTestSize/=numberOfMultiHit;
+    double PTestSize= PTestSizeGlobal/numberOfMultiHit;
 
     //ensure that enough Sets are picked
     if(PTestSize < 20){
@@ -373,14 +377,14 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
     std::cout << PTestSize << std::endl;
     std::vector<double> PTest(PTestSize);
 
-    bool condition = true;
-    int counter = 0;
-    while(condition){
-    
+    size_t stabilization=0;
+    int allcounter = 0;
+    while(stabilization < 5){ //stabilization < 5
+        int counter = 0;
 
         while(counter < PTestSize){
         std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
-            thread_local std::mt19937_64 Threadindexing(dindexing*i*12872+(counter+2)* 7311);
+            thread_local std::mt19937_64 Threadindexing(dindexing*i*12872+(allcounter+2)* 7311);
             std::uniform_int_distribution<int> threadIndexDist(0, XSet.size()-1);
 
             std::uniform_real_distribution<double> threadAcceptReject(0,1);
@@ -416,9 +420,9 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
                     size_t index = threadIndexDist(Threadindexing);
                     X=XSet[index];
 
-                    UPrime = matrix_multiplication(X,lattice[i]);
+                    UPrime = matrix_multiplication(X,U);
                     normalizeSU3Matrix(UPrime);
-                    bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadindexing, threadAcceptReject);
+                    bool acceptance = latticeAction(lattice, U, UPrime, A, Threadindexing, threadAcceptReject);
 
                     if(acceptance==true){
                         U=UPrime;
@@ -442,6 +446,7 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
 
         std::vector<double> plaquettes(xAxis*yAxis*zAxis*tAxis,0.0);
         plaquette(lattice, plaquettes);
+        std::cout << average(plaquettes) << std::endl;
         PTest[counter]=average(plaquettes);
 
 
@@ -449,21 +454,33 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
         counter++;
     }
 
-    std::cout << "made it" << std::endl;
-    std::vector<double> slice1(PTest.begin(), PTest.begin()+ int(PTest.size()/2.0) );
-    std::vector<double> slice2(PTest.begin()+ int(PTest.size()/2),PTest.begin()+PTest.size());
+    //std::cout << "made it" << std::endl;
+    size_t mid = PTest.size() / 2;
+    std::vector<double> slice1(PTest.begin(), PTest.begin()+mid );
+    std::vector<double> slice2(PTest.begin()+mid,PTest.end());
 
     avg1 = average(slice1);
+
     avg2 = average(slice2);
 
 
-    P = (avg2-avg1)/(double(PTestSize/2.0));
+    P = (avg2-avg1)/avg1;
+    std::cout << "avg1: " << avg1 << std::endl;
+    std::cout << "avg2: " << avg2 << std::endl;
+    std::cout << "P: " << P << std::endl;
+    std::cout << "Low: " << changeRateLow << std::endl;
+    std::cout << "High: " << changeRateHigh << std::endl;
 
-    if(P < (avg2*changeRateHigh)/(double(PTestSize/2.0))&& P>(avg2*changeRateLow)/(double(PTestSize/2.0))){
-        condition = false;
+    
+
+    if(P < changeRateHigh&& P>changeRateLow){
+        stabilization++;
+    }
+    else{
+        stabilization =0;
     }
 
-
+    allcounter++;
     }
 
 
@@ -483,7 +500,7 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
     std::iota(indices.begin(), indices.end(),0);
     size_t epsilonCounter=0;
     int counter =0;
-    while(epsilonCounter<2){
+    while(epsilonCounter<5){
   //parallelization
         counter++;
         std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
@@ -526,9 +543,9 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
                     size_t index = threadIndexDist(Threadindexing);
                     X=XSet[index];
 
-                    UPrime = matrix_multiplication(X,lattice[i]);
+                    UPrime = matrix_multiplication(X,U);
                     normalizeSU3Matrix(UPrime);
-                    bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadindexing, threadAcceptReject);
+                    bool acceptance = latticeAction(lattice, U, UPrime, A, Threadindexing, threadAcceptReject);
 
                     if(acceptance==true){
                         U=UPrime;
@@ -546,37 +563,42 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
         std::swap(lattice, bufferLattice);
         //Update X matrices
         if(counter%XUpdate ==0 && counter!=0){
+            double rate = double(acceptanceRate.load())/double(updates.load());
+            std::cout << rate << std::endl;
+            epsilonCounter++;
+            epsilon *= 1 + alpha * (rate - target_rate);
+            if(rate > target_rate + rateInterval){
+                epsilonCounter = 0;
+            //    if(rate < 0.35){
+            //        epsilon *=0.9;
+                }
+            //    else{
+            //        epsilon *=0.95;
+            //    }
+//
+            //}
+            if(rate<target_rate - rateInterval){
+                epsilonCounter=0;
+            //    if(rate < 0.7){
+            //        epsilon*=1.1;
+                }
+            //    else{
+            //        epsilon*=1.05;
+            //    }
+
+            //}
+            if(epsilon>0.7){
+                epsilon=0.7;
+            }
+            std::cout << epsilonCounter << std::endl;
+            std::cout << epsilon << std::endl;
+
+            acceptanceRate.store(0);
+            updates.store(0);
             
             X_updateSU3(counter*counter*drng1+207);
                         }
-        double rate = double(acceptanceRate.load())/double(updates.load());
-        std::cout << rate << std::endl;
-        epsilonCounter++;
-        if(rate < 0.45){
-            epsilonCounter = 0;
-            if(rate < 0.35){
-                epsilon *=0.8;
-            }
-            else{
-                epsilon *=0.95;
-            }
-            
-        }
-        if(rate>0.6){
-            epsilonCounter=0;
-            if(rate < 0.7){
-                epsilon*=1.2;
-            }
-            else{
-                epsilon*=1.05;
-            }
 
-        }
-        std::cout << epsilonCounter << std::endl;
-        std::cout << epsilon << std::endl;
-
-        acceptanceRate.store(0);
-        updates.store(0);
 
 
     }
@@ -596,10 +618,11 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
     std::iota(indices.begin(), indices.end(),0);
 
 
-    std::vector<Matrix<rSU,rSU>> copiedlattice(linksPerSite*xAxis*yAxis*zAxis*tAxis);
+    //std::vector<Matrix<rSU,rSU>> copiedlattice(linksPerSite*xAxis*yAxis*zAxis*tAxis);
     std::vector<double> copiedplaquettes(xAxis*yAxis*zAxis+tAxis,0.0);
-    plaquette(copiedlattice, copiedplaquettes);
+    plaquette(lattice, copiedplaquettes);
     double CX0 = correlationFunc(copiedplaquettes, copiedplaquettes);
+    std::cout <<"CX0:"<< CX0 << std::endl;
 
     //that acccounts for CX0/CX0 convention to take the halfs of all
     double integratedCorrelationTime = 0.5;
@@ -613,7 +636,7 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
 
 
         std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
-            thread_local std::mt19937_64 Threadindexing(dindexing*i*12872+(counter+2)* 7311);
+            thread_local std::mt19937_64 Threadindexing(dindexing*i*12872+(counter+2)* 7911);
             std::uniform_int_distribution<int> threadIndexDist(0, XSet.size()-1);
 
             std::uniform_real_distribution<double> threadAcceptReject(0,1);
@@ -649,9 +672,9 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
                     size_t index = threadIndexDist(Threadindexing);
                     X=XSet[index];
 
-                    UPrime = matrix_multiplication(X,lattice[i]);
+                    UPrime = matrix_multiplication(X,U);
                     normalizeSU3Matrix(UPrime);
-                    bool acceptance = latticeAction(lattice, lattice[i], UPrime, A, Threadindexing, threadAcceptReject);
+                    bool acceptance = latticeAction(lattice, U, UPrime, A, Threadindexing, threadAcceptReject);
 
                     if(acceptance==true){
                         U=UPrime;
@@ -673,6 +696,7 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
         plaquette(lattice, plaquettes);
         double CX = correlationFunc(plaquettes, copiedplaquettes);
         CX/=CX0;
+        std::cout << CX << std::endl;
         if(CX<=0){
             condition = false;
             break;
@@ -688,6 +712,8 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
     }
     //apparently that is a factor
     integratedCorrelationTime *=2;
+
+    //why not just ceil on integrated and then time multihit, isn't the current wrong?
     size_t temp = static_cast<size_t>(std::ceil(double(integratedCorrelationTime)/double(numberOfMultiHit)));
     size_t sweepFactor = temp*numberOfMultiHit;
 
