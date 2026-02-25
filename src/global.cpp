@@ -22,21 +22,20 @@ std::vector<Matrix<rSU,rSU>> XSet(2*NSetXMatrices);
 
 double epsilon = 0.4;
 
-//RNG in [-0.5, 0.5]
+
 std::uniform_real_distribution<double> dist(-0.5,0.5);
 
+//controls spread of starting config in hot_start, always divided by input beta
 double hotEpsilon=0.5;
 
-//uniform dist for generation of random variables in hot_start()
+
 std::uniform_real_distribution<double> hotDist(-hotEpsilon, hotEpsilon);
 
 
 
-//Pauli matrices and 2x2 identity
-
 Matrix<2,2> identity2, Pauli1,Pauli2, Pauli3;
 std::vector<Matrix<2,2>> pauliMatrices;
-//rsU x cSU identity
+
 Matrix<rSU,cSU> identityMatrix;
 
 Matrix<rSU,cSU> zeroMatrix;
@@ -49,7 +48,7 @@ double dhotNumbT1=10;
 double dhotNumbR1=30;
 double dindexing=666;
 
-//equilibrium test
+
 double PTestSizeGlobal = 100;
 
 

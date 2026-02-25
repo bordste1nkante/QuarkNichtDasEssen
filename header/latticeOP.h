@@ -20,7 +20,7 @@ size_t idx(size_t x, size_t y, size_t z, size_t t, size_t mu);
 std::tuple <size_t, size_t, size_t, size_t, size_t> ReIdx(size_t idx);
 
 
-//Updates the set of X matrices from metropolis, XU=U'
+//Updates the set of X matrices from metropolis, XU=U'. We generate three SU2 matrices and combine them
 void X_updateSU3(size_t input);
 
 

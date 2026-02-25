@@ -44,7 +44,6 @@ void ensureGroup(H5::H5File& file, const std::string& datasetPath)
 }
 
 
-//store important meta data in h5file
 bool Setup_H5(  bool ColdOrHot,  const std::vector<size_t>& startingPoint, 
     const std::vector<size_t>& endPoint, 
     const size_t numberOfThermalSweeps,  
@@ -219,7 +218,6 @@ bool Setup_H5(  bool ColdOrHot,  const std::vector<size_t>& startingPoint,
 
 
 
-//store important tune data in h5
 bool SaveTune_H5(const double epsilon, const double avgPlaq, const size_t SweepFactor){
 
         bool success = false;
@@ -295,7 +293,7 @@ bool SaveTune_H5(const double epsilon, const double avgPlaq, const size_t SweepF
 }
 
 
-//store an array in h5 file
+
 bool saveArrayH5(const std::vector<double>& array, std::string dataSetPath){
 
     bool success= false;
@@ -501,7 +499,7 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
         });
         //they exchange pointers, so lattice now points to values of buffer and vice versa
         std::swap(lattice, bufferLattice);
-            //Update X matrices
+        //Update X matrices
         if(counter%XUpdate ==0 && counter!=0){
             X_updateSU3(counter*drng1+27);
                         }
@@ -516,7 +514,6 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
         counter++;
     }
 
-    //std::cout << "made it" << std::endl;
     size_t mid = PTest.size() / 2;
     std::vector<double> slice1(PTest.begin(), PTest.begin()+mid );
     std::vector<double> slice2(PTest.begin()+mid,PTest.end());
@@ -563,7 +560,6 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
     size_t epsilonCounter=0;
     int counter =0;
     while(epsilonCounter<5){
-  //parallelization
         counter++;
         std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
             thread_local std::mt19937_64 Threadindexing(dindexing*i*14002+(counter+2)* 12311);
@@ -631,24 +627,15 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
             epsilon *= 1 + alpha * (rate - target_rate);
             if(rate > target_rate + rateInterval){
                 epsilonCounter = 0;
-            //    if(rate < 0.35){
-            //        epsilon *=0.9;
+
                 }
-            //    else{
-            //        epsilon *=0.95;
-            //    }
-//
-            //}
+
             if(rate<target_rate - rateInterval){
                 epsilonCounter=0;
-            //    if(rate < 0.7){
-            //        epsilon*=1.1;
-                }
-            //    else{
-            //        epsilon*=1.05;
-            //    }
 
-            //}
+                }
+
+
             if(epsilon>0.7){
                 epsilon=0.7;
             }
@@ -680,7 +667,6 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
     std::iota(indices.begin(), indices.end(),0);
 
 
-    //std::vector<Matrix<rSU,rSU>> copiedlattice(linksPerSite*xAxis*yAxis*zAxis*tAxis);
     std::vector<double> copiedplaquettes(xAxis*yAxis*zAxis+tAxis,0.0);
     plaquette(lattice, copiedplaquettes);
     double CX0 = correlationFunc(copiedplaquettes, copiedplaquettes);
@@ -772,7 +758,7 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
                         }  
 
     }
-    //apparently that is a factor
+    //necessary factor from definition
     integratedCorrelationTime *=2;
 
     //why not just ceil on integrated and then time multihit, isn't the current wrong?
@@ -781,7 +767,9 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
 
     return sweepFactor;
     }
-//translate our matrices to eigen, they have better support
+
+
+
 Eigen::Matrix3cd translateMatrices(const Matrix<rSU,cSU>& A){
 
 
@@ -797,7 +785,7 @@ Eigen::Matrix3cd translateMatrices(const Matrix<rSU,cSU>& A){
     return M;
 }
 
-//translate eigen to our matrices, we use them :(
+
 Matrix<rSU,cSU> retranslateMatrices(const Eigen::Matrix3cd& A){
 
     Matrix<rSU,cSU> M;

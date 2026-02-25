@@ -14,12 +14,12 @@
 #include "../header/utils.h"
 
 
-
+// periodic boundary condition
 inline size_t shift(size_t coord, int dir, size_t dim) {
-    return (coord + dir + dim) % dim; // periodic boundary condition
+    return (coord + dir + dim) % dim;
 }
 
-// this mimics the behaviour of a 4D lattice from our 1D array
+
 size_t idx(size_t x, size_t y, size_t z, size_t t, size_t mu){
 
     return linksPerSite*(x+ xAxis*(y+ yAxis*(z+zAxis*t)))+mu;
@@ -70,7 +70,7 @@ void normalizeSU2Matrix(Matrix<2,2>& U){
 
 
 
-//parallel
+
 void X_updateSU3(size_t input){
 
 
@@ -287,8 +287,6 @@ void normalizeSU3Matrix(Matrix<rSU,rSU>& U){
     
 
 
-
-//sets all matrices to identity, a potential starting config
 void cold_start(std::vector<Matrix<rSU,rSU>>& lattice){
 
     std::vector<Matrix<rSU,rSU>> bufferLattice(lattice.size());
@@ -303,7 +301,7 @@ void cold_start(std::vector<Matrix<rSU,rSU>>& lattice){
     return;
 }
 
-//sets all matrices to random ones, a possible starting config
+
 void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
 
     std::vector<Matrix<rSU,rSU>> bufferLattice(lattice.size());
@@ -342,7 +340,6 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
 
 
 
-        //number required to generate 3 SU(2) matrices, from these we form a SU(3)
         double r[3];
         r[0]= distribution(hottestNumbR1);
         r[1]= distribution(hottestNumbR1);
@@ -442,9 +439,9 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
         T(1,2)=Tsmall(0,1);
         T(2,2)=Tsmall(1,1);
 
-        //matrix multiplication S*T = ST
+
         ST=matrix_multiplication(S,T);
-        //matrix multiplication R*ST = U
+
         U=matrix_multiplication(R,ST);
         normalizeSU3Matrix(U);
             
@@ -462,7 +459,7 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
 
 
 
-//parallel
+
 bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU,rSU>& U,  const Matrix<rSU,rSU>& UPrime, const Matrix<rSU,cSU>& A, std::mt19937_64& ActionAccept, std::uniform_real_distribution<double>& Distribution){
     
     bool accept;
@@ -591,7 +588,7 @@ Matrix<rSU,cSU> determineA(const std::vector<Matrix<rSU,rSU>>& lattice ,size_t x
 }
 
 
-//parallel
+
 Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& U,std::uniform_int_distribution<int>& distribution,std::mt19937_64& random ){
     int reflect = distribution(random);
     Eigen::Matrix3cd R1 = Eigen::Matrix3cd::Identity();

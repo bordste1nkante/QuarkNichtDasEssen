@@ -39,7 +39,7 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
 
     //thermalization
     for(int p=0; p<numberOfThermalSweeps/numberOfMultiHit; p++){
-        //parallelization
+
         std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
             thread_local std::mt19937_64 Threadindexing(dindexing*i*17007+ (p+2)* 10111);
             std::uniform_int_distribution<int> threadIndexDist(0, XSet.size()-1);
@@ -69,6 +69,19 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
                 //in theory automatically accepted
                 if(j%overrelaxationStep==0 && j!=0){
                     U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
+                    //std::cout << matrix_trace(matrix_multiplication(U,matrix_hermitean_conjugate(U))) << std::endl;
+                    
+                    //bool acceptance = latticeAction(lattice, lattice[i], U, A, Threadindexing, threadAcceptReject);
+                    //normalizeSU3Matrix(U);
+
+
+//
+                    //if(acceptance==true){
+                    //    std::cout << "acceptedOver" << std::endl; 
+                    //    }
+                    //else{
+                    //    std::cout << "falseOver" << std::endl;
+                    //}
                     normalizeSU3Matrix(U);
 
                     }
@@ -104,24 +117,6 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
             double rate = double(acceptanceRate.load())/double(updates.load());
             std::cout << rate << std::endl;
            // epsilon *= 1 + alpha * (rate - target_rate);
-            //if(rate < 0.45){
-            //    if(rate < 0.35){
-            //        epsilon *=0.9;
-            //    }
-            //    else{
-            //        epsilon *=0.95;
-            //    }
-//
-            //}
-            //if(rate>0.6){
-            //    if(rate < 0.7){
-            //        epsilon*=1.1;
-            //    }
-            //    else{
-            //        epsilon*=1.05;
-            //    }
-//
-            //}
             if(epsilon>0.7){
                 epsilon=0.7;
             }
@@ -132,18 +127,7 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
         
 
     }
-    //std::vector<double> plaquettes(xAxis*yAxis*zAxis*tAxis,0.0);
-    //plaquette(lattice, plaquettes);
-    //for(int i =0; i< plaquettes.size(); i++){
-    //    std::cout << plaquettes[i] << std::endl;
-    //}
-    //double PTest=average(plaquettes);
 
-
-
-    //std::cout <<"P: " << PTest << std::endl;
-    //double rate = double(acceptanceRate.load())/double(updates.load());
-    //std::cout << rate << std::endl;
 
 
     //tune params
@@ -232,6 +216,7 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
         if(p%XUpdate ==0 && p!=0){
             X_updateSU3(p*p+SweepFactor);
                         }
+        //data aquisition after enough steps to prevent autocorrelation
         if(p % SweepFactor==0) {
 
             std::vector<std::complex<double>> loops;
