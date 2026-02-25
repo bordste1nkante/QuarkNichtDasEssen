@@ -241,7 +241,7 @@ bool SaveTune_H5(const double epsilon, const double avgPlaq, const size_t SweepF
 
 
 
-        H5::H5File file(fileString,H5F_ACC_TRUNC);
+        H5::H5File file(fileString,H5F_ACC_RDWR);
 
         H5::Group groupTune =file.createGroup("/metaData/Tune");
 
@@ -439,7 +439,7 @@ double ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
 
     size_t stabilization=0;
     int allcounter = 0;
-    while(stabilization < 5){ //stabilization < 5
+    while(stabilization < 3){ //stabilization < 5
         int counter = 0;
 
         while(counter < PTestSize){
@@ -471,7 +471,7 @@ double ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
                 //in theory automatically accepted
                 if(j%overrelaxationStep==0 && j!=0){
                     U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
-                    normalizeSU3Matrix(U);
+                    //normalizeSU3Matrix(U);
 
                 }
                 else{
@@ -593,7 +593,7 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
                 //in theory automatically accepted
                 if(j%overrelaxationStep==0 && j!=0){
                     U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
-                    normalizeSU3Matrix(U);
+                    //normalizeSU3Matrix(U);
 
                 }
                 else{
@@ -712,7 +712,7 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
                 //in theory automatically accepted
                 if(j%overrelaxationStep==0 && j!=0){
                     U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
-                    normalizeSU3Matrix(U);
+                    //normalizeSU3Matrix(U);
 
                 }
                 else{

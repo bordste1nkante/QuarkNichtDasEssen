@@ -8,7 +8,7 @@ import tools
 
 #number of configs
 #n=2000
-n=400
+n=1000
 
 #number of bootstrap iterations
 B=200
@@ -17,8 +17,8 @@ B=200
 MeanCold = []
 StdCold=[]
 #read out all data into array
-with h5py.File("../h5/ColdPlaq.h5", "r") as f:
-#with h5py.File("../h5/ColdMultiPlaq.h5", "r") as f:
+#with h5py.File("../h5/ColdPlaq.h5", "r") as f:
+with h5py.File("../h5/ColdMultiPlaq.h5", "r") as f:
     for i in range(n):
         dataset = f[f"Configuration/{i}/plaquette"]
         #print(dataset[3])

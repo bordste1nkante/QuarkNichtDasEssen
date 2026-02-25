@@ -82,7 +82,7 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
                     //else{
                     //    std::cout << "falseOver" << std::endl;
                     //}
-                    normalizeSU3Matrix(U);
+                    //normalizeSU3Matrix(U);
 
                     }
                 else{
@@ -115,7 +115,7 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
             //Update X matrices
         if(p%XUpdate ==0 && p!=0){
             double rate = double(acceptanceRate.load())/double(updates.load());
-            std::cout << rate << std::endl;
+            //std::cout << rate << std::endl;
            // epsilon *= 1 + alpha * (rate - target_rate);
             if(epsilon>0.7){
                 epsilon=0.7;
@@ -127,17 +127,21 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
         
 
     }
+    std::cout << "First Thermalization done" << std::endl;
 
 
 
     //tune params
-    //epsilonTune(lattice, numberOfThermalSweeps, XUpdate, numberOfMultiHit,overrelaxationStep);
-    //double avgPlaq = ThermalTune(lattice,numberOfThermalSweeps, XUpdate,numberOfMultiHit,overrelaxationStep);
-    //SweepFactor = AutoCorrelationTune(lattice, numberOfThermalSweeps, XUpdate, numberOfMultiHit,overrelaxationStep);
-    //SaveTune_H5(const double epsilon, const double avgPlaq, const size_t SweepFactor);
+    epsilonTune(lattice, numberOfThermalSweeps, XUpdate, numberOfMultiHit,overrelaxationStep);
+    std::cout << "Epsilon set" << std::endl;
+    double avgPlaq = ThermalTune(lattice,numberOfThermalSweeps, XUpdate,numberOfMultiHit,overrelaxationStep);
+    std::cout << "reached equilibrium" << std::endl;
+    SweepFactor = AutoCorrelationTune(lattice, numberOfThermalSweeps, XUpdate, numberOfMultiHit,overrelaxationStep);
+    std::cout << "autocorrelation analyzed" << std::endl;
+    SaveTune_H5(epsilon,avgPlaq, SweepFactor);
 
 
-    for(int p=0; p<NConfigs*SweepFactor; p++){
+    for(int p=0; p<NConfigs*SweepFactor/numberOfMultiHit; p++){
 
         //parallelization
         std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
@@ -217,7 +221,8 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
             X_updateSU3(p*p+SweepFactor);
                         }
         //data aquisition after enough steps to prevent autocorrelation
-        if(p % SweepFactor==0) {
+        if(p % (SweepFactor/numberOfMultiHit)==0) {
+            
 
             std::vector<std::complex<double>> loops;
             std::vector<double> plaquettes(xAxis*yAxis*zAxis*tAxis,0.0);

@@ -1,0 +1,35 @@
+epsilon: 0.2
+h5Name: Wilson562.h5
+lattice:
+  beta: 5.62
+  t: 10
+  x: 10
+  y: 1
+  z: 1
+observable: 1
+positions:
+  endPoint:
+  - 5
+  - 0
+  - 0
+  - 5
+  startPoint:
+  - 0
+  - 0
+  - 0
+  - 0
+seeds:
+  dist:
+    hotNumbR1: 307
+    hotNumbS1: 200
+    hotNumbT1: 170
+    rng1: 420
+  indexDist: 666
+startConfig: false
+updates:
+  Multi: 5
+  NConfig: 10000
+  NSweepsThermal: 400
+  Sweep: 2
+  XUpdate: 2
+  overrelaxation: 2

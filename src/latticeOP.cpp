@@ -611,6 +611,12 @@ Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& 
     Eigen::Matrix3cd H = es.eigenvectors()*D_Sqrt*es.eigenvectors().adjoint();
 
     Eigen::Matrix3cd O=M*H.inverse();
+
+    //// 2. Reduce O to the SU(3) matrix O_tilde (Paper Eq. 2)
+    //std::complex<double> detO = O.determinant();
+    //// I(alpha) = exp(i * alpha) * Identity, where exp(3i * alpha) = det(O^dagger)
+    //std::complex<double> phase_factor = std::pow(std::conj(detO), 1.0/3.0); 
+    //Eigen::Matrix3cd O_tilde = O * phase_factor;
     
 
     Eigen::SelfAdjointEigenSolver<Eigen::Matrix3cd> esH(H);
@@ -620,7 +626,7 @@ Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& 
     //seems to be the wrong way around in paper
     Eigen::Matrix3cd Ur = Vadjoint*UEigen*O*V;//O*UEigen.adjoint()*O;//V*UEigen*O*Vadjoint;
 
-    Ur = Ur.adjoint().eval();
+    //Ur = Ur.adjoint().eval();
     if(reflect == 1){
         Ur = R1*Ur*R1;
         //Ur(0,1)=-Ur(0,1);
@@ -652,6 +658,8 @@ Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& 
     Eigen::Matrix3cd UR = V*Ur*Vadjoint*O.adjoint();
     //std::cout << ((UEigen)*M).trace() << std::endl;
     //std::cout << (UR*M).trace() << std::endl;
+    //std::cout << "Trace: " << (UR*UR.adjoint()).trace() << std::endl;
+    //std::cout << "Determinant: " << (UR.determinant()) << std::endl;
 //
     UPrime = retranslateMatrices(UR);//UR
     //std::cout << matrix_trace (matrix_multiplication(U,A)) << std::endl;

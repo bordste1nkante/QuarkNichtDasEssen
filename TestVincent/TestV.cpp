@@ -190,6 +190,8 @@ std::atomic<int> acceptanceRate=0;
         
 
     }
+    plaquette(lattice, plaquettes);
+    PTest=average(plaquettes);
     std::cout << PTest << std::endl;
 
     epsilonTune(lattice,0,2,5,3);
