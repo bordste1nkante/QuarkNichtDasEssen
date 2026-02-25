@@ -50,7 +50,6 @@ bool Setup_H5(  bool ColdOrHot,  const std::vector<size_t>& startingPoint,
     const size_t numberOfThermalSweeps,  
     const size_t XUpdate, 
     const size_t NConfigs, 
-    const size_t SweepFactor, 
     const size_t observable){
 
         bool success = false;
@@ -70,7 +69,6 @@ bool Setup_H5(  bool ColdOrHot,  const std::vector<size_t>& startingPoint,
         hsize_t Thermal = static_cast<hsize_t>(numberOfThermalSweeps);
         hsize_t Update = static_cast<hsize_t>(XUpdate);
         hsize_t Configs = static_cast<hsize_t>(NConfigs);
-        hsize_t Sweep = static_cast<hsize_t>(SweepFactor);
         hsize_t observable = static_cast<hsize_t>(observable);
 
         std::vector<hsize_t> startingh5;
@@ -165,17 +163,6 @@ bool Setup_H5(  bool ColdOrHot,  const std::vector<size_t>& startingPoint,
         attrConfigs.write(H5::PredType::NATIVE_HSIZE, &Configs);
 
 
-
-        H5::Attribute attrSweep = groupParams.createAttribute(
-            "Sweep",
-            H5::PredType::NATIVE_HSIZE,
-            H5::DataSpace(H5S_SCALAR)
-        );
-        
-
-        attrSweep.write(H5::PredType::NATIVE_HSIZE, &Sweep);
-
-
         H5::Attribute attrObservable = groupParams.createAttribute(
             "Collected observable",
             H5::PredType::NATIVE_HSIZE,
@@ -231,6 +218,81 @@ bool Setup_H5(  bool ColdOrHot,  const std::vector<size_t>& startingPoint,
 }
 
 
+
+//store important tune data in h5
+bool SaveTune_H5(const double epsilon, const double avgPlaq, const size_t SweepFactor){
+
+        bool success = false;
+
+        
+    try
+    {
+
+        std::string fileString = "../h5/"+filenameh5;
+        hsize_t xAxish5 = static_cast<hsize_t>(xAxis);
+        hsize_t yAxish5 = static_cast<hsize_t>(yAxis);
+        hsize_t zAxish5 = static_cast<hsize_t>(zAxis);
+        hsize_t tAxish5 = static_cast<hsize_t>(tAxis);
+
+
+
+        hsize_t Sweep = static_cast<hsize_t>(SweepFactor);
+        double epsilonh5 = (epsilon);
+        double avgPlaqh5 = (avgPlaq);
+
+
+
+
+        H5::H5File file(fileString,H5F_ACC_TRUNC);
+
+        H5::Group groupTune =file.createGroup("/metaData/Tune");
+
+
+        H5::Attribute Sweeping = groupTune.createAttribute(
+            "SweepFactor",
+            H5::PredType::NATIVE_HSIZE,
+            H5::DataSpace(H5S_SCALAR)
+        );
+        
+
+        Sweeping.write(H5::PredType::NATIVE_HSIZE, &Sweep);
+
+
+        H5::Attribute Epsiloning = groupTune.createAttribute(
+            "Epsilon",
+            H5::PredType::NATIVE_DOUBLE,
+            H5::DataSpace(H5S_SCALAR)
+        );
+        
+
+        Epsiloning.write(H5::PredType::NATIVE_DOUBLE, &epsilonh5);
+
+
+        H5::Attribute AvgPlaqing = groupTune.createAttribute(
+            "avgPlaq",
+            H5::PredType::NATIVE_DOUBLE,
+            H5::DataSpace(H5S_SCALAR)
+        );
+        
+
+        AvgPlaqing.write(H5::PredType::NATIVE_DOUBLE, &avgPlaqh5);
+
+        file.close();
+
+        
+
+        success = true;
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    
+
+    return success;
+
+
+}
 
 
 //store an array in h5 file
