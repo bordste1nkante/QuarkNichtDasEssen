@@ -149,11 +149,7 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
     //tune params
     //epsilonTune(lattice, numberOfThermalSweeps, XUpdate, numberOfMultiHit,overrelaxationStep);
     //ThermalTune(lattice,numberOfThermalSweeps, XUpdate,numberOfMultiHit,overrelaxationStep);
-<<<<<<< HEAD
     //SweepFactor = AutoCorrelationTune(lattice, numberOfThermalSweeps, XUpdate, numberOfMultiHit,overrelaxationStep);
-=======
-   // SweepFactor = AutoCorrelationTune(lattice, numberOfThermalSweeps, XUpdate, numberOfMultiHit,overrelaxationStep);
->>>>>>> refs/remotes/origin/main
 
 
     for(int p=0; p<NConfigs*SweepFactor; p++){
