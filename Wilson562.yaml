@@ -2,10 +2,10 @@ epsilon: 0.2
 h5Name: Wilson562.h5
 lattice:
   beta: 5.62
-  t: 12
-  x: 12
-  y: 2
-  z: 2
+  t: 3
+  x: 3
+  y: 3
+  z: 3
 observable: 1
 positions:
   endPoint:
@@ -28,7 +28,7 @@ seeds:
 startConfig: false
 updates:
   Multi: 5
-  NConfig: 10000
+  NConfig: 1000
   NSweepsThermal: 400
   Sweep: 2
   XUpdate: 2

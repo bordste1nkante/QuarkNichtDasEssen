@@ -2,17 +2,17 @@ epsilon: 0.3
 h5Name: Wilson369.h5
 lattice:
   beta: 3.69
-  t: 14
-  x: 14
-  y: 2
-  z: 2
-observable: 1
+  t: 3
+  x: 3
+  y: 3
+  z: 3
+observable: 2
 positions:
   endPoint:
-  - 7
   - 0
   - 0
-  - 7
+  - 0
+  - 0
   startPoint:
   - 0
   - 0
@@ -28,7 +28,7 @@ seeds:
 startConfig: false
 updates:
   Multi: 5
-  NConfig: 1000
+  NConfig: 100
   NSweepsThermal: 400
   Sweep: 2
   XUpdate: 2

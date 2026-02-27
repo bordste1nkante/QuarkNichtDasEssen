@@ -703,7 +703,7 @@ void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<
         Matrix<rSU, cSU> TPath1 = identityMatrix;
         Matrix<rSU, cSU> TPath2 = identityMatrix;
 
-        for(size_t nt= 0; nt<T+1;  nt++){
+        for(size_t nt= 0; nt<T;  nt++){
         TPath1=matrix_multiplication(lattice[idx(startingPoint[0],startingPoint[1],startingPoint[2],nt,3)],TPath1);
         TPath2=matrix_multiplication(lattice[idx(x,y,z,nt,3)],TPath2);   
         }     
