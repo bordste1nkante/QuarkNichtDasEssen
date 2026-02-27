@@ -50,7 +50,7 @@ Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& 
 //calculate WilsonLoop
 void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<double>>& loops,
                             std::vector<double>& r,   const std::vector<size_t>& startingPoint, 
-    const std::vector<size_t>& endPoint );
+    const std::vector<size_t>& endPoint, const double T );
 
 //calculate polyakovLoop
 void polyakovLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<double>>& loops,

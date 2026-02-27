@@ -347,13 +347,13 @@ bool saveArrayH5complex(const std::vector<std::complex<double>>& array, std::str
 
 
 
-        std::vector<double> arrayCombined(array.size());
+        std::vector<double> arrayCombined(2*array.size());
 
         for(size_t i= 0; i<array.size(); i++){
             arrayCombined[2*i]=array[i].real();
             arrayCombined[2*i+1]=array[i].imag();
         }
-        hsize_t dim[2] = {arrayCombined.size(),2};
+        hsize_t dim[2] = {array.size(),2};
         H5::DataSpace dataspace(2,dim);
 
         H5::DataSet Store = file.createDataSet(
@@ -443,6 +443,7 @@ double ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
         int counter = 0;
 
         while(counter < PTestSize){
+        for(int color = 0; color < 2; ++color){
         std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
             thread_local std::mt19937_64 Threadindexing(dindexing*i*12872+(allcounter+2)* 7311);
             std::uniform_int_distribution<int> threadIndexDist(0, XSet.size()-1);
@@ -462,6 +463,10 @@ double ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
             y= std::get<2>(temp);
             z= std::get<3>(temp);
             t= std::get<4>(temp);
+            if( ((x+y+z+t)%2) != color ){
+                bufferLattice[i] = U;
+                return;
+            }
             A= determineA(lattice, x,y,z,t,mu);
 
 
@@ -499,6 +504,7 @@ double ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
         });
         //they exchange pointers, so lattice now points to values of buffer and vice versa
         std::swap(lattice, bufferLattice);
+    }
         //Update X matrices
         if(counter%XUpdate ==0 && counter!=0){
             X_updateSU3(counter*drng1+27);
@@ -562,6 +568,7 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
     int counter =0;
     while(epsilonCounter<5){
         counter++;
+        for(int color = 0; color < 2; ++color){
         std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
             thread_local std::mt19937_64 Threadindexing(dindexing*i*14002+(counter+2)* 12311);
             std::uniform_int_distribution<int> threadIndexDist(0, XSet.size()-1);
@@ -584,6 +591,10 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
             y= std::get<2>(temp);
             z= std::get<3>(temp);
             t= std::get<4>(temp);
+            if( ((x+y+z+t)%2) != color ){
+                bufferLattice[i] = U;
+                return;
+            }
             A= determineA(lattice, x,y,z,t,mu);
 
 
@@ -593,7 +604,7 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
                 //in theory automatically accepted
                 if(j%overrelaxationStep==0 && j!=0){
                     U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
-                    //normalizeSU3Matrix(U);
+
 
                 }
                 else{
@@ -620,6 +631,8 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
         });
         //they exchange pointers, so lattice now points to values of buffer and vice versa
         std::swap(lattice, bufferLattice);
+
+        }
         //Update X matrices
         if(counter%XUpdate ==0 && counter!=0){
             double rate = double(acceptanceRate.load())/double(updates.load());
@@ -683,6 +696,7 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
 
     while(condition){
 
+        for(int color = 0; color < 2; ++color){
 
         std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
             thread_local std::mt19937_64 Threadindexing(dindexing*i*12872+(counter+2)* 7911);
@@ -703,6 +717,10 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
             y= std::get<2>(temp);
             z= std::get<3>(temp);
             t= std::get<4>(temp);
+            if( ((x+y+z+t)%2) != color ){
+                bufferLattice[i] = U;
+                return;
+            }
             A= determineA(lattice, x,y,z,t,mu);
 
 
@@ -741,6 +759,7 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
         //they exchange pointers, so lattice now points to values of buffer and vice versa
         std::swap(lattice, bufferLattice);
 
+        }
         std::vector<double> plaquettes(xAxis*yAxis*zAxis*tAxis,0.0);
         plaquette(lattice, plaquettes);
         double CX = correlationFunc(plaquettes, copiedplaquettes);

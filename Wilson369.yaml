@@ -1,18 +1,18 @@
-epsilon: 0.2
-h5Name: HotMultiPlaq.h5
+epsilon: 0.3
+h5Name: Wilson369.h5
 lattice:
-  beta: 5.62
-  t: 10
-  x: 10
+  beta: 3.69
+  t: 14
+  x: 14
   y: 2
   z: 2
 observable: 1
 positions:
   endPoint:
-  - 5
+  - 7
   - 0
   - 0
-  - 5
+  - 7
   startPoint:
   - 0
   - 0
@@ -20,16 +20,16 @@ positions:
   - 0
 seeds:
   dist:
-    hotNumbR1: 31
-    hotNumbS1: 270
-    hotNumbT1: 332
-    rng1: 276
-  indexDist: 349
+    hotNumbR1: 174
+    hotNumbS1: 803
+    hotNumbT1: 415
+    rng1: 90
+  indexDist: 563
 startConfig: false
 updates:
   Multi: 5
   NConfig: 1000
   NSweepsThermal: 400
-  Sweep: 1
+  Sweep: 2
   XUpdate: 2
   overrelaxation: 2

@@ -674,9 +674,11 @@ Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& 
 
 void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<double>>& loops,
                             std::vector<double>& r,   const std::vector<size_t>& startingPoint, 
-    const std::vector<size_t>& endPoint ){
-    Matrix<rSU, cSU> Path1;
-    Matrix<rSU, cSU> Path2;
+    const std::vector<size_t>& endPoint, const double T ){
+    Matrix<rSU, cSU> Path1 = identityMatrix;
+    Matrix<rSU, cSU> Path2 = identityMatrix;
+    Matrix<rSU, cSU> Temp1 = identityMatrix;
+    Matrix<rSU, cSU> Temp2 = identityMatrix;
 
     int dx=(endPoint[0]>startingPoint[0]) ? +1:-1;
     int dy=(endPoint[1]>startingPoint[1]) ? +1:-1;                              
@@ -695,9 +697,19 @@ void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<
     while (x!=endPoint[0])
     {
 
-        Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,0,0)]);
-        Path2=matrix_multiplication(Path2,lattice[idx(x,y,z,tAxis-1,0)]);
-        loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_hermitean_conjugate(Path1))));
+        Path1=matrix_multiplication(lattice[idx(x,y,z,0,0)],Path1);
+        Path2=matrix_multiplication(lattice[idx(x,y,z,T,0)],Path2);
+        
+        Matrix<rSU, cSU> TPath1 = identityMatrix;
+        Matrix<rSU, cSU> TPath2 = identityMatrix;
+
+        for(size_t nt= 0; nt<T+1;  nt++){
+        TPath1=matrix_multiplication(lattice[idx(startingPoint[0],startingPoint[1],startingPoint[2],nt,3)],TPath1);
+        TPath2=matrix_multiplication(lattice[idx(x,y,z,nt,3)],TPath2);   
+        }     
+        Temp1 = matrix_multiplication(Path2, matrix_hermitean_conjugate(TPath2));
+        Temp2 = matrix_multiplication(matrix_hermitean_conjugate(Path1), TPath1);
+        loops.push_back(matrix_trace(matrix_multiplication(Temp1, Temp2)));
         x+=dx;
         xDistance+=1;
         r.push_back(std::sqrt(xDistance*xDistance+yDistance*yDistance+zDistance*zDistance));
@@ -705,8 +717,8 @@ void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<
     }
     while (y!=endPoint[1])
     {
-        Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,0,1)]);
-        Path2=matrix_multiplication(Path2,lattice[idx(x,y,z,tAxis-1,1)]);
+        Path1=matrix_multiplication(lattice[idx(x,y,z,0,1)], Path1);
+        Path2=matrix_multiplication(lattice[idx(x,y,z,T,1)],Path2);
         loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_hermitean_conjugate(Path1))));
         y+=dy;
         yDistance+=1;
@@ -715,8 +727,8 @@ void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<
     }
     while (z!=endPoint[2])
     {
-        Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,0,2)]);
-        Path2=matrix_multiplication(Path2,lattice[idx(x,y,z,tAxis-1,2)]);
+        Path1=matrix_multiplication(lattice[idx(x,y,z,0,2)],Path1);
+        Path2=matrix_multiplication(lattice[idx(x,y,z,T,2)],Path2);
         loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_hermitean_conjugate(Path1))));
         z+=dz;
         zDistance+=1;
@@ -734,29 +746,26 @@ void polyakovLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::comple
                             std::vector<double>& r,   const std::vector<size_t>& startingPoint, 
     const std::vector<size_t>& endPoint ){
 
-    Matrix<rSU, cSU> Path1;
-    Matrix<rSU, cSU> Path2;
+    std::complex<double> totalP = {0.0,0.0};
 
+    for(size_t x=0; x<xAxis; x++){
+    for(size_t y=0; y<yAxis; y++){
+    for(size_t z=0; z<zAxis; z++){
 
-    int dt=(endPoint[3]>startingPoint[3]) ? +1:-1;
-    int x= startingPoint[0];
-    int y= startingPoint[1];
-    int z= startingPoint[2];
-    int t= startingPoint[3];
+    Matrix<rSU,cSU> P = identityMatrix;
 
-    int tDistance= 0;
+        for(size_t t=0; t<tAxis; t++){
+        P = matrix_multiplication(lattice[idx(x,y,z,t,3)], P);
+        }
 
-    while(t!=endPoint[3]){
-        Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,t,3)]);
-        Path2=matrix_multiplication(Path2, lattice[idx(x,y,z,endPoint[3],3)]);
-        loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_hermitean_conjugate(Path1))));
+    totalP += matrix_trace(P);
+}
+    }
+}
 
-        //save t-distance in r array (for simplicity)
-        r.push_back(std::sqrt(tDistance*tDistance));
-        tDistance +=1;
-        t+=dt;
+totalP /= (xAxis*yAxis*zAxis);
 
-                                }
+loops.push_back(totalP);
 
                             }
 

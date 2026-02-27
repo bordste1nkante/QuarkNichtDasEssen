@@ -8,7 +8,7 @@ import tools
 
 #number of configs
 #n=2000
-n=1000
+n=230
 
 #number of bootstrap iterations
 B=200
@@ -18,7 +18,7 @@ MeanCold = []
 StdCold=[]
 #read out all data into array
 #with h5py.File("../h5/ColdPlaq.h5", "r") as f:
-with h5py.File("../h5/ColdMultiPlaq.h5", "r") as f:
+with h5py.File("../h5/HotMultiPlaq.h5", "r") as f:
     for i in range(n):
         dataset = f[f"Configuration/{i}/plaquette"]
         #print(dataset[3])
@@ -30,8 +30,8 @@ print("done with 1")
 MeanHot = []
 StdHot=[]
 #read out all data into array
-#with h5py.File("../h5/HotPlaq.h5", "r") as f:
 with h5py.File("../h5/HotMultiPlaq.h5", "r") as f:
+#with h5py.File("../h5/HotMultiPlaq.h5", "r") as f:
     for i in range(n):
         dataset = f[f"Configuration/{i}/plaquette"]
 
@@ -49,7 +49,7 @@ plt.errorbar(xHot, MeanHot, yerr = StdHot, label="Hot", fmt=".")
 plt.grid()
 plt.legend()
 
-plt.savefig("testMulti.png")
+plt.savefig("testHot.png")
 
 
 

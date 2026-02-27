@@ -3,15 +3,15 @@ lattice:
   beta: 5.62
   t: 5
   x: 5
-  y: 5
-  z: 5
-observable: 1
+  y: 1
+  z: 1
+observable: 0
 positions:
   endPoint:
   - 0
   - 0
-  - 2
-  - 5
+  - 0
+  - 0
   startPoint:
   - 0
   - 0
@@ -43,9 +43,9 @@ seeds:
   uniformAcceptReject: 1949
 startConfig: true
 updates:
-  Multi: 10
+  Multi: 5
   NConfig: 100
   NSweepsThermal: 100
   Sweep: 20
   XUpdate: 2
-  overrelaxation: 4
+  overrelaxation: 2
