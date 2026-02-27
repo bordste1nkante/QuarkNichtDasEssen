@@ -14,12 +14,12 @@
 #include "../header/utils.h"
 
 
-
+// periodic boundary condition
 inline size_t shift(size_t coord, int dir, size_t dim) {
-    return (coord + dir + dim) % dim; // periodic boundary condition
+    return (coord + dir + dim) % dim;
 }
 
-// this mimics the behaviour of a 4D lattice from our 1D array
+
 size_t idx(size_t x, size_t y, size_t z, size_t t, size_t mu){
 
     return linksPerSite*(x+ xAxis*(y+ yAxis*(z+zAxis*t)))+mu;
@@ -70,7 +70,7 @@ void normalizeSU2Matrix(Matrix<2,2>& U){
 
 
 
-//parallel
+
 void X_updateSU3(size_t input){
 
 
@@ -287,8 +287,6 @@ void normalizeSU3Matrix(Matrix<rSU,rSU>& U){
     
 
 
-
-//sets all matrices to identity, a potential starting config
 void cold_start(std::vector<Matrix<rSU,rSU>>& lattice){
 
     std::vector<Matrix<rSU,rSU>> bufferLattice(lattice.size());
@@ -303,7 +301,7 @@ void cold_start(std::vector<Matrix<rSU,rSU>>& lattice){
     return;
 }
 
-//sets all matrices to random ones, a possible starting config
+
 void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
 
     std::vector<Matrix<rSU,rSU>> bufferLattice(lattice.size());
@@ -342,7 +340,6 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
 
 
 
-        //number required to generate 3 SU(2) matrices, from these we form a SU(3)
         double r[3];
         r[0]= distribution(hottestNumbR1);
         r[1]= distribution(hottestNumbR1);
@@ -442,9 +439,9 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
         T(1,2)=Tsmall(0,1);
         T(2,2)=Tsmall(1,1);
 
-        //matrix multiplication S*T = ST
+
         ST=matrix_multiplication(S,T);
-        //matrix multiplication R*ST = U
+
         U=matrix_multiplication(R,ST);
         normalizeSU3Matrix(U);
             
@@ -462,7 +459,7 @@ void hot_start(std::vector<Matrix<rSU,rSU>>& lattice){
 
 
 
-//parallel
+
 bool latticeAction(const std::vector<Matrix<rSU,rSU>>& lattice, const Matrix<rSU,rSU>& U,  const Matrix<rSU,rSU>& UPrime, const Matrix<rSU,cSU>& A, std::mt19937_64& ActionAccept, std::uniform_real_distribution<double>& Distribution){
     
     bool accept;
@@ -591,7 +588,7 @@ Matrix<rSU,cSU> determineA(const std::vector<Matrix<rSU,rSU>>& lattice ,size_t x
 }
 
 
-//parallel
+
 Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& U,std::uniform_int_distribution<int>& distribution,std::mt19937_64& random ){
     int reflect = distribution(random);
     Eigen::Matrix3cd R1 = Eigen::Matrix3cd::Identity();
@@ -614,6 +611,12 @@ Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& 
     Eigen::Matrix3cd H = es.eigenvectors()*D_Sqrt*es.eigenvectors().adjoint();
 
     Eigen::Matrix3cd O=M*H.inverse();
+
+    //// 2. Reduce O to the SU(3) matrix O_tilde (Paper Eq. 2)
+    //std::complex<double> detO = O.determinant();
+    //// I(alpha) = exp(i * alpha) * Identity, where exp(3i * alpha) = det(O^dagger)
+    //std::complex<double> phase_factor = std::pow(std::conj(detO), 1.0/3.0); 
+    //Eigen::Matrix3cd O_tilde = O * phase_factor;
     
 
     Eigen::SelfAdjointEigenSolver<Eigen::Matrix3cd> esH(H);
@@ -623,7 +626,7 @@ Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& 
     //seems to be the wrong way around in paper
     Eigen::Matrix3cd Ur = Vadjoint*UEigen*O*V;//O*UEigen.adjoint()*O;//V*UEigen*O*Vadjoint;
 
-    Ur = Ur.adjoint().eval();
+    //Ur = Ur.adjoint().eval();
     if(reflect == 1){
         Ur = R1*Ur*R1;
         //Ur(0,1)=-Ur(0,1);
@@ -653,13 +656,15 @@ Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& 
     }
 
     Eigen::Matrix3cd UR = V*Ur*Vadjoint*O.adjoint();
-    std::cout << ((UEigen)*M).trace() << std::endl;
-    std::cout << (UR*M).trace() << std::endl;
-
+    //std::cout << ((UEigen)*M).trace() << std::endl;
+    //std::cout << (UR*M).trace() << std::endl;
+    //std::cout << "Trace: " << (UR*UR.adjoint()).trace() << std::endl;
+    //std::cout << "Determinant: " << (UR.determinant()) << std::endl;
+//
     UPrime = retranslateMatrices(UR);//UR
     //std::cout << matrix_trace (matrix_multiplication(U,A)) << std::endl;
     //std::cout << matrix_trace (matrix_multiplication(UPrime,A)) << std::endl;
-    
+    //
     //std::cout <<"Output:" << ((UEigen-UR)*M).trace() << std::endl;
    // std::cout <<"subEigen:" << ((UEigen-UR)) << std::endl;
     return UPrime;
@@ -669,9 +674,11 @@ Matrix<rSU,cSU> overrelaxation(const Matrix<rSU,cSU>& A, const Matrix<rSU,cSU>& 
 
 void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<double>>& loops,
                             std::vector<double>& r,   const std::vector<size_t>& startingPoint, 
-    const std::vector<size_t>& endPoint ){
-    Matrix<rSU, cSU> Path1;
-    Matrix<rSU, cSU> Path2;
+    const std::vector<size_t>& endPoint, const double T ){
+    Matrix<rSU, cSU> Path1 = identityMatrix;
+    Matrix<rSU, cSU> Path2 = identityMatrix;
+    Matrix<rSU, cSU> Temp1 = identityMatrix;
+    Matrix<rSU, cSU> Temp2 = identityMatrix;
 
     int dx=(endPoint[0]>startingPoint[0]) ? +1:-1;
     int dy=(endPoint[1]>startingPoint[1]) ? +1:-1;                              
@@ -690,9 +697,19 @@ void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<
     while (x!=endPoint[0])
     {
 
-        Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,0,0)]);
-        Path2=matrix_multiplication(Path2,lattice[idx(x,y,z,tAxis-1,0)]);
-        loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_hermitean_conjugate(Path1))));
+        Path1=matrix_multiplication(lattice[idx(x,y,z,0,0)],Path1);
+        Path2=matrix_multiplication(lattice[idx(x,y,z,T,0)],Path2);
+        
+        Matrix<rSU, cSU> TPath1 = identityMatrix;
+        Matrix<rSU, cSU> TPath2 = identityMatrix;
+
+        for(size_t nt= 0; nt<T+1;  nt++){
+        TPath1=matrix_multiplication(lattice[idx(startingPoint[0],startingPoint[1],startingPoint[2],nt,3)],TPath1);
+        TPath2=matrix_multiplication(lattice[idx(x,y,z,nt,3)],TPath2);   
+        }     
+        Temp1 = matrix_multiplication(Path2, matrix_hermitean_conjugate(TPath2));
+        Temp2 = matrix_multiplication(matrix_hermitean_conjugate(Path1), TPath1);
+        loops.push_back(matrix_trace(matrix_multiplication(Temp1, Temp2)));
         x+=dx;
         xDistance+=1;
         r.push_back(std::sqrt(xDistance*xDistance+yDistance*yDistance+zDistance*zDistance));
@@ -700,8 +717,8 @@ void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<
     }
     while (y!=endPoint[1])
     {
-        Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,0,1)]);
-        Path2=matrix_multiplication(Path2,lattice[idx(x,y,z,tAxis-1,1)]);
+        Path1=matrix_multiplication(lattice[idx(x,y,z,0,1)], Path1);
+        Path2=matrix_multiplication(lattice[idx(x,y,z,T,1)],Path2);
         loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_hermitean_conjugate(Path1))));
         y+=dy;
         yDistance+=1;
@@ -710,8 +727,8 @@ void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<
     }
     while (z!=endPoint[2])
     {
-        Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,0,2)]);
-        Path2=matrix_multiplication(Path2,lattice[idx(x,y,z,tAxis-1,2)]);
+        Path1=matrix_multiplication(lattice[idx(x,y,z,0,2)],Path1);
+        Path2=matrix_multiplication(lattice[idx(x,y,z,T,2)],Path2);
         loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_hermitean_conjugate(Path1))));
         z+=dz;
         zDistance+=1;
@@ -729,29 +746,26 @@ void polyakovLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::comple
                             std::vector<double>& r,   const std::vector<size_t>& startingPoint, 
     const std::vector<size_t>& endPoint ){
 
-    Matrix<rSU, cSU> Path1;
-    Matrix<rSU, cSU> Path2;
+    std::complex<double> totalP = {0.0,0.0};
 
+    for(size_t x=0; x<xAxis; x++){
+    for(size_t y=0; y<yAxis; y++){
+    for(size_t z=0; z<zAxis; z++){
 
-    int dt=(endPoint[3]>startingPoint[3]) ? +1:-1;
-    int x= startingPoint[0];
-    int y= startingPoint[1];
-    int z= startingPoint[2];
-    int t= startingPoint[3];
+    Matrix<rSU,cSU> P = identityMatrix;
 
-    int tDistance= 0;
+        for(size_t t=0; t<tAxis; t++){
+        P = matrix_multiplication(lattice[idx(x,y,z,t,3)], P);
+        }
 
-    while(t!=endPoint[3]){
-        Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,t,3)]);
-        Path2=matrix_multiplication(Path2, lattice[idx(x,y,z,endPoint[3],3)]);
-        loops.push_back(matrix_trace(matrix_multiplication(Path2,matrix_hermitean_conjugate(Path1))));
+    totalP += matrix_trace(P);
+}
+    }
+}
 
-        //save t-distance in r array (for simplicity)
-        r.push_back(std::sqrt(tDistance*tDistance));
-        tDistance +=1;
-        t+=dt;
+totalP /= (xAxis*yAxis*zAxis);
 
-                                }
+loops.push_back(totalP);
 
                             }
 

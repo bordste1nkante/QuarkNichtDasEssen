@@ -75,7 +75,7 @@ int main(){
 
  
 
-    bool stop = Setup_H5(coldOrHot, start, end, numberOfThermalSweeps,XUpdate,NConfigs,SweepFactor,observable);
+    bool stop = Setup_H5(coldOrHot, start, end, numberOfThermalSweeps,XUpdate,NConfigs,observable);
 
     if(stop == false){
         std::cout << "Something went wrong with the h5 file" << std::endl;

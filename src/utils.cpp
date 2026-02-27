@@ -44,13 +44,11 @@ void ensureGroup(H5::H5File& file, const std::string& datasetPath)
 }
 
 
-//store important meta data in h5file
 bool Setup_H5(  bool ColdOrHot,  const std::vector<size_t>& startingPoint, 
     const std::vector<size_t>& endPoint, 
     const size_t numberOfThermalSweeps,  
     const size_t XUpdate, 
     const size_t NConfigs, 
-    const size_t SweepFactor, 
     const size_t observable){
 
         bool success = false;
@@ -70,7 +68,6 @@ bool Setup_H5(  bool ColdOrHot,  const std::vector<size_t>& startingPoint,
         hsize_t Thermal = static_cast<hsize_t>(numberOfThermalSweeps);
         hsize_t Update = static_cast<hsize_t>(XUpdate);
         hsize_t Configs = static_cast<hsize_t>(NConfigs);
-        hsize_t Sweep = static_cast<hsize_t>(SweepFactor);
         hsize_t observable = static_cast<hsize_t>(observable);
 
         std::vector<hsize_t> startingh5;
@@ -165,17 +162,6 @@ bool Setup_H5(  bool ColdOrHot,  const std::vector<size_t>& startingPoint,
         attrConfigs.write(H5::PredType::NATIVE_HSIZE, &Configs);
 
 
-
-        H5::Attribute attrSweep = groupParams.createAttribute(
-            "Sweep",
-            H5::PredType::NATIVE_HSIZE,
-            H5::DataSpace(H5S_SCALAR)
-        );
-        
-
-        attrSweep.write(H5::PredType::NATIVE_HSIZE, &Sweep);
-
-
         H5::Attribute attrObservable = groupParams.createAttribute(
             "Collected observable",
             H5::PredType::NATIVE_HSIZE,
@@ -232,8 +218,82 @@ bool Setup_H5(  bool ColdOrHot,  const std::vector<size_t>& startingPoint,
 
 
 
+bool SaveTune_H5(const double epsilon, const double avgPlaq, const size_t SweepFactor){
 
-//store an array in h5 file
+        bool success = false;
+
+        
+    try
+    {
+
+        std::string fileString = "../h5/"+filenameh5;
+        hsize_t xAxish5 = static_cast<hsize_t>(xAxis);
+        hsize_t yAxish5 = static_cast<hsize_t>(yAxis);
+        hsize_t zAxish5 = static_cast<hsize_t>(zAxis);
+        hsize_t tAxish5 = static_cast<hsize_t>(tAxis);
+
+
+
+        hsize_t Sweep = static_cast<hsize_t>(SweepFactor);
+        double epsilonh5 = (epsilon);
+        double avgPlaqh5 = (avgPlaq);
+
+
+
+
+        H5::H5File file(fileString,H5F_ACC_RDWR);
+
+        H5::Group groupTune =file.createGroup("/metaData/Tune");
+
+
+        H5::Attribute Sweeping = groupTune.createAttribute(
+            "SweepFactor",
+            H5::PredType::NATIVE_HSIZE,
+            H5::DataSpace(H5S_SCALAR)
+        );
+        
+
+        Sweeping.write(H5::PredType::NATIVE_HSIZE, &Sweep);
+
+
+        H5::Attribute Epsiloning = groupTune.createAttribute(
+            "Epsilon",
+            H5::PredType::NATIVE_DOUBLE,
+            H5::DataSpace(H5S_SCALAR)
+        );
+        
+
+        Epsiloning.write(H5::PredType::NATIVE_DOUBLE, &epsilonh5);
+
+
+        H5::Attribute AvgPlaqing = groupTune.createAttribute(
+            "avgPlaq",
+            H5::PredType::NATIVE_DOUBLE,
+            H5::DataSpace(H5S_SCALAR)
+        );
+        
+
+        AvgPlaqing.write(H5::PredType::NATIVE_DOUBLE, &avgPlaqh5);
+
+        file.close();
+
+        
+
+        success = true;
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    
+
+    return success;
+
+
+}
+
+
+
 bool saveArrayH5(const std::vector<double>& array, std::string dataSetPath){
 
     bool success= false;
@@ -287,13 +347,13 @@ bool saveArrayH5complex(const std::vector<std::complex<double>>& array, std::str
 
 
 
-        std::vector<double> arrayCombined(array.size());
+        std::vector<double> arrayCombined(2*array.size());
 
         for(size_t i= 0; i<array.size(); i++){
             arrayCombined[2*i]=array[i].real();
             arrayCombined[2*i+1]=array[i].imag();
         }
-        hsize_t dim[2] = {arrayCombined.size(),2};
+        hsize_t dim[2] = {array.size(),2};
         H5::DataSpace dataspace(2,dim);
 
         H5::DataSet Store = file.createDataSet(
@@ -337,9 +397,9 @@ double correlationFunc(const std::vector<double>& Plaqs,const std::vector<double
 
 
     mean = average(Plaqs);
-    std::cout << "mean:" << mean << std::endl;
+    //std::cout << "mean:" << mean << std::endl;
     meanOG = average(OGPlaqs);
-    std::cout << "meanOG:" << meanOG << std::endl;
+    //std::cout << "meanOG:" << meanOG << std::endl;
 
     //all k or all k and i?
     for(size_t k = 0; k< Plaqs.size(); k++){
@@ -347,14 +407,14 @@ double correlationFunc(const std::vector<double>& Plaqs,const std::vector<double
     }
 
     correlationMean=average(product);
-    std::cout << "correlation:" << correlationMean << std::endl;
+    //std::cout << "correlation:" << correlationMean << std::endl;
     CX= correlationMean - mean*meanOG;
     return CX;
 
 
 }
 
-void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice, 
+double ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice, 
     const size_t numberOfThermalSweeps, 
     const size_t XUpdate, 
     const size_t numberOfMultiHit,
@@ -374,15 +434,16 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
     if(PTestSize < 20){
         PTestSize = 20;
     }
-    std::cout << PTestSize << std::endl;
+    //std::cout << PTestSize << std::endl;
     std::vector<double> PTest(PTestSize);
 
     size_t stabilization=0;
     int allcounter = 0;
-    while(stabilization < 5){ //stabilization < 5
+    while(stabilization < 3){ //stabilization < 5
         int counter = 0;
 
         while(counter < PTestSize){
+        for(int color = 0; color < 2; ++color){
         std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
             thread_local std::mt19937_64 Threadindexing(dindexing*i*12872+(allcounter+2)* 7311);
             std::uniform_int_distribution<int> threadIndexDist(0, XSet.size()-1);
@@ -402,6 +463,10 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
             y= std::get<2>(temp);
             z= std::get<3>(temp);
             t= std::get<4>(temp);
+            if( ((x+y+z+t)%2) != color ){
+                bufferLattice[i] = U;
+                return;
+            }
             A= determineA(lattice, x,y,z,t,mu);
 
 
@@ -411,7 +476,7 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
                 //in theory automatically accepted
                 if(j%overrelaxationStep==0 && j!=0){
                     U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
-                    normalizeSU3Matrix(U);
+                    //normalizeSU3Matrix(U);
 
                 }
                 else{
@@ -439,14 +504,15 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
         });
         //they exchange pointers, so lattice now points to values of buffer and vice versa
         std::swap(lattice, bufferLattice);
-            //Update X matrices
+    }
+        //Update X matrices
         if(counter%XUpdate ==0 && counter!=0){
             X_updateSU3(counter*drng1+27);
                         }
 
         std::vector<double> plaquettes(xAxis*yAxis*zAxis*tAxis,0.0);
         plaquette(lattice, plaquettes);
-        std::cout << average(plaquettes) << std::endl;
+        //std::cout << average(plaquettes) << std::endl;
         PTest[counter]=average(plaquettes);
 
 
@@ -454,7 +520,6 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
         counter++;
     }
 
-    //std::cout << "made it" << std::endl;
     size_t mid = PTest.size() / 2;
     std::vector<double> slice1(PTest.begin(), PTest.begin()+mid );
     std::vector<double> slice2(PTest.begin()+mid,PTest.end());
@@ -465,11 +530,11 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
 
 
     P = (avg2-avg1)/avg1;
-    std::cout << "avg1: " << avg1 << std::endl;
-    std::cout << "avg2: " << avg2 << std::endl;
-    std::cout << "P: " << P << std::endl;
-    std::cout << "Low: " << changeRateLow << std::endl;
-    std::cout << "High: " << changeRateHigh << std::endl;
+    //std::cout << "avg1: " << avg1 << std::endl;
+    //std::cout << "avg2: " << avg2 << std::endl;
+    //std::cout << "P: " << P << std::endl;
+    //std::cout << "Low: " << changeRateLow << std::endl;
+    //std::cout << "High: " << changeRateHigh << std::endl;
 
     
 
@@ -482,6 +547,7 @@ void ThermalTune(std::vector<Matrix<rSU,cSU>>& lattice,
 
     allcounter++;
     }
+    return avg2;
 
 
     }
@@ -501,8 +567,8 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
     size_t epsilonCounter=0;
     int counter =0;
     while(epsilonCounter<5){
-  //parallelization
         counter++;
+        for(int color = 0; color < 2; ++color){
         std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
             thread_local std::mt19937_64 Threadindexing(dindexing*i*14002+(counter+2)* 12311);
             std::uniform_int_distribution<int> threadIndexDist(0, XSet.size()-1);
@@ -525,6 +591,10 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
             y= std::get<2>(temp);
             z= std::get<3>(temp);
             t= std::get<4>(temp);
+            if( ((x+y+z+t)%2) != color ){
+                bufferLattice[i] = U;
+                return;
+            }
             A= determineA(lattice, x,y,z,t,mu);
 
 
@@ -534,7 +604,7 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
                 //in theory automatically accepted
                 if(j%overrelaxationStep==0 && j!=0){
                     U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
-                    normalizeSU3Matrix(U);
+
 
                 }
                 else{
@@ -561,37 +631,30 @@ void epsilonTune( std::vector<Matrix<rSU,cSU>>& lattice,
         });
         //they exchange pointers, so lattice now points to values of buffer and vice versa
         std::swap(lattice, bufferLattice);
+
+        }
         //Update X matrices
         if(counter%XUpdate ==0 && counter!=0){
             double rate = double(acceptanceRate.load())/double(updates.load());
-            std::cout << rate << std::endl;
+            //std::cout << rate << std::endl;
             epsilonCounter++;
             epsilon *= 1 + alpha * (rate - target_rate);
             if(rate > target_rate + rateInterval){
                 epsilonCounter = 0;
-            //    if(rate < 0.35){
-            //        epsilon *=0.9;
+
                 }
-            //    else{
-            //        epsilon *=0.95;
-            //    }
-//
-            //}
+
             if(rate<target_rate - rateInterval){
                 epsilonCounter=0;
-            //    if(rate < 0.7){
-            //        epsilon*=1.1;
-                }
-            //    else{
-            //        epsilon*=1.05;
-            //    }
 
-            //}
+                }
+
+
             if(epsilon>0.7){
                 epsilon=0.7;
             }
-            std::cout << epsilonCounter << std::endl;
-            std::cout << epsilon << std::endl;
+            //std::cout << epsilonCounter << std::endl;
+            //std::cout << epsilon << std::endl;
 
             acceptanceRate.store(0);
             updates.store(0);
@@ -618,11 +681,10 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
     std::iota(indices.begin(), indices.end(),0);
 
 
-    //std::vector<Matrix<rSU,rSU>> copiedlattice(linksPerSite*xAxis*yAxis*zAxis*tAxis);
     std::vector<double> copiedplaquettes(xAxis*yAxis*zAxis+tAxis,0.0);
     plaquette(lattice, copiedplaquettes);
     double CX0 = correlationFunc(copiedplaquettes, copiedplaquettes);
-    std::cout <<"CX0:"<< CX0 << std::endl;
+    //std::cout <<"CX0:"<< CX0 << std::endl;
 
     //that acccounts for CX0/CX0 convention to take the halfs of all
     double integratedCorrelationTime = 0.5;
@@ -634,6 +696,7 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
 
     while(condition){
 
+        for(int color = 0; color < 2; ++color){
 
         std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
             thread_local std::mt19937_64 Threadindexing(dindexing*i*12872+(counter+2)* 7911);
@@ -654,6 +717,10 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
             y= std::get<2>(temp);
             z= std::get<3>(temp);
             t= std::get<4>(temp);
+            if( ((x+y+z+t)%2) != color ){
+                bufferLattice[i] = U;
+                return;
+            }
             A= determineA(lattice, x,y,z,t,mu);
 
 
@@ -663,7 +730,7 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
                 //in theory automatically accepted
                 if(j%overrelaxationStep==0 && j!=0){
                     U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
-                    normalizeSU3Matrix(U);
+                    //normalizeSU3Matrix(U);
 
                 }
                 else{
@@ -692,11 +759,12 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
         //they exchange pointers, so lattice now points to values of buffer and vice versa
         std::swap(lattice, bufferLattice);
 
+        }
         std::vector<double> plaquettes(xAxis*yAxis*zAxis*tAxis,0.0);
         plaquette(lattice, plaquettes);
         double CX = correlationFunc(plaquettes, copiedplaquettes);
         CX/=CX0;
-        std::cout << CX << std::endl;
+        //std::cout << CX << std::endl;
         if(CX<=0){
             condition = false;
             break;
@@ -710,16 +778,19 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
                         }  
 
     }
-    //apparently that is a factor
+    //necessary factor from definition
     integratedCorrelationTime *=2;
 
-    //why not just ceil on integrated and then time multihit, isn't the current wrong?
-    size_t temp = static_cast<size_t>(std::ceil(double(integratedCorrelationTime)/double(numberOfMultiHit)));
+    //why not just ceil on integrated and then time multihit, isn't the current wrong? it ensure size_t
+    size_t temp = static_cast<size_t>(std::ceil(integratedCorrelationTime/double(numberOfMultiHit)));
     size_t sweepFactor = temp*numberOfMultiHit;
 
+    //size_t sweepFactor = integratedCorrelationTime*numberOfMultiHit;
     return sweepFactor;
     }
-//translate our matrices to eigen, they have better support
+
+
+
 Eigen::Matrix3cd translateMatrices(const Matrix<rSU,cSU>& A){
 
 
@@ -735,7 +806,7 @@ Eigen::Matrix3cd translateMatrices(const Matrix<rSU,cSU>& A){
     return M;
 }
 
-//translate eigen to our matrices, we use them :(
+
 Matrix<rSU,cSU> retranslateMatrices(const Eigen::Matrix3cd& A){
 
     Matrix<rSU,cSU> M;

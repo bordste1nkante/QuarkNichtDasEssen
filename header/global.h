@@ -46,20 +46,19 @@ const size_t cSU=3;
 const int NSetXMatrices = 100;
 extern std::vector<Matrix<rSU,rSU>> XSet;
 
-//required for generation of X. Epsilon affects acceptance rate.
+//required for generation of X it controls spread around unity. Epsilon affects acceptance rate.
 extern double epsilon;
 
-//generate random values scaled with epsilon
 
-//those are the random numbers for updates?
-
+//relevance?
 extern std::uniform_real_distribution<double> dist;
 
 
-//required for hot start, to create a set of not identity matrices, like generating X, but with bigger spread 
+//required for hot start, to create a set of not identity matrices, like generating X
 extern double hotEpsilon;
 
 
+//relevant?
 extern std::uniform_real_distribution<double> hotDist;
 
 
@@ -71,8 +70,8 @@ extern Matrix<2,2> identity2, Pauli1, Pauli2, Pauli3;
 //rsU x cSU identity
 extern Matrix<rSU,cSU> identityMatrix;
 
+//zeroMatrices
 extern Matrix<rSU,cSU> zeroMatrix;
-
 extern Matrix<2,2> zeroMatrix2;
 
 
@@ -81,19 +80,30 @@ extern std::string filenameh5;
 
 
 
+//relevant factors for seeding
 extern double drng1;
 extern double dhotNumbS1;
 extern double dhotNumbT1;
 extern double dhotNumbR1;
 extern double dindexing;
 
+
+
+//some condition for equilibrium:
+
+//controls size of checked set, we compare the change of means between sets
 extern double PTestSizeGlobal;
 
-//x+0.95x
+//control allowed spread of means between sets
 extern double changeRateLow;
-//x + 1.05x
 extern double changeRateHigh;
 
+//epsilon tuning:
+
+//controls changefactor of epsilon
 extern double alpha;
+//what would be the ideal rate
 extern double target_rate;
+
+//target rate +- rateInterval controls accepted epsilon
 extern double rateInterval;

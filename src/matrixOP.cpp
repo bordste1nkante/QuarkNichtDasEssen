@@ -124,7 +124,7 @@ void generate_zero(){
 }
 
 
-//generates a rSU x cSU identity matrix
+
 void generate_identity(){
     for(int i = 0; i<rSU; i++){
         for(int j=0; j<cSU; j++){

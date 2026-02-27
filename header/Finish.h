@@ -14,6 +14,8 @@
 #include "global.h"
 
 
+
+//runs the simulation, including tuning and data aquisition (does not generate starting config)
 void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice, 
     const std::vector<size_t>& startingPoint, 
     const std::vector<size_t>& endPoint, 

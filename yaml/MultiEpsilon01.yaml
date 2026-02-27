@@ -1,12 +1,12 @@
-epsilon: 0.1
+epsilon: 0.2
 h5Name: MultiEpsilon01.h5
 lattice:
   beta: 5.62
-  t: 4
-  x: 4
-  y: 4
-  z: 4
-observable: 1
+  t: 6
+  x: 6
+  y: 1
+  z: 1
+observable: 0
 positions:
   endPoint:
   - 0
@@ -45,8 +45,8 @@ seeds:
 startConfig: true
 updates:
   Multi: 5
-  NConfig: 0
-  NSweepsThermal: 1000
+  NConfig: 100
+  NSweepsThermal: 100
   Sweep: 1
   XUpdate: 2
   overrelaxation: 2

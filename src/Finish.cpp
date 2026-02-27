@@ -39,7 +39,8 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
 
     //thermalization
     for(int p=0; p<numberOfThermalSweeps/numberOfMultiHit; p++){
-        //parallelization
+
+        for(int color = 0; color < 2; ++color){
         std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
             thread_local std::mt19937_64 Threadindexing(dindexing*i*17007+ (p+2)* 10111);
             std::uniform_int_distribution<int> threadIndexDist(0, XSet.size()-1);
@@ -60,6 +61,10 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
             y= std::get<2>(temp);
             z= std::get<3>(temp);
             t= std::get<4>(temp);
+            if( ((x+y+z+t)%2) != color ){
+                bufferLattice[i] = U;
+                return;
+            }
             A= determineA(lattice, x,y,z,t,mu);
 
 
@@ -69,7 +74,8 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
                 //in theory automatically accepted
                 if(j%overrelaxationStep==0 && j!=0){
                     U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
-                    normalizeSU3Matrix(U);
+                    //std::cout << matrix_trace(matrix_multiplication(U,matrix_hermitean_conjugate(U))) << std::endl;
+
 
                     }
                 else{
@@ -99,29 +105,12 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
 
         //they exchange pointers, so lattice now points to values of buffer and vice versa
         std::swap(lattice, bufferLattice);
+    }
             //Update X matrices
         if(p%XUpdate ==0 && p!=0){
             double rate = double(acceptanceRate.load())/double(updates.load());
-            std::cout << rate << std::endl;
+            //std::cout << rate << std::endl;
            // epsilon *= 1 + alpha * (rate - target_rate);
-            //if(rate < 0.45){
-            //    if(rate < 0.35){
-            //        epsilon *=0.9;
-            //    }
-            //    else{
-            //        epsilon *=0.95;
-            //    }
-//
-            //}
-            //if(rate>0.6){
-            //    if(rate < 0.7){
-            //        epsilon*=1.1;
-            //    }
-            //    else{
-            //        epsilon*=1.05;
-            //    }
-//
-            //}
             if(epsilon>0.7){
                 epsilon=0.7;
             }
@@ -132,27 +121,23 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
         
 
     }
-    //std::vector<double> plaquettes(xAxis*yAxis*zAxis*tAxis,0.0);
-    //plaquette(lattice, plaquettes);
-    //for(int i =0; i< plaquettes.size(); i++){
-    //    std::cout << plaquettes[i] << std::endl;
-    //}
-    //double PTest=average(plaquettes);
+    std::cout << "First Thermalization done" << std::endl;
 
-
-
-    //std::cout <<"P: " << PTest << std::endl;
-    //double rate = double(acceptanceRate.load())/double(updates.load());
-    //std::cout << rate << std::endl;
 
 
     //tune params
-    //epsilonTune(lattice, numberOfThermalSweeps, XUpdate, numberOfMultiHit,overrelaxationStep);
-    //ThermalTune(lattice,numberOfThermalSweeps, XUpdate,numberOfMultiHit,overrelaxationStep);
-    //SweepFactor = AutoCorrelationTune(lattice, numberOfThermalSweeps, XUpdate, numberOfMultiHit,overrelaxationStep);
+    epsilonTune(lattice, numberOfThermalSweeps, XUpdate, numberOfMultiHit,overrelaxationStep);
+    std::cout << "Epsilon set" << std::endl;
+    double avgPlaq = ThermalTune(lattice,numberOfThermalSweeps, XUpdate,numberOfMultiHit,overrelaxationStep);
+    std::cout << "reached equilibrium" << std::endl;
+    SweepFactor = AutoCorrelationTune(lattice, numberOfThermalSweeps, XUpdate, numberOfMultiHit,overrelaxationStep);
+    std::cout << "autocorrelation analyzed" << std::endl;
+    SaveTune_H5(epsilon,avgPlaq, SweepFactor);
 
 
-    for(int p=0; p<NConfigs*SweepFactor; p++){
+    for(int p=0; p<NConfigs*SweepFactor/numberOfMultiHit; p++){
+
+        for(int color = 0; color < 2; ++color){
 
         //parallelization
         std::for_each(std::execution::par, indices.begin(), indices.end(),[&](size_t i){
@@ -177,6 +162,10 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
             y= std::get<2>(temp);
             z= std::get<3>(temp);
             t= std::get<4>(temp);
+            if( ((x+y+z+t)%2) != color ){
+                bufferLattice[i] = U;
+                return;
+            }
             A= determineA(lattice, x,y,z,t,mu);
 
             for(size_t j= 0; j<numberOfMultiHit; j++){
@@ -185,20 +174,7 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
                 //in theory automatically accepted
                 if(j%overrelaxationStep==0 && j!=0){
                     U = overrelaxation(A, U, threadrefelctDist, Threadindexing);
-                    //std::cout << matrix_trace(matrix_multiplication(U,matrix_hermitean_conjugate(U))) << std::endl;
-                    
-                    //bool acceptance = latticeAction(lattice, lattice[i], U, A, Threadindexing, threadAcceptReject);
-                    //normalizeSU3Matrix(U);
 
-
-//
-                    //if(acceptance==true){
-                    //    std::cout << "acceptedOver" << std::endl; 
-                    //    }
-                    //else{
-                    //    std::cout << "falseOver" << std::endl;
-                    //}
-                    normalizeSU3Matrix(U);
 
                 }
                 else{
@@ -221,39 +197,51 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
             bufferLattice[i]=U;
 
         });
-
+    
 
 
         //they exchange pointers, so lattice now points to values of buffer and vice versa
         std::swap(lattice, bufferLattice);
+
+        }
         
         //Update X matrices
         if(p%XUpdate ==0 && p!=0){
             X_updateSU3(p*p+SweepFactor);
                         }
-        if(p % SweepFactor==0) {
+        //data aquisition after enough steps to prevent autocorrelation
+        if(p % (SweepFactor/numberOfMultiHit)==0) {
+            
 
-            std::vector<std::complex<double>> loops;
-            std::vector<double> plaquettes(xAxis*yAxis*zAxis*tAxis,0.0);
-            std::vector<double> r;
+
 
             if(observable==0){
+                std::vector<std::complex<double>> loops;
+                std::vector<double> plaquettes(xAxis*yAxis*zAxis*tAxis,0.0);
+                std::vector<double> r;
                 plaquette(lattice,plaquettes);
                 std::string pathL = "/Configuration/"+ std::to_string(observableCollected)+ "/plaquette";
                 saveArrayH5(plaquettes,pathL);
             }
             if(observable == 1){
-                wilsonLoop( lattice, loops, r, startingPoint,endPoint );
-                std::string pathR = "/Configuration/"+ std::to_string(observableCollected)+ "/r";
-                std::string pathL = "/Configuration/"+ std::to_string(observableCollected)+ "/loops";
+                double t = endPoint[3]-startingPoint[3];
+                for(size_t T =0; T<t; T++){
+                std::vector<std::complex<double>> loops;
+                std::vector<double> r;
+                wilsonLoop( lattice, loops, r, startingPoint,endPoint, T );
+                std::string pathR = "/Configuration/"+ std::to_string(observableCollected)+"/T"+std::to_string(T)+ "/r";
+                std::string pathL = "/Configuration/"+ std::to_string(observableCollected)+"/T"+std::to_string(T)+ "/loops";
                 saveArrayH5(r,pathR);
                 saveArrayH5complex(loops,pathL);
+                }
             }
             if(observable == 2){
-                polyakovLoop( lattice, loops, r, startingPoint,endPoint );
-                std::string pathR = "/Configuration/"+ std::to_string(observableCollected)+ "/r";
+                std::vector<std::complex<double>> loops;
+                std::vector<double> r;
+                polyakovLoop( lattice, loops, r, startingPoint,endPoint);
+                //std::string pathR = "/Configuration/"+ std::to_string(observableCollected)+ "/r";
                 std::string pathL = "/Configuration/"+ std::to_string(observableCollected)+ "/loops";
-                saveArrayH5(r,pathR);
+                //saveArrayH5(r,pathR);
                 saveArrayH5complex(loops,pathL);
             }
             observableCollected +=1;

@@ -2,10 +2,10 @@ epsilon: 0.2
 h5Name: ColdMultiPlaq.h5
 lattice:
   beta: 5.62
-  t: 4
-  x: 4
-  y: 4
-  z: 4
+  t: 7
+  x: 7
+  y: 2
+  z: 2
 observable: 0
 positions:
   endPoint:
@@ -45,7 +45,7 @@ seeds:
 startConfig: true
 updates:
   Multi: 5
-  NConfig: 400
+  NConfig: 800
   NSweepsThermal: 0
   Sweep: 1
   XUpdate: 2
