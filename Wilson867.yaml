@@ -2,17 +2,17 @@ epsilon: 0.1
 h5Name: Wilson867.h5
 lattice:
   beta: 8.67
-  t: 14
-  x: 14
-  y: 2
-  z: 2
+  t: 12
+  x: 12
+  y: 3
+  z: 3
 observable: 1
 positions:
   endPoint:
-  - 7
+  - 6
   - 0
   - 0
-  - 7
+  - 6
   startPoint:
   - 0
   - 0
@@ -21,7 +21,7 @@ positions:
 seeds:
   dist:
     hotNumbR1: 379
-    hotNumbS1: 65
+    hotNumbS1: 650
     hotNumbT1: 234
     rng1: 972
   indexDist: 256

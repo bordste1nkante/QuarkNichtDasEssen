@@ -2,8 +2,8 @@ epsilon: 0.2
 h5Name: Wilson562.h5
 lattice:
   beta: 5.62
-  t: 3
-  x: 3
+  t: 12
+  x: 12
   y: 3
   z: 3
 observable: 1
@@ -20,11 +20,11 @@ positions:
   - 0
 seeds:
   dist:
-    hotNumbR1: 2
-    hotNumbS1: 49
-    hotNumbT1: 10
+    hotNumbR1: 200
+    hotNumbS1: 401
+    hotNumbT1: 562
     rng1: 420
-  indexDist: 66
+  indexDist: 987
 startConfig: false
 updates:
   Multi: 5

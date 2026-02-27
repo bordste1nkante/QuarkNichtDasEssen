@@ -247,8 +247,14 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
             if(observable ==3){
                 double t = endPoint[3]-startingPoint[3];
                 for(size_t T =1; T<t+1; T++){
-                std::vector<std::complex<double>> loops = {1,0.5,0.2};
+                std::vector<std::complex<double>> loops = {    std::complex<double>(1.0,0.0),
+                    std::complex<double>(0.5,0.0),
+                    std::complex<double>(0.2,0.0)
+                };
                 std::vector<double> r= {1,2,3};
+                //std::vector<std::complex<double>> loops;
+                //std::vector<double> r;
+                //wilsonLoop( lattice, loops, r, startingPoint,endPoint, T );
                 std::string pathR = "/Configuration/"+ std::to_string(observableCollected)+"/T"+std::to_string(T)+ "/r";
                 std::string pathL = "/Configuration/"+ std::to_string(observableCollected)+"/T"+std::to_string(T)+ "/loops";
                 saveArrayH5(r,pathR);

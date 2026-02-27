@@ -697,19 +697,37 @@ void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<
     while (x!=endPoint[0])
     {
 
-        Path1=matrix_multiplication(lattice[idx(x,y,z,0,0)],Path1);
-        Path2=matrix_multiplication(lattice[idx(x,y,z,T,0)],Path2);
+        Path1=matrix_multiplication(Path1, lattice[idx(x,y,z,0,0)]);
+        Path2=matrix_multiplication(Path2,lattice[idx(x,y,z,T,0)]);
         
         Matrix<rSU, cSU> TPath1 = identityMatrix;
         Matrix<rSU, cSU> TPath2 = identityMatrix;
+        //std::cout << "X: " << x<< std::endl;
+        //std::cout << "Y: " << y<< std::endl;
+        //std::cout << "Z: " << z<< std::endl;
+        //std::cout << "T: " << T<< std::endl;
+        normalizeSU3Matrix(Path1);
+        normalizeSU3Matrix(Path2);
 
         for(size_t nt= 0; nt<T;  nt++){
-        TPath1=matrix_multiplication(lattice[idx(startingPoint[0],startingPoint[1],startingPoint[2],nt,3)],TPath1);
-        TPath2=matrix_multiplication(lattice[idx(x,y,z,nt,3)],TPath2);   
-        }     
-        Temp1 = matrix_multiplication(Path2, matrix_hermitean_conjugate(TPath2));
-        Temp2 = matrix_multiplication(matrix_hermitean_conjugate(Path1), TPath1);
-        loops.push_back(matrix_trace(matrix_multiplication(Temp1, Temp2)));
+        TPath1=matrix_multiplication(TPath1, lattice[idx(startingPoint[0],startingPoint[1],startingPoint[2],nt,3)]);
+        TPath2=matrix_multiplication(TPath2, lattice[idx(x+1,y,z,nt,3)]);
+        //std::cout << "nt: " << nt<< std::endl;   
+        normalizeSU3Matrix(TPath1);
+        normalizeSU3Matrix(TPath2);
+            }     
+        Temp1 = matrix_multiplication(Path1, TPath2);
+        Temp1 = matrix_multiplication(Temp1, matrix_hermitean_conjugate(Path2));
+        Temp1 = matrix_multiplication(Temp1, matrix_hermitean_conjugate(TPath1));
+        //Temp2 = matrix_multiplication(matrix_hermitean_conjugate(Path1), TPath1);
+        loops.push_back(1.0/double(rSU)* matrix_trace(Temp1));
+        //std::cout << "Plaq: " << (1.0/double(rSU)* matrix_trace(Temp1)).real()<< std::endl;
+        //Matrix<rSU, cSU> Wplaq = matrix_multiplication( lattice[idx(x,y,z,0,0)],
+        //                 lattice[idx(x+1,y,z,0,3)]);
+        //Wplaq = matrix_multiplication(Wplaq, matrix_hermitean_conjugate(lattice[idx(x,y,z,1,0)]));
+        //Wplaq = matrix_multiplication(Wplaq, matrix_hermitean_conjugate(lattice[idx(x,y,z,0,3)]));
+//
+        //loops.push_back(1.0/double(rSU)* matrix_trace(Wplaq));
         x+=dx;
         xDistance+=1;
         r.push_back(std::sqrt(xDistance*xDistance+yDistance*yDistance+zDistance*zDistance));
