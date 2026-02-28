@@ -720,7 +720,7 @@ void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<
         Temp1 = matrix_multiplication(Temp1, matrix_hermitean_conjugate(Path2));
         Temp1 = matrix_multiplication(Temp1, matrix_hermitean_conjugate(TPath1));
         //Temp2 = matrix_multiplication(matrix_hermitean_conjugate(Path1), TPath1);
-        loops.push_back(1.0/double(rSU)* matrix_trace(Temp1));
+        loops.push_back(matrix_trace(Temp1));
         //std::cout << "Plaq: " << (1.0/double(rSU)* matrix_trace(Temp1)).real()<< std::endl;
         //Matrix<rSU, cSU> Wplaq = matrix_multiplication( lattice[idx(x,y,z,0,0)],
         //                 lattice[idx(x+1,y,z,0,3)]);
@@ -773,7 +773,7 @@ void polyakovLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::comple
     Matrix<rSU,cSU> P = identityMatrix;
 
         for(size_t t=0; t<tAxis; t++){
-        P = matrix_multiplication(lattice[idx(x,y,z,t,3)], P);
+        P = matrix_multiplication(P,lattice[idx(x,y,z,t,3)]);
         }
 
     totalP += matrix_trace(P);

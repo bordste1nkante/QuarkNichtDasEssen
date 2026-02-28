@@ -345,7 +345,7 @@ bool saveArrayH5complex(const std::vector<std::complex<double>>& array, std::str
         std::string fileString = "../h5/"+filenameh5;
         H5::H5File file(fileString,H5F_ACC_RDWR);
 
-
+        ensureGroup(file, dataSetPath);
 
         std::vector<double> arrayCombined(2*array.size());
 
