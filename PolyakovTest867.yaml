@@ -1,18 +1,18 @@
-epsilon: 0.2
-h5Name: Wilson562.h5
+epsilon: 0.1
+h5Name: Polyakov867.h5
 lattice:
-  beta: 5.62
-  t: 8
-  x: 8
+  beta: 8.67
+  t: 4
+  x: 4
   y: 4
   z: 4
-observable: 1
+observable: 2
 positions:
   endPoint:
-  - 4
   - 0
   - 0
-  - 4
+  - 0
+  - 0
   startPoint:
   - 0
   - 0
@@ -20,11 +20,11 @@ positions:
   - 0
 seeds:
   dist:
-    hotNumbR1: 200
-    hotNumbS1: 401
-    hotNumbT1: 562
-    rng1: 420
-  indexDist: 987
+    hotNumbR1: 353
+    hotNumbS1: 595
+    hotNumbT1: 231
+    rng1: 341
+  indexDist: 270
 startConfig: false
 updates:
   Multi: 5

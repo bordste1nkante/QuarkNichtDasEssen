@@ -6,5 +6,5 @@ CXX_DEFINES = -DYAML_CPP_STATIC_DEFINE
 
 CXX_INCLUDES = -I/home/mrv/QuarkNichtDasEssen/header -I/home/mrv/QuarkNichtDasEssen/HDF5::HDF5 -isystem /usr/include/hdf5/serial -isystem /usr/include/eigen3
 
-CXX_FLAGS = -std=c++20
+CXX_FLAGS = -g -std=c++20
 
