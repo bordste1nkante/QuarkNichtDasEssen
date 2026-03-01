@@ -1,7 +1,7 @@
-epsilon: 0.17
-h5Name: Polyakov600.h5
+epsilon: 0.2
+h5Name: Polyakov583.h5
 lattice:
-  beta: 6.00
+  beta: 5.83
   t: 4
   x: 6
   y: 6
@@ -20,11 +20,11 @@ positions:
   - 0
 seeds:
   dist:
-    hotNumbR1: 453
-    hotNumbS1: 395
-    hotNumbT1: 232
-    rng1: 541
-  indexDist: 890
+    hotNumbR1: 761
+    hotNumbS1: 821
+    hotNumbT1: 382
+    rng1: 621
+  indexDist: 431
 startConfig: false
 updates:
   Multi: 5

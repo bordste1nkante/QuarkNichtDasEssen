@@ -810,7 +810,7 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
                 condition = false;
                 break;
             }
-            std::cout << CX << std::endl;
+            //std::cout << CX << std::endl;
             integratedCorrelationTime += CX;
         }
 
