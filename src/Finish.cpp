@@ -130,12 +130,12 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
     std::cout << "Epsilon set" << std::endl;
     double avgPlaq = ThermalTune(lattice,numberOfThermalSweeps, XUpdate,numberOfMultiHit,overrelaxationStep);
     std::cout << "reached equilibrium" << std::endl;
-    SweepFactor = AutoCorrelationTune(lattice, numberOfThermalSweeps, XUpdate, numberOfMultiHit,overrelaxationStep);
+    SweepFactor = AutoCorrelationTune(lattice, numberOfThermalSweeps, XUpdate, numberOfMultiHit,overrelaxationStep, observable);
     std::cout << "autocorrelation analyzed" << std::endl;
     SaveTune_H5(epsilon,avgPlaq, SweepFactor);
 
 
-    for(int p=0; p<NConfigs*SweepFactor/numberOfMultiHit; p++){
+    for(int p=0; p<NConfigs*SweepFactor; p++){
 
         for(int color = 0; color < 2; ++color){
 
@@ -210,7 +210,7 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
             X_updateSU3(p*p+SweepFactor);
                         }
         //data aquisition after enough steps to prevent autocorrelation
-        if(p % (SweepFactor/numberOfMultiHit)==0) {
+        if(p % (SweepFactor)==0) {
             
 
 
@@ -238,7 +238,7 @@ void Simulation(   std::vector<Matrix<rSU,cSU>>& lattice,
             if(observable == 2){
                 std::vector<std::complex<double>> loops;
                 std::vector<double> r;
-                polyakovLoop( lattice, loops, r, startingPoint,endPoint);
+                polyakovLoop( lattice, loops, r);
                 //std::string pathR = "/Configuration/"+ std::to_string(observableCollected)+ "/r";
                 std::string pathL = "/Configuration/"+ std::to_string(observableCollected)+ "/loops";
                 //saveArrayH5(r,pathR);

@@ -673,17 +673,37 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
     const size_t numberOfThermalSweeps, 
     const size_t XUpdate, 
     const size_t numberOfMultiHit,
-    const size_t overrelaxationStep){
+    const size_t overrelaxationStep, const size_t observable){
 
     
     std::vector<Matrix<rSU,rSU>> bufferLattice(linksPerSite*xAxis*yAxis*zAxis*tAxis);
     std::vector<size_t> indices(lattice.size());
     std::iota(indices.begin(), indices.end(),0);
+    double CX0=0;
 
-
+    //for plaquette/Wilson
     std::vector<double> copiedplaquettes(xAxis*yAxis*zAxis+tAxis,0.0);
     plaquette(lattice, copiedplaquettes);
-    double CX0 = correlationFunc(copiedplaquettes, copiedplaquettes);
+
+
+    //for polyakov
+    std::vector<std::complex<double>> loops;
+    std::vector<double> r;
+    polyakovLoopSimple(lattice,loops,r);
+    std::vector<double> P;
+    //get absolute value
+    for(int i=0; i < loops.size(); i++){
+        P.push_back(std::sqrt(std::norm(loops[i])));
+        }
+
+    if(observable == 0 || observable ==1 ||observable ==3){
+
+        CX0 = correlationFunc(copiedplaquettes, copiedplaquettes);
+    }
+    if(observable==2){
+
+        CX0 = correlationFunc(P,P);
+    }
     //std::cout <<"CX0:"<< CX0 << std::endl;
 
     //that acccounts for CX0/CX0 convention to take the halfs of all
@@ -760,16 +780,39 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
         std::swap(lattice, bufferLattice);
 
         }
-        std::vector<double> plaquettes(xAxis*yAxis*zAxis*tAxis,0.0);
-        plaquette(lattice, plaquettes);
-        double CX = correlationFunc(plaquettes, copiedplaquettes);
-        CX/=CX0;
-        //std::cout << CX << std::endl;
-        if(CX<=0){
-            condition = false;
-            break;
+        if(observable == 0 || observable ==1 ||observable ==3){
+            std::vector<double> plaquettes(xAxis*yAxis*zAxis*tAxis,0.0);
+            plaquette(lattice, plaquettes);
+            double CX = correlationFunc(plaquettes, copiedplaquettes);
+            CX/=CX0;
+            //std::cout << CX << std::endl;
+            if(CX<=0){
+                condition = false;
+                break;
+            }
+            integratedCorrelationTime += CX;
+
         }
-        integratedCorrelationTime += CX;
+        if(observable==2){
+            std::vector<std::complex<double>> loopsy;
+            std::vector<double> ry;
+            polyakovLoopSimple(lattice,loopsy,ry);
+            std::vector<double> Poly;
+            for(int i=0; i < loopsy.size(); i++){
+                Poly.push_back(std::sqrt(std::norm(loopsy[i])));
+                
+            }
+
+            double CX = correlationFunc(Poly,P);
+            CX/=CX0;
+            //std::cout << CX << std::endl;
+            if(CX<=0){
+                condition = false;
+                break;
+            }
+            std::cout << CX << std::endl;
+            integratedCorrelationTime += CX;
+        }
 
 
         //Update X matrices
@@ -782,8 +825,8 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
     integratedCorrelationTime *=2;
 
     //why not just ceil on integrated and then time multihit, isn't the current wrong? it ensure size_t
-    size_t temp = static_cast<size_t>(std::ceil(integratedCorrelationTime/double(numberOfMultiHit)));
-    size_t sweepFactor = temp*numberOfMultiHit;
+    size_t temp = static_cast<size_t>(std::ceil(integratedCorrelationTime));
+    size_t sweepFactor = temp;
 
     //size_t sweepFactor = integratedCorrelationTime*numberOfMultiHit;
     return sweepFactor;
