@@ -54,8 +54,10 @@ void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<
 
 //calculate polyakovLoop
 void polyakovLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<double>>& loops,
-                            std::vector<double>& r,   const std::vector<size_t>& startingPoint, 
-    const std::vector<size_t>& endPoint );
+                            std::vector<double>& r );
+void polyakovLoopSimple(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<double>>& loops,
+                            std::vector<double>& r);
+
 
 //calculate average plaquette for all lattice points
 void plaquette(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<double>& plaquette);

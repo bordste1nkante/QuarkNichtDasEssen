@@ -62,7 +62,7 @@ size_t AutoCorrelationTune( std::vector<Matrix<rSU,cSU>>& lattice,
     const size_t numberOfThermalSweeps, 
     const size_t XUpdate, 
     const size_t numberOfMultiHit,
-    const size_t overrelaxationStep);
+    const size_t overrelaxationStep, const size_t observable);
 
 
 //change matrix style to Eigen

@@ -761,8 +761,7 @@ void wilsonLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<
 
 
 void polyakovLoop(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<double>>& loops,
-                            std::vector<double>& r,   const std::vector<size_t>& startingPoint, 
-    const std::vector<size_t>& endPoint ){
+                            std::vector<double>& r ){
 
     std::complex<double> totalP = {0.0,0.0};
 
@@ -787,7 +786,30 @@ loops.push_back(totalP);
 
                             }
 
+void polyakovLoopSimple(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<std::complex<double>>& loops,
+                            std::vector<double>& r ){
 
+    std::complex<double> PT = {0.0,0.0};
+
+    for(size_t x=0; x<xAxis; x++){
+    for(size_t y=0; y<yAxis; y++){
+    for(size_t z=0; z<zAxis; z++){
+
+    Matrix<rSU,cSU> P = identityMatrix;
+
+        for(size_t t=0; t<tAxis; t++){
+        P = matrix_multiplication(P,lattice[idx(x,y,z,t,3)]);
+        PT= matrix_trace(P);
+        loops.push_back(PT);
+        }
+
+
+}
+    }
+}
+
+
+                            }
 
 void plaquette(std::vector<Matrix<rSU,rSU>>& lattice, std::vector<double>& plaquette){
     std::vector<size_t> indices(xAxis*yAxis*zAxis*tAxis);
