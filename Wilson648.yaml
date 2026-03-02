@@ -1,7 +1,7 @@
-epsilon: 0.17
-h5Name: Wilson593.h5
+epsilon: 0.18
+h5Name: Wilson648.h5
 lattice:
-  beta: 5.93
+  beta: 6.48
   t: 8
   x: 8
   y: 4
